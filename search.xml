@@ -273,7 +273,7 @@
       </tags>
   </entry>
   <entry>
-    <title>Python 登录土巴兔装修网，解决 RSA 加密</title>
+    <title>Python 登录土巴兔，解决 RSA 加密</title>
     <url>/archives/6310.html</url>
     <content><![CDATA[<center>使用 python3 模拟登录土巴兔装修网，主要解决 RSA 加密问题</center>
 
