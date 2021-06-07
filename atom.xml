@@ -6,7 +6,7 @@
   <link href="https://hyacinth.fit/atom.xml" rel="self"/>
   
   <link href="https://hyacinth.fit/"/>
-  <updated>2021-06-07T04:56:05.435Z</updated>
+  <updated>2021-06-07T09:02:08.074Z</updated>
   <id>https://hyacinth.fit/</id>
   
   <author>
@@ -15,6 +15,38 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Excel 使用技巧</title>
+    <link href="https://hyacinth.fit/archives/740b22a4.html"/>
+    <id>https://hyacinth.fit/archives/740b22a4.html</id>
+    <published>2021-06-07T07:56:23.000Z</published>
+    <updated>2021-06-07T09:02:08.074Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="源数据表"><a href="#源数据表" class="headerlink" title="源数据表"></a>源数据表</h3><ul><li>一维数据</li><li>一个标题行</li><li>字段分类清晰</li><li>数据属性完整</li><li>数据连续</li><li>无合并单元格</li><li>无合计行</li><li>无分隔行 / 列</li><li>数据区域中无空白单元格</li><li>单元格内容禁用短语或句子</li></ul><span id="more"></span><h3 id="技巧"><a href="#技巧" class="headerlink" title="技巧"></a>技巧</h3><h4 id="移动行列位置"><a href="#移动行列位置" class="headerlink" title="移动行列位置"></a>移动行列位置</h4><ul><li>选中行或列后，按 Shift 拖动到指定行列位置</li></ul><h4 id="快捷键"><a href="#快捷键" class="headerlink" title="快捷键"></a>快捷键</h4><ul><li>Ctrl + Enter  批量修改单元格</li><li>Ctrl + ;  当前日期</li><li>Ctrl + Shift + ;  当前时间 16:10</li><li>Alt + =  自动求和</li><li>Ctrl + A   输入函数名称后，调出函数面板</li><li>Shift + F3  插入函数</li><li>F2  使单元格进入编辑状态</li><li>F4  使单元格引用在相对、绝对、混合引用中循环切换</li><li>F9  是Excel进行一次计算，对象可以是引用数据区域，函数或公式</li><li>Ctrl + `  公式单元格从显示结果切换到显示公式</li></ul><h4 id="批量取消合并单元格"><a href="#批量取消合并单元格" class="headerlink" title="批量取消合并单元格"></a>批量取消合并单元格</h4><ul><li>选中数据点击取消合并单元格</li><li>F5定位空值数据</li><li>输入公式 “=B2”（当前单元格上一格坐标）</li><li>Ctrl + Enter 批量录入 </li></ul><h4 id="“切”和“拼”"><a href="#“切”和“拼”" class="headerlink" title="“切”和“拼”"></a>“切”和“拼”</h4><ul><li>切：数据 &gt; 分列</li><li>拼：=B2&amp;C2</li></ul><h4 id="数据有效性"><a href="#数据有效性" class="headerlink" title="数据有效性"></a>数据有效性</h4><ul><li>=A2=TODAY()</li></ul><blockquote><p>确保当天录入数据，结合保护工作表可防止修改（exc. 修改计算机日期可以达目的）</p></blockquote><ul><li>=LEN(A1)&lt;&gt;0</li></ul><blockquote><p>但A1单元格有数据时才允许录入，确保数据按序录入</p></blockquote><h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><h4 id="VLOOKUP"><a href="#VLOOKUP" class="headerlink" title="VLOOKUP"></a>VLOOKUP</h4><p> VLOOKUP (要查找的项、要查找位置、包含要返回的值的单元格区域中的列号、返回近似或精确匹配 - 指示为 1/TRUE 或 0/FALSE)  </p><ul><li>普通查找</li></ul><blockquote><p>=VLOOKUP(E2,$B$1:$C$15,2,0) </p></blockquote><ul><li>屏蔽错误值查找</li></ul><blockquote><p>=IFERROR(VLOOKUP(E2,$A$1:$C$15,3,0),”查找不到”) </p></blockquote><ul><li>逆向查找</li></ul><blockquote><p>=VLOOKUP(E2,IF({1,0},$B$2:$B$15,$A$2:$A$15),2,0)<br>IF{1,0}，就是把1对应的范围和0对应的范围组合成新的区域。 </p></blockquote><ul><li>按顺序返回多列值内容</li></ul><blockquote><p>=VLOOKUP($E2,$A$1:$C$15,COLUMN(B1),0) </p></blockquote><ul><li>多条件查询</li></ul><blockquote><p>=VLOOKUP(E2&amp;F2,IF({1,0},$A$2:$A$15&amp;$B$2:$B$15,$C$2:$C$15),2,0)<br>此处的IF{1,0}的用法是把A2:A15及B2:B5的区域合并成一个区域使用 </p></blockquote><ul><li>一对多查询</li></ul><blockquote><p>查询一个部门对应所有人员数<br>首先添加辅助列， =B2&amp;COUNTIF($B$2:B2,B2) ，确保用 VLOOKUP 函数查找值是唯一的=IFERROR(VLOOKUP($G$2&amp;ROW(A1),$A$1:$C$27,3,0),””) </p></blockquote><ul><li>VLOOKUP + Match</li></ul><blockquote><p>MATCH(查找的值，查找的区域，0为精确匹配)，实现的结果是返回查找值在查找区域的第几行第几列<br>=VLOOKUP(A20,$A$2:$M$16,MATCH(B20,$A$2:$M$2,0),0) </p></blockquote><ul><li>VLOOKUP + 通配符查找</li></ul><blockquote><p>=VLOOKUP(“<em>“&amp;C2&amp;”</em>“,$A$1:$A$6,1,0) </p></blockquote><h4 id="MATCH"><a href="#MATCH" class="headerlink" title="MATCH"></a>MATCH</h4><p> MATCH（lookup_value,lookuparray,match-type） </p><blockquote><p>match-type： 1或省略，查找小于或等于指定内容最大值，数据必须升序排列；0，查找等于指定内容的第一个值；-1或省略，查找大于或等于指定内容最大值，数据必须降序排列</p></blockquote><h4 id="ROW"><a href="#ROW" class="headerlink" title="ROW"></a>ROW</h4><p>row(reference) </p><blockquote><p>返回 reference 行数， 若无参数，则返回当前行数</p></blockquote><h4 id="MOD"><a href="#MOD" class="headerlink" title="MOD"></a>MOD</h4><p>MOD(number, divisor) </p><blockquote><p>求余数</p></blockquote><h4 id="INDEX"><a href="#INDEX" class="headerlink" title="INDEX"></a>INDEX</h4><p>INDEX(array, row_num, [column_num])</p><blockquote><p>返回由行号和列号索引选中的表或数组中元素的值 </p></blockquote><h4 id="RANK"><a href="#RANK" class="headerlink" title="RANK"></a>RANK</h4><p> RANK(number,ref,[order]) </p><blockquote><p> 返回一列数字的数字排位 </p></blockquote>]]></content>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;源数据表&quot;&gt;&lt;a href=&quot;#源数据表&quot; class=&quot;headerlink&quot; title=&quot;源数据表&quot;&gt;&lt;/a&gt;源数据表&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;一维数据&lt;/li&gt;
+&lt;li&gt;一个标题行&lt;/li&gt;
+&lt;li&gt;字段分类清晰&lt;/li&gt;
+&lt;li&gt;数据属性完整&lt;/li&gt;
+&lt;li&gt;数据连续&lt;/li&gt;
+&lt;li&gt;无合并单元格&lt;/li&gt;
+&lt;li&gt;无合计行&lt;/li&gt;
+&lt;li&gt;无分隔行 / 列&lt;/li&gt;
+&lt;li&gt;数据区域中无空白单元格&lt;/li&gt;
+&lt;li&gt;单元格内容禁用短语或句子&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="Excel" scheme="https://hyacinth.fit/categories/Excel/"/>
+    
+    
+    <category term="Skill" scheme="https://hyacinth.fit/tags/Skill/"/>
+    
+  </entry>
   
   <entry>
     <title>Python 批量重命名文件</title>
