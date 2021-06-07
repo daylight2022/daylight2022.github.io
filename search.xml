@@ -208,6 +208,31 @@
       </tags>
   </entry>
   <entry>
+    <title>Python 批量重命名文件</title>
+    <url>/archives/e6a92538.html</url>
+    <content><![CDATA[<p>使用 python 遍历文件目录，批量重命名文件，已支持功能包括</p>
+<ul>
+<li><p>添加前后缀，支持默认序列（输入 seq ）和自定义</p>
+</li>
+<li><p>选择文件类型</p>
+</li>
+<li><p>选择是否遍历子目录</p>
+</li>
+</ul>
+<p><img data-src="https://i.loli.net/2021/06/07/s6bzIfUTL7S5N4r.png"></p>
+<span id="more"></span>
+
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">oriPath = <span class="string">&#x27;C:\\Users\\MSI-PC\\Desktop\\img&#x27;</span></span><br><span class="line">desPath = <span class="string">&#x27;C:\\Users\\MSI-PC\\Desktop\\des&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_boolean</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">if</span> s == <span class="string">&#x27;y&#x27;</span> <span class="keyword">or</span> s == <span class="string">&#x27;yes&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">elif</span> s == <span class="string">&#x27;n&#x27;</span> <span class="keyword">or</span> s == <span class="string">&#x27;no&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">        <span class="comment"># return get_boolean(input(&#x27;Please enter y(yes) or n(no): &#x27;))</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加文件前缀</span></span><br><span class="line">file_prefix = <span class="built_in">input</span>(<span class="string">&#x27;Please enter the file name prefix: &#x27;</span>)</span><br><span class="line"><span class="comment"># 添加文件后缀</span></span><br><span class="line">file_suffix = <span class="built_in">input</span>(<span class="string">&#x27;Please enter the file name suffix: &#x27;</span>)</span><br><span class="line"><span class="comment"># 指定文件类型</span></span><br><span class="line">file_type = <span class="built_in">list</span>(<span class="built_in">input</span>(<span class="string">&#x27;Please enter the file type(separated by spaces): &#x27;</span>).split())</span><br><span class="line">print(file_type)</span><br><span class="line"><span class="comment"># 是否遍历子目录</span></span><br><span class="line">sub_dir = get_boolean(<span class="built_in">input</span>(<span class="string">&#x27;Whether to traverse subdirectories(y/n): &#x27;</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Modify file names in batches</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">rename_files</span>(<span class="params">path, des_path, prefix=<span class="string">&#x27;&#x27;</span>, suffix=<span class="string">&#x27;&#x27;</span>, file_ext=<span class="literal">None</span>, is_sub=<span class="literal">True</span></span>):</span></span><br><span class="line">    <span class="keyword">if</span> file_ext <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> file_ext == []:  <span class="comment"># 默认全部类型</span></span><br><span class="line">        file_ext = [<span class="string">&#x27;*&#x27;</span>]</span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> root, dirs, names <span class="keyword">in</span> os.walk(path):</span><br><span class="line">        <span class="keyword">for</span> name <span class="keyword">in</span> names:</span><br><span class="line">            file_name = os.path.splitext(name)[<span class="number">0</span>]</span><br><span class="line">            ext = os.path.splitext(name)[<span class="number">1</span>]</span><br><span class="line">            ori_path = os.path.join(root, name)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> file_ext <span class="keyword">and</span> (<span class="string">&#x27;*&#x27;</span> <span class="keyword">in</span> file_ext[<span class="number">0</span>] <span class="keyword">or</span> ext[<span class="number">1</span>:] <span class="keyword">in</span> file_type):</span><br><span class="line">                des_name = (prefix <span class="keyword">if</span> prefix != <span class="string">&#x27;seq&#x27;</span> <span class="keyword">else</span> <span class="built_in">str</span>(count + <span class="number">1</span>) + <span class="string">&#x27;_&#x27;</span>) + file_name + (</span><br><span class="line">                    suffix <span class="keyword">if</span> suffix != <span class="string">&#x27;seq&#x27;</span> <span class="keyword">else</span> <span class="string">&#x27;_&#x27;</span> + <span class="built_in">str</span>(count + <span class="number">1</span>)) + ext  <span class="comment"># 目标命名</span></span><br><span class="line">                move_path = os.path.join(des_path, des_name)</span><br><span class="line">                <span class="keyword">if</span> name != os.path.basename(__file__):  <span class="comment"># 防止重命名本文件</span></span><br><span class="line">                    <span class="keyword">try</span>:</span><br><span class="line">                        os.rename(ori_path, move_path)</span><br><span class="line">                        count += <span class="number">1</span></span><br><span class="line">                        print(name + <span class="string">&#x27; 已重命名为 &#x27;</span> + des_name)</span><br><span class="line">                    <span class="keyword">except</span> FileExistsError <span class="keyword">as</span> e:</span><br><span class="line">                        print(name + <span class="string">&#x27;更名失败! 已有同名文件存在：&#x27;</span> + move_path)</span><br><span class="line">                    <span class="keyword">except</span> FileNotFoundError <span class="keyword">as</span> e:</span><br><span class="line">                        print(<span class="string">&#x27;目标文件夹不存在，请检查后重试&#x27;</span>)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> is_sub:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    print(<span class="string">&#x27;共有 &#x27;</span> + <span class="built_in">str</span>(count) + <span class="string">&#x27; 个文件更名成功&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    rename_files(oriPath, desPath, file_prefix, file_suffix, file_type, sub_dir)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>Skill</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hexo 使用及问题总结</title>
     <url>/archives/58793.html</url>
     <content><![CDATA[<h3 id="快速启动"><a href="#快速启动" class="headerlink" title="快速启动"></a>快速启动</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">npm install hexo-cli -g</span><br><span class="line">hexo init blog</span><br><span class="line">cd blog</span><br><span class="line">npm install</span><br><span class="line">hexo server</span><br></pre></td></tr></table></figure>
@@ -252,7 +277,7 @@
     <url>/archives/62201.html</url>
     <content><![CDATA[<center>使用 python3 抓取百度文库特点文章数据，只对可查看的内容有效。通过分析查找传输内容数据的 js 链接，而后请求即可</center>
 
-<p><img data-src="https://i.loli.net/2021/06/06/92RXF8zck6fTBjl.png"></p>
+<p><img data-src="https://i.loli.net/2021/06/07/igN6U5TuVYI7wrC.png"></p>
 <span id="more"></span>
 
 <h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>经过排查，发现数据所在文件位置</p>
@@ -277,7 +302,7 @@
     <url>/archives/6310.html</url>
     <content><![CDATA[<center>使用 python3 模拟登录土巴兔装修网，主要解决 RSA 加密问题</center>
 
-<p><img data-src="https://i.loli.net/2021/06/06/QZ2AbKcFqD7o4Ha.png"></p>
+<p><img data-src="https://i.loli.net/2021/06/07/b6g9NspVKuXcPd8.png" alt="carbon (1)"></p>
 <span id="more"></span>
 
 <h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>先进行一次登录，在开发者工具里搜索关键词</p>
