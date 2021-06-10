@@ -5,7 +5,8 @@
     <url>/archives/49905.html</url>
     <content><![CDATA[<center>聚合各领域链接，资源、博客、工具、素材等</center>
 
-<p><img data-src="https://i.loli.net/2021/06/06/IPuV6z1y24rSGws.png"></p>
+<img data-src="https://i.loli.net/2021/06/06/IPuV6z1y24rSGws.png" style="zoom:200%;" />
+
 <span id="more"></span>
 
 <h2 id="Android"><a href="#Android" class="headerlink" title="Android"></a>Android</h2><ul>
@@ -407,7 +408,8 @@
     <title>Python 爬取百度文库数据</title>
     <url>/archives/62201.html</url>
     <content><![CDATA[<p>使用 python3 抓取百度文库特点文章数据，只对可查看的内容有效。通过分析查找传输内容数据的 js 链接，而后请求即可</p>
-<p><img data-src="https://i.loli.net/2021/06/07/igN6U5TuVYI7wrC.png"></p>
+<img data-src="https://i.loli.net/2021/06/07/igN6U5TuVYI7wrC.png"  />
+
 <span id="more"></span>
 
 <h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>经过排查，发现数据所在文件位置</p>
