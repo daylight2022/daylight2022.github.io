@@ -209,88 +209,6 @@
       </tags>
   </entry>
   <entry>
-    <title>复杂度分析（下）</title>
-    <url>/archives/a1a87ec3.html</url>
-    <content><![CDATA[]]></content>
-      <categories>
-        <category>数据结构与算法</category>
-      </categories>
-      <tags>
-        <tag>数据结构与算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据结构与算法学习路线</title>
-    <url>/archives/c754dd43.html</url>
-    <content><![CDATA[<h2 id="路线图"><a href="#路线图" class="headerlink" title="路线图"></a>路线图</h2><p><img data-src="https://i.loli.net/2021/07/27/W2Ds79noOQjvH43.png" alt="数据结构与算法学习路线"></p>
-<h2 id="学习书单"><a href="#学习书单" class="headerlink" title="学习书单"></a>学习书单</h2><p><img data-src="https://i.loli.net/2021/07/27/ZIaeVGOrXckR3uY.png" alt="数据结构与算法学习书单"></p>
-<h2 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h2><p><img data-src="https://i.loli.net/2021/07/27/INry6zw7fdFkHPo.png" alt="数据结构与算法知识点"></p>
-]]></content>
-      <categories>
-        <category>数据结构与算法</category>
-      </categories>
-      <tags>
-        <tag>数据结构与算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>复杂度分析（上）：如何分析、统计算法的执行效率和资源消耗？</title>
-    <url>/archives/aaaaf04a.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/ed/5a/edc6039771a3bdfa2ff132000710e85a.jpg" style="zoom: 50%;" />
-
-
-
-<p>我们都知道，数据结构和算法本身解决的是“快”和“省”的问题，即如何让代码运行得更快，如何让代码更省存储空间。所以，执行效率是算法一个非常重要的考量指标。那如何来衡量你编写的算法代码的执行效率呢？这里就要用到我们今天要讲的内容：时间、空间复杂度分析。</p>
-<span id="more"></span>
-
-<h2 id="为什么要进行复杂度分析？"><a href="#为什么要进行复杂度分析？" class="headerlink" title="为什么要进行复杂度分析？"></a>为什么要进行复杂度分析？</h2><p>平时跑代码通过统计、监控来得到算法执行的时间和占用的内存大小的统计方法有很大的局限性（也称为<strong>事后统计法</strong>）</p>
-<p><strong>1. 测试结果非常依赖测试环境</strong></p>
-<p>测试环境中硬件的不同会对测试结果有很大的影响</p>
-<p><strong>2. 测试结果受数据规模的影响很大</strong></p>
-<p>对同一个排序算法，待排序数据的有序度不一样，排序的执行时间就会有很大的差别。极端情况下，如果数据已经是有序的，那排序算法不需要做任何操作，执行时间就会非常短。除此之外，如果测试数据规模太小，测试结果可能无法真实地反映算法的性</p>
-<p>所以，<strong>我们需要一个不用具体的测试数据来测试，就可以粗略地估计算法的执行效率的方法</strong>，也就是本文所要讲述的时间、空间复杂度分析方法。</p>
-<h2 id="大-O-复杂度表示法"><a href="#大-O-复杂度表示法" class="headerlink" title="大 O 复杂度表示法"></a>大 O 复杂度表示法</h2><img data-src="https://i.loli.net/2021/07/27/q6WUtBvMd9ZD4O5.png" style="zoom:50%;" />
-
-<p>T(n) 表示代码执行的时间，n 表示数据规模的大小，f(n) 表示每行代码执行的次数总和。公式中的 O，表示代码的执行时间 T(n) 与 f(n) 表达式成正比。</p>
-<p><strong>大 O 时间复杂度</strong>实际上并不具体表示代码真正的执行时间，而是表示<strong>代码执行时间随数据规模增长的变化趋势</strong>，所以，也叫作<strong>渐进时间复杂度</strong>（asymptotic time complexity），简称<strong>时间复杂度</strong>。</p>
-<h2 id="时间复杂度分析"><a href="#时间复杂度分析" class="headerlink" title="时间复杂度分析"></a>时间复杂度分析</h2><p><strong>1.只关注循环执行次数最多的一段代码</strong></p>
-<p>核心代码执行次数的 n 的量级，就是整段要分析代码的时间复杂度</p>
-<p><strong>2.加法法则：总复杂度等于量级最大的那段代码的复杂度</strong></p>
-<p>如果 T1(n)=O(f(n))，T2(n)=O(g(n))；那么 T(n)=T1(n)+T2(n)=max(O(f(n)), O(g(n))) =O(max(f(n), g(n))).</p>
-<p><strong>3.乘法法则：嵌套代码的复杂度等于嵌套内外代码复杂度的乘积</strong></p>
-<p>T(n) = T1(n) * T2(n) = O(n*n) = O(n2)</p>
-<h2 id="几种常见时间复杂度实例分析"><a href="#几种常见时间复杂度实例分析" class="headerlink" title="几种常见时间复杂度实例分析"></a>几种常见时间复杂度实例分析</h2><img data-src="https://i.loli.net/2021/07/27/jRgEOxP7C6Lst5k.png" style="zoom: 50%;" />
-
-<p>对于罗列的复杂度量级，我们可以粗略地分为两类，多项式量级和非多项式量级。其中，非多项式量级只有两个：O(2n) 和 O(n!)。</p>
-<p>我们把时间复杂度为非多项式量级的算法问题叫作 NP（Non-Deterministic Polynomial，非确定多项式）问题。</p>
-<p>当数据规模 n 越来越大时，非多项式量级算法的执行时间会急剧增加，求解问题的执行时间会无限增长。所以，非多项式时间复杂度的算法其实是非常低效的算法。因此，关于 NP 时间复杂度在此不展开讲。我们主要来看几种常见的<strong>多项式时间复杂度</strong>。</p>
-<p><strong>1. O(1)</strong></p>
-<p>O(1) 只是常量级时间复杂度的一种表示方法，并不是指只执行了一行代码</p>
-<p><strong>2. O(logn)、O(nlogn)</strong></p>
-<p>通过一个例子说明</p>
-<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span> (i &lt;= n) &#123; </span><br><span class="line">	i = i * <span class="number">2</span>; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>根据我们前面讲的复杂度分析方法，第三行代码是循环执行次数最多的。所以，我们只要能计算出这行代码被执行了多少次，就能知道整段代码的时间复杂度。</p>
-<p>从代码中可以看出，变量 i 的值从 1 开始取，每循环一次就乘以 2。当大于 n 时，循环结束。还记得我们高中学过的等比数列吗？实际上，变量 i 的取值就是一个等比数列。如果我把它一个一个列出来，就应该是这个样子的：</p>
-<img data-src="https://i.loli.net/2021/07/27/qab9dmInWu67GDQ.jpg" style="zoom:50%;" />
-
-<p>$x=log_2n$，所以，这段代码的时间复杂度就是 $O(log_2n)$。</p>
-<p>而对数之间是可以互相转换的，$log_3n$就等于$ log_32 * log_2n$，所以 $O(log_3n) = O(C * log2n)$，其中$ C=log_32$ 是一个常量。基于我们前面的一个理论：在采用大 O 标记复杂度的时候，可以忽略系数，即 $O(Cf(n)) = O(f(n))$。所以，$O(log_2n)$ 就等于 $O(log_3n)$。因此，在对数阶时间复杂度的表示方法里，我们忽略对数的“底”，统一表示为$ O(logn)$。</p>
-<p><strong>3. (m+n)、O(m*n)</strong></p>
-<p>代码的复杂度由两个数据的规模来决定</p>
-<p>加法规则改为：T1(m) + T2(n) = O(f(m) + g(n))</p>
-<h2 id="空间复杂度分析"><a href="#空间复杂度分析" class="headerlink" title="空间复杂度分析"></a>空间复杂度分析</h2><p><strong>渐进空间复杂度</strong>（asymptotic space complexity），<strong>表示算法的存储空间与数据规模之间的增长关系</strong></p>
-<p>和时间复杂度分析一样。常见的空间复杂度就是 O(1)、O(n)、O(n2 )，像 O(logn)、O(nlogn) 这样的对数阶复杂度平时用不到。</p>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>复杂度也叫渐进复杂度，包括时间复杂度和空间复杂度，用来分析算法执行效率与数据规模之间的增长关系，可以粗略地表示，越高阶复杂度的算法，执行效率越低</p>
-<img data-src="https://i.loli.net/2021/07/27/tiReMnHlyrqVUDY.png" style="zoom: 50%;" />]]></content>
-      <categories>
-        <category>数据结构与算法</category>
-      </categories>
-      <tags>
-        <tag>数据结构与算法</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Excel 使用技巧</title>
     <url>/archives/740b22a4.html</url>
     <content><![CDATA[<h3 id="源数据表"><a href="#源数据表" class="headerlink" title="源数据表"></a>源数据表</h3><ul>
@@ -422,30 +340,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Python 批量重命名文件</title>
-    <url>/archives/e6a92538.html</url>
-    <content><![CDATA[<p>使用 python 遍历文件目录，批量重命名文件，已支持功能包括</p>
-<ul>
-<li>添加前后缀，支持默认序列（输入 seq ）和自定义</li>
-<li>选择文件类型</li>
-<li>选择是否遍历子目录</li>
-<li>选择是否保留原文件名（python读取文件名顺序与文件管理器不同）</li>
-<li>如果已存在序列，可使用正则替换序列格式</li>
-</ul>
-<p><img data-src="https://i.loli.net/2021/06/07/s6bzIfUTL7S5N4r.png"></p>
-<span id="more"></span>
-
-<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">prompt_info</span>():</span></span><br><span class="line">    print(<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">        Prefix/Suffix: When &quot;seq&quot; is input, the auto-increasing sequence is output;</span></span><br><span class="line"><span class="string">        Use spaces to distinguish the file type you entered;</span></span><br><span class="line"><span class="string">        Replace existing sequence by regular</span></span><br><span class="line"><span class="string">        &#x27;&#x27;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_boolean</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">if</span> s == <span class="string">&#x27;y&#x27;</span> <span class="keyword">or</span> s == <span class="string">&#x27;yes&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">elif</span> s == <span class="string">&#x27;n&#x27;</span> <span class="keyword">or</span> s == <span class="string">&#x27;no&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="comment"># return get_boolean(input(&#x27;Please enter y(yes) or n(no): &#x27;))</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">is_re</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RenameFiles</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;docstring for RenameFiles&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="built_in">super</span>(RenameFiles, self).__init__()</span><br><span class="line"></span><br><span class="line">        prompt_info()</span><br><span class="line"></span><br><span class="line">        self.desPath = <span class="string">&#x27;C:\\Users\\MSI-PC\\Desktop\\desktop-pet\\images\\meizi&#x27;</span></span><br><span class="line">        self.oriPath = <span class="string">&#x27;C:\\Users\\MSI-PC\\Desktop\\desktop-pet\\images\\meizi&#x27;</span></span><br><span class="line">        <span class="comment"># 文件前缀</span></span><br><span class="line">        self.prefix = <span class="built_in">input</span>(<span class="string">&#x27;Please enter the file name prefix: &#x27;</span>)</span><br><span class="line">        <span class="comment"># 文件后缀</span></span><br><span class="line">        self.suffix = <span class="built_in">input</span>(<span class="string">&#x27;Please enter the file name suffix: &#x27;</span>)</span><br><span class="line">        <span class="comment"># 是否保留原文件名</span></span><br><span class="line">        self.is_keep = get_boolean(<span class="built_in">input</span>(<span class="string">&#x27;whether to keep the original file name(y/n: &#x27;</span>))</span><br><span class="line">        <span class="comment"># 使用正则替换已存在序列</span></span><br><span class="line">        self.pattern = <span class="built_in">str</span>(<span class="built_in">input</span>(<span class="string">&#x27;Please enter the re pattern: &#x27;</span>))</span><br><span class="line">        <span class="comment"># 文件类型</span></span><br><span class="line">        self.file_type = <span class="built_in">list</span>(<span class="built_in">input</span>(<span class="string">&#x27;Please enter the file type(separated by spaces): &#x27;</span>).split())</span><br><span class="line">        <span class="keyword">if</span> self.file_type <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> self.file_type == []:  <span class="comment"># 默认全部类型</span></span><br><span class="line">            self.file_type = [<span class="string">&#x27;*&#x27;</span>]</span><br><span class="line">        print(<span class="string">&#x27;pattern: &#x27;</span>, self.pattern, <span class="string">&#x27;file_type: &#x27;</span>, self.file_type)</span><br><span class="line">        <span class="comment"># 是否遍历子目录</span></span><br><span class="line">        self.sub_dir = get_boolean(<span class="built_in">input</span>(<span class="string">&#x27;Whether to traverse subdirectories(y/n): &#x27;</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Modify file names in batches</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">rename</span>(<span class="params">self</span>):</span></span><br><span class="line">        count = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> root, dirs, names <span class="keyword">in</span> os.walk(self.oriPath):</span><br><span class="line">            <span class="keyword">for</span> name <span class="keyword">in</span> names:</span><br><span class="line">                file_name = os.path.splitext(name)[<span class="number">0</span>]</span><br><span class="line">                ext = os.path.splitext(name)[<span class="number">1</span>]</span><br><span class="line">                ori_path = os.path.join(root, name)</span><br><span class="line">                <span class="keyword">if</span> self.file_type <span class="keyword">and</span> (<span class="string">&#x27;*&#x27;</span> <span class="keyword">in</span> self.file_type <span class="keyword">or</span> ext[<span class="number">1</span>:] <span class="keyword">in</span> self.file_type):</span><br><span class="line">                    <span class="comment"># 目标命名</span></span><br><span class="line">                    des_name = (self.prefix <span class="keyword">if</span> self.prefix != <span class="string">&#x27;seq&#x27;</span> <span class="keyword">else</span> <span class="built_in">str</span>(count + <span class="number">1</span>) + <span class="string">&#x27;_&#x27;</span>) + (</span><br><span class="line">                        re.sub(self.pattern, <span class="keyword">lambda</span> x: re.findall(<span class="string">r&#x27;\d+&#x27;</span>, x.group(<span class="number">0</span>))[<span class="number">0</span>],</span><br><span class="line">                               file_name) <span class="keyword">if</span> self.is_keep <span class="keyword">else</span> <span class="string">&#x27;&#x27;</span>) + (</span><br><span class="line">                                   self.suffix <span class="keyword">if</span> self.suffix != <span class="string">&#x27;seq&#x27;</span> <span class="keyword">else</span> <span class="string">&#x27;_&#x27;</span> + <span class="built_in">str</span>(count + <span class="number">1</span>)) + ext</span><br><span class="line"></span><br><span class="line">                    move_path = os.path.join(self.desPath, des_name)</span><br><span class="line">                    <span class="keyword">if</span> name != os.path.basename(__file__):  <span class="comment"># 防止重命名本文件</span></span><br><span class="line">                        <span class="keyword">try</span>:</span><br><span class="line">                            os.rename(ori_path, move_path)</span><br><span class="line">                            count += <span class="number">1</span></span><br><span class="line">                            print(name + <span class="string">&#x27; 已重命名为 &#x27;</span> + des_name)</span><br><span class="line">                        <span class="keyword">except</span> FileExistsError:</span><br><span class="line">                            print(name + <span class="string">&#x27;更名失败! 已有同名文件存在：&#x27;</span> + move_path)</span><br><span class="line">                        <span class="keyword">except</span> FileNotFoundError:</span><br><span class="line">                            print(<span class="string">&#x27;目标文件夹不存在，请检查后重试&#x27;</span>)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> self.sub_dir:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        print(<span class="string">&#x27;共有 &#x27;</span> + <span class="built_in">str</span>(count) + <span class="string">&#x27; 个文件更名成功&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main = RenameFiles()</span><br><span class="line">    main.rename()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>Python</category>
-      </categories>
-      <tags>
-        <tag>Skill</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Hexo 使用及问题总结</title>
     <url>/archives/58793.html</url>
     <content><![CDATA[<h3 id="快速启动"><a href="#快速启动" class="headerlink" title="快速启动"></a>快速启动</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line">npm install hexo-cli -g</span><br><span class="line">hexo init blog</span><br><span class="line">cd blog</span><br><span class="line">npm install</span><br><span class="line">hexo server</span><br></pre></td></tr></table></figure>
@@ -489,28 +383,136 @@
       </tags>
   </entry>
   <entry>
-    <title>Python 爬取百度文库数据</title>
-    <url>/archives/62201.html</url>
-    <content><![CDATA[<p>使用 python3 抓取百度文库特点文章数据，只对可查看的内容有效。通过分析查找传输内容数据的 js 链接，而后请求即可</p>
-<img data-src="https://i.loli.net/2021/06/07/igN6U5TuVYI7wrC.png"  />
+    <title>复杂度分析（上）：如何分析、统计算法的执行效率和资源消耗？</title>
+    <url>/archives/aaaaf04a.html</url>
+    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/ed/5a/edc6039771a3bdfa2ff132000710e85a.jpg" style="zoom: 50%;" />
 
+
+
+<p>我们都知道，数据结构和算法本身解决的是“快”和“省”的问题，即如何让代码运行得更快，如何让代码更省存储空间。所以，执行效率是算法一个非常重要的考量指标。那如何来衡量你编写的算法代码的执行效率呢？这里就要用到我们今天要讲的内容：时间、空间复杂度分析。</p>
 <span id="more"></span>
 
-<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>经过排查，发现数据所在文件位置</p>
-<p><img data-src="https://i.loli.net/2021/06/05/BRLcKDuITevVJSf.png"></p>
-<p>查看其 url 请求，发现有个 <code>authorization</code></p>
-<p><img data-src="https://i.loli.net/2021/06/05/geCMP8j7KS3wxzH.png"></p>
-<p>开启 Ctrl F 大法，找到了 url 请求的出处，用正则把其中的链接给提前出来就可以取到数据了</p>
-<p><img data-src="https://i.loli.net/2021/06/05/FVmD7PR8nYULI6t.png"></p>
-<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WenKu</span>():</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.session = requests.Session()</span><br><span class="line">        self.get_url()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_url</span>(<span class="params">self</span>):</span></span><br><span class="line">        url = <span class="string">&quot;https://wenku.baidu.com/view/b35a73c5ee3a87c24028915f804d2b160b4e86c6&quot;</span></span><br><span class="line">        headers = &#123;</span><br><span class="line">            <span class="string">&#x27;Accept&#x27;</span>: <span class="string">&#x27;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Encoding&#x27;</span>: <span class="string">&#x27;gzip, deflate, br&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Language&#x27;</span>: <span class="string">&#x27;zh-CN,zh;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Cache-Control&#x27;</span>: <span class="string">&#x27;max-age=0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Connection&#x27;</span>: <span class="string">&#x27;keep-alive&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Host&#x27;</span>: <span class="string">&#x27;wenku.baidu.com&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Dest&#x27;</span>: <span class="string">&#x27;document&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Mode&#x27;</span>: <span class="string">&#x27;navigate&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Site&#x27;</span>: <span class="string">&#x27;same-origin&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-User&#x27;</span>: <span class="string">&#x27;?1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Upgrade-Insecure-Requests&#x27;</span>: <span class="string">&#x27;1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;User-Agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        response = self.session.get(url=url,headers=headers)</span><br><span class="line">        html = etree.HTML(response.text)</span><br><span class="line">        script_content = html.xpath(<span class="string">&#x27;//script[2]/text()&#x27;</span>)[<span class="number">0</span>]</span><br><span class="line">        recompile = re.<span class="built_in">compile</span>(<span class="string">&#x27;.*?var pageData = (.*?);.*?window.pageData = pageData;.*?&#x27;</span>,re.S)</span><br><span class="line">        page_data = json.loads(recompile.findall(script_content)[<span class="number">0</span>])</span><br><span class="line">        js = json.loads(page_data[<span class="string">&#x27;readerInfo2019&#x27;</span>][<span class="string">&#x27;htmlUrls&#x27;</span>])[<span class="string">&#x27;json&#x27;</span>]</span><br><span class="line">        <span class="keyword">for</span> page_load_urls <span class="keyword">in</span> js:</span><br><span class="line">            page_load_url = page_load_urls[<span class="string">&#x27;pageLoadUrl&#x27;</span>]</span><br><span class="line">            self.get_data(page_load_url)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_data</span>(<span class="params">self,url</span>):</span></span><br><span class="line">        headers = &#123;</span><br><span class="line">            <span class="string">&#x27;Accept&#x27;</span>: <span class="string">&#x27;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Encoding&#x27;</span>: <span class="string">&#x27;gzip, deflate, br&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Language&#x27;</span>: <span class="string">&#x27;zh-CN,zh;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Cache-Control&#x27;</span>: <span class="string">&#x27;max-age=0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Connection&#x27;</span>: <span class="string">&#x27;keep-alive&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Host&#x27;</span>: <span class="string">&#x27;wkbjcloudbos.bdimg.com&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Dest&#x27;</span>: <span class="string">&#x27;document&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Mode&#x27;</span>: <span class="string">&#x27;navigate&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Site&#x27;</span>: <span class="string">&#x27;none&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-User&#x27;</span>: <span class="string">&#x27;?1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Upgrade-Insecure-Requests&#x27;</span>: <span class="string">&#x27;1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;User-Agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        response = self.session.get(url=url,headers=headers)</span><br><span class="line">        print(response.content.decode(<span class="string">&#x27;unicode_escape&#x27;</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    WenKu()</span><br></pre></td></tr></table></figure>
+<h2 id="为什么要进行复杂度分析？"><a href="#为什么要进行复杂度分析？" class="headerlink" title="为什么要进行复杂度分析？"></a>为什么要进行复杂度分析？</h2><p>平时跑代码通过统计、监控来得到算法执行的时间和占用的内存大小的统计方法有很大的局限性（也称为<strong>事后统计法</strong>）</p>
+<p><strong>1. 测试结果非常依赖测试环境</strong></p>
+<p>测试环境中硬件的不同会对测试结果有很大的影响</p>
+<p><strong>2. 测试结果受数据规模的影响很大</strong></p>
+<p>对同一个排序算法，待排序数据的有序度不一样，排序的执行时间就会有很大的差别。极端情况下，如果数据已经是有序的，那排序算法不需要做任何操作，执行时间就会非常短。除此之外，如果测试数据规模太小，测试结果可能无法真实地反映算法的性</p>
+<p>所以，<strong>我们需要一个不用具体的测试数据来测试，就可以粗略地估计算法的执行效率的方法</strong>，也就是本文所要讲述的时间、空间复杂度分析方法。</p>
+<h2 id="大-O-复杂度表示法"><a href="#大-O-复杂度表示法" class="headerlink" title="大 O 复杂度表示法"></a>大 O 复杂度表示法</h2><img data-src="https://i.loli.net/2021/07/27/q6WUtBvMd9ZD4O5.png" style="zoom:50%;" />
 
-<h3 id="Response"><a href="#Response" class="headerlink" title="Response"></a>Response</h3><p><img data-src="https://i.loli.net/2021/06/05/HzgZkCqL15JyNTj.png"></p>
+<p>T(n) 表示代码执行的时间，n 表示数据规模的大小，f(n) 表示每行代码执行的次数总和。公式中的 O，表示代码的执行时间 T(n) 与 f(n) 表达式成正比。</p>
+<p><strong>大 O 时间复杂度</strong>实际上并不具体表示代码真正的执行时间，而是表示<strong>代码执行时间随数据规模增长的变化趋势</strong>，所以，也叫作<strong>渐进时间复杂度</strong>（asymptotic time complexity），简称<strong>时间复杂度</strong>。</p>
+<h2 id="时间复杂度分析"><a href="#时间复杂度分析" class="headerlink" title="时间复杂度分析"></a>时间复杂度分析</h2><p><strong>1.只关注循环执行次数最多的一段代码</strong></p>
+<p>核心代码执行次数的 n 的量级，就是整段要分析代码的时间复杂度</p>
+<p><strong>2.加法法则：总复杂度等于量级最大的那段代码的复杂度</strong></p>
+<p>如果 T1(n)=O(f(n))，T2(n)=O(g(n))；那么 T(n)=T1(n)+T2(n)=max(O(f(n)), O(g(n))) =O(max(f(n), g(n))).</p>
+<p><strong>3.乘法法则：嵌套代码的复杂度等于嵌套内外代码复杂度的乘积</strong></p>
+<p>T(n) = T1(n) * T2(n) = O(n*n) = O(n2)</p>
+<h2 id="几种常见时间复杂度实例分析"><a href="#几种常见时间复杂度实例分析" class="headerlink" title="几种常见时间复杂度实例分析"></a>几种常见时间复杂度实例分析</h2><img data-src="https://i.loli.net/2021/07/27/jRgEOxP7C6Lst5k.png" style="zoom: 50%;" />
+
+<p>对于罗列的复杂度量级，我们可以粗略地分为两类，多项式量级和非多项式量级。其中，非多项式量级只有两个：O(2n) 和 O(n!)。</p>
+<p>我们把时间复杂度为非多项式量级的算法问题叫作 NP（Non-Deterministic Polynomial，非确定多项式）问题。</p>
+<p>当数据规模 n 越来越大时，非多项式量级算法的执行时间会急剧增加，求解问题的执行时间会无限增长。所以，非多项式时间复杂度的算法其实是非常低效的算法。因此，关于 NP 时间复杂度在此不展开讲。我们主要来看几种常见的<strong>多项式时间复杂度</strong>。</p>
+<p><strong>1. O(1)</strong></p>
+<p>O(1) 只是常量级时间复杂度的一种表示方法，并不是指只执行了一行代码</p>
+<p><strong>2. O(logn)、O(nlogn)</strong></p>
+<p>通过一个例子说明</p>
+<figure class="highlight c++"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">while</span> (i &lt;= n) &#123; </span><br><span class="line">	i = i * <span class="number">2</span>; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据我们前面讲的复杂度分析方法，第三行代码是循环执行次数最多的。所以，我们只要能计算出这行代码被执行了多少次，就能知道整段代码的时间复杂度。</p>
+<p>从代码中可以看出，变量 i 的值从 1 开始取，每循环一次就乘以 2。当大于 n 时，循环结束。还记得我们高中学过的等比数列吗？实际上，变量 i 的取值就是一个等比数列。如果我把它一个一个列出来，就应该是这个样子的：</p>
+<img data-src="https://i.loli.net/2021/07/27/qab9dmInWu67GDQ.jpg" style="zoom:50%;" />
+
+<p>$x=log_2n$，所以，这段代码的时间复杂度就是 $O(log_2n)$。</p>
+<p>而对数之间是可以互相转换的，$log_3n$就等于$ log_32 * log_2n$，所以 $O(log_3n) = O(C * log2n)$，其中$ C=log_32$ 是一个常量。基于我们前面的一个理论：在采用大 O 标记复杂度的时候，可以忽略系数，即 $O(Cf(n)) = O(f(n))$。所以，$O(log_2n)$ 就等于 $O(log_3n)$。因此，在对数阶时间复杂度的表示方法里，我们忽略对数的“底”，统一表示为$ O(logn)$。</p>
+<p><strong>3. (m+n)、O(m*n)</strong></p>
+<p>代码的复杂度由两个数据的规模来决定</p>
+<p>加法规则改为：T1(m) + T2(n) = O(f(m) + g(n))</p>
+<h2 id="空间复杂度分析"><a href="#空间复杂度分析" class="headerlink" title="空间复杂度分析"></a>空间复杂度分析</h2><p><strong>渐进空间复杂度</strong>（asymptotic space complexity），<strong>表示算法的存储空间与数据规模之间的增长关系</strong></p>
+<p>和时间复杂度分析一样。常见的空间复杂度就是 O(1)、O(n)、O(n2 )，像 O(logn)、O(nlogn) 这样的对数阶复杂度平时用不到。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>复杂度也叫渐进复杂度，包括时间复杂度和空间复杂度，用来分析算法执行效率与数据规模之间的增长关系，可以粗略地表示，越高阶复杂度的算法，执行效率越低</p>
+<img data-src="https://i.loli.net/2021/07/27/tiReMnHlyrqVUDY.png" style="zoom: 50%;" />]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>复杂度分析（下）</title>
+    <url>/archives/a1a87ec3.html</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python 批量重命名文件</title>
+    <url>/archives/e6a92538.html</url>
+    <content><![CDATA[<p>使用 python 遍历文件目录，批量重命名文件，已支持功能包括</p>
+<ul>
+<li>添加前后缀，支持默认序列（输入 seq ）和自定义</li>
+<li>选择文件类型</li>
+<li>选择是否遍历子目录</li>
+<li>选择是否保留原文件名（python读取文件名顺序与文件管理器不同）</li>
+<li>如果已存在序列，可使用正则替换序列格式</li>
+</ul>
+<p><img data-src="https://i.loli.net/2021/06/07/s6bzIfUTL7S5N4r.png"></p>
+<span id="more"></span>
+
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">prompt_info</span>():</span></span><br><span class="line">    print(<span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">        Prefix/Suffix: When &quot;seq&quot; is input, the auto-increasing sequence is output;</span></span><br><span class="line"><span class="string">        Use spaces to distinguish the file type you entered;</span></span><br><span class="line"><span class="string">        Replace existing sequence by regular</span></span><br><span class="line"><span class="string">        &#x27;&#x27;&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_boolean</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">if</span> s == <span class="string">&#x27;y&#x27;</span> <span class="keyword">or</span> s == <span class="string">&#x27;yes&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="keyword">elif</span> s == <span class="string">&#x27;n&#x27;</span> <span class="keyword">or</span> s == <span class="string">&#x27;no&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">        <span class="comment"># return get_boolean(input(&#x27;Please enter y(yes) or n(no): &#x27;))</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">is_re</span>(<span class="params">s</span>):</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RenameFiles</span>(<span class="params"><span class="built_in">object</span></span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;docstring for RenameFiles&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="built_in">super</span>(RenameFiles, self).__init__()</span><br><span class="line"></span><br><span class="line">        prompt_info()</span><br><span class="line"></span><br><span class="line">        self.desPath = <span class="string">&#x27;C:\\Users\\MSI-PC\\Desktop\\desktop-pet\\images\\meizi&#x27;</span></span><br><span class="line">        self.oriPath = <span class="string">&#x27;C:\\Users\\MSI-PC\\Desktop\\desktop-pet\\images\\meizi&#x27;</span></span><br><span class="line">        <span class="comment"># 文件前缀</span></span><br><span class="line">        self.prefix = <span class="built_in">input</span>(<span class="string">&#x27;Please enter the file name prefix: &#x27;</span>)</span><br><span class="line">        <span class="comment"># 文件后缀</span></span><br><span class="line">        self.suffix = <span class="built_in">input</span>(<span class="string">&#x27;Please enter the file name suffix: &#x27;</span>)</span><br><span class="line">        <span class="comment"># 是否保留原文件名</span></span><br><span class="line">        self.is_keep = get_boolean(<span class="built_in">input</span>(<span class="string">&#x27;whether to keep the original file name(y/n: &#x27;</span>))</span><br><span class="line">        <span class="comment"># 使用正则替换已存在序列</span></span><br><span class="line">        self.pattern = <span class="built_in">str</span>(<span class="built_in">input</span>(<span class="string">&#x27;Please enter the re pattern: &#x27;</span>))</span><br><span class="line">        <span class="comment"># 文件类型</span></span><br><span class="line">        self.file_type = <span class="built_in">list</span>(<span class="built_in">input</span>(<span class="string">&#x27;Please enter the file type(separated by spaces): &#x27;</span>).split())</span><br><span class="line">        <span class="keyword">if</span> self.file_type <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> self.file_type == []:  <span class="comment"># 默认全部类型</span></span><br><span class="line">            self.file_type = [<span class="string">&#x27;*&#x27;</span>]</span><br><span class="line">        print(<span class="string">&#x27;pattern: &#x27;</span>, self.pattern, <span class="string">&#x27;file_type: &#x27;</span>, self.file_type)</span><br><span class="line">        <span class="comment"># 是否遍历子目录</span></span><br><span class="line">        self.sub_dir = get_boolean(<span class="built_in">input</span>(<span class="string">&#x27;Whether to traverse subdirectories(y/n): &#x27;</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># Modify file names in batches</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">rename</span>(<span class="params">self</span>):</span></span><br><span class="line">        count = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> root, dirs, names <span class="keyword">in</span> os.walk(self.oriPath):</span><br><span class="line">            <span class="keyword">for</span> name <span class="keyword">in</span> names:</span><br><span class="line">                file_name = os.path.splitext(name)[<span class="number">0</span>]</span><br><span class="line">                ext = os.path.splitext(name)[<span class="number">1</span>]</span><br><span class="line">                ori_path = os.path.join(root, name)</span><br><span class="line">                <span class="keyword">if</span> self.file_type <span class="keyword">and</span> (<span class="string">&#x27;*&#x27;</span> <span class="keyword">in</span> self.file_type <span class="keyword">or</span> ext[<span class="number">1</span>:] <span class="keyword">in</span> self.file_type):</span><br><span class="line">                    <span class="comment"># 目标命名</span></span><br><span class="line">                    des_name = (self.prefix <span class="keyword">if</span> self.prefix != <span class="string">&#x27;seq&#x27;</span> <span class="keyword">else</span> <span class="built_in">str</span>(count + <span class="number">1</span>) + <span class="string">&#x27;_&#x27;</span>) + (</span><br><span class="line">                        re.sub(self.pattern, <span class="keyword">lambda</span> x: re.findall(<span class="string">r&#x27;\d+&#x27;</span>, x.group(<span class="number">0</span>))[<span class="number">0</span>],</span><br><span class="line">                               file_name) <span class="keyword">if</span> self.is_keep <span class="keyword">else</span> <span class="string">&#x27;&#x27;</span>) + (</span><br><span class="line">                                   self.suffix <span class="keyword">if</span> self.suffix != <span class="string">&#x27;seq&#x27;</span> <span class="keyword">else</span> <span class="string">&#x27;_&#x27;</span> + <span class="built_in">str</span>(count + <span class="number">1</span>)) + ext</span><br><span class="line"></span><br><span class="line">                    move_path = os.path.join(self.desPath, des_name)</span><br><span class="line">                    <span class="keyword">if</span> name != os.path.basename(__file__):  <span class="comment"># 防止重命名本文件</span></span><br><span class="line">                        <span class="keyword">try</span>:</span><br><span class="line">                            os.rename(ori_path, move_path)</span><br><span class="line">                            count += <span class="number">1</span></span><br><span class="line">                            print(name + <span class="string">&#x27; 已重命名为 &#x27;</span> + des_name)</span><br><span class="line">                        <span class="keyword">except</span> FileExistsError:</span><br><span class="line">                            print(name + <span class="string">&#x27;更名失败! 已有同名文件存在：&#x27;</span> + move_path)</span><br><span class="line">                        <span class="keyword">except</span> FileNotFoundError:</span><br><span class="line">                            print(<span class="string">&#x27;目标文件夹不存在，请检查后重试&#x27;</span>)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> self.sub_dir:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        print(<span class="string">&#x27;共有 &#x27;</span> + <span class="built_in">str</span>(count) + <span class="string">&#x27; 个文件更名成功&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    main = RenameFiles()</span><br><span class="line">    main.rename()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
 ]]></content>
       <categories>
         <category>Python</category>
       </categories>
       <tags>
-        <tag>爬虫</tag>
+        <tag>Skill</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据结构与算法学习路线</title>
+    <url>/archives/c754dd43.html</url>
+    <content><![CDATA[<h2 id="路线图"><a href="#路线图" class="headerlink" title="路线图"></a>路线图</h2><img data-src="https://i.loli.net/2021/07/27/W2Ds79noOQjvH43.png" alt="数据结构与算法学习路线"  />
+
+
+
+<h2 id="学习书单"><a href="#学习书单" class="headerlink" title="学习书单"></a>学习书单</h2><img data-src="https://i.loli.net/2021/07/27/ZIaeVGOrXckR3uY.png" alt="数据结构与算法学习书单"  />
+
+
+
+<h2 id="知识点"><a href="#知识点" class="headerlink" title="知识点"></a>知识点</h2><img data-src="https://i.loli.net/2021/07/27/INry6zw7fdFkHPo.png" alt="数据结构与算法知识点" style="zoom:67%;" />
+
+
+
+<hr>
+<p>没有捷径，没有杀手锏，更没有一招致胜的“葵花宝典”</p>
+<img data-src="https://i.loli.net/2021/07/27/jGrCabD9t4FOlms.jpg" style="zoom:50%;" />
+
+<p>不要浮躁，不要丧失思考能力，不要丧失学习能力</p>
+<img data-src="https://i.loli.net/2021/07/27/3fh5uHRktqopaez.jpg" style="zoom:50%;" />
+
+<p>只有做好打硬仗的心理准备，遇到困难才能心态平和</p>
+<img data-src="https://static001.geekbang.org/resource/image/d3/42/d3c715012b855aaca2b186b5cf862642.jpg" style="zoom:50%;" />
+
+<p>“放弃”的念头像是一个心魔，它会一直围绕着你</p>
+<img data-src="https://static001.geekbang.org/resource/image/61/f4/6118ba4f07e5c1f8f1a7a0a18ba6f7f4.jpg" style="zoom:50%;" />
+
+<p>入门是一个非常漫长和煎熬的过程，谁都逃不过</p>
+<img data-src="https://i.loli.net/2021/07/27/uv6eYGlFdi87PWS.jpg" style="zoom:50%;" />
+
+<p>情商比智商更重要。对于很多学科的学习，智商并不是瓶颈，最终能够决定你能达到的高度的，还是情商，而情商中最重要的，我觉得就是逆商（逆境商数，Adversity Quotient），也就是，当你遇到困难时，你会如何去面对，这将会决定你的人生最终能够走多远。</p>
+<img data-src="https://i.loli.net/2021/07/27/ZFXGd6r1wyD249N.jpg" style="zoom:50%;" />
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
       </tags>
   </entry>
   <entry>
@@ -534,6 +536,31 @@
 
 <h3 id="Response"><a href="#Response" class="headerlink" title="Response"></a>Response</h3><p><img data-src="https://i.loli.net/2021/06/05/GCSr5vm9MTwgjpt.png"></p>
 <h2 id="声明：本文仅供学习交流使用，请勿用于商业用途，违者后果自负。"><a href="#声明：本文仅供学习交流使用，请勿用于商业用途，违者后果自负。" class="headerlink" title="声明：本文仅供学习交流使用，请勿用于商业用途，违者后果自负。"></a>声明：本文仅供学习交流使用，请勿用于商业用途，违者后果自负。</h2>]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>爬虫</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python 爬取百度文库数据</title>
+    <url>/archives/62201.html</url>
+    <content><![CDATA[<p>使用 python3 抓取百度文库特点文章数据，只对可查看的内容有效。通过分析查找传输内容数据的 js 链接，而后请求即可</p>
+<img data-src="https://i.loli.net/2021/06/07/igN6U5TuVYI7wrC.png"  />
+
+<span id="more"></span>
+
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>经过排查，发现数据所在文件位置</p>
+<p><img data-src="https://i.loli.net/2021/06/05/BRLcKDuITevVJSf.png"></p>
+<p>查看其 url 请求，发现有个 <code>authorization</code></p>
+<p><img data-src="https://i.loli.net/2021/06/05/geCMP8j7KS3wxzH.png"></p>
+<p>开启 Ctrl F 大法，找到了 url 请求的出处，用正则把其中的链接给提前出来就可以取到数据了</p>
+<p><img data-src="https://i.loli.net/2021/06/05/FVmD7PR8nYULI6t.png"></p>
+<h3 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WenKu</span>():</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.session = requests.Session()</span><br><span class="line">        self.get_url()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_url</span>(<span class="params">self</span>):</span></span><br><span class="line">        url = <span class="string">&quot;https://wenku.baidu.com/view/b35a73c5ee3a87c24028915f804d2b160b4e86c6&quot;</span></span><br><span class="line">        headers = &#123;</span><br><span class="line">            <span class="string">&#x27;Accept&#x27;</span>: <span class="string">&#x27;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Encoding&#x27;</span>: <span class="string">&#x27;gzip, deflate, br&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Language&#x27;</span>: <span class="string">&#x27;zh-CN,zh;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Cache-Control&#x27;</span>: <span class="string">&#x27;max-age=0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Connection&#x27;</span>: <span class="string">&#x27;keep-alive&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Host&#x27;</span>: <span class="string">&#x27;wenku.baidu.com&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Dest&#x27;</span>: <span class="string">&#x27;document&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Mode&#x27;</span>: <span class="string">&#x27;navigate&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Site&#x27;</span>: <span class="string">&#x27;same-origin&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-User&#x27;</span>: <span class="string">&#x27;?1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Upgrade-Insecure-Requests&#x27;</span>: <span class="string">&#x27;1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;User-Agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        response = self.session.get(url=url,headers=headers)</span><br><span class="line">        html = etree.HTML(response.text)</span><br><span class="line">        script_content = html.xpath(<span class="string">&#x27;//script[2]/text()&#x27;</span>)[<span class="number">0</span>]</span><br><span class="line">        recompile = re.<span class="built_in">compile</span>(<span class="string">&#x27;.*?var pageData = (.*?);.*?window.pageData = pageData;.*?&#x27;</span>,re.S)</span><br><span class="line">        page_data = json.loads(recompile.findall(script_content)[<span class="number">0</span>])</span><br><span class="line">        js = json.loads(page_data[<span class="string">&#x27;readerInfo2019&#x27;</span>][<span class="string">&#x27;htmlUrls&#x27;</span>])[<span class="string">&#x27;json&#x27;</span>]</span><br><span class="line">        <span class="keyword">for</span> page_load_urls <span class="keyword">in</span> js:</span><br><span class="line">            page_load_url = page_load_urls[<span class="string">&#x27;pageLoadUrl&#x27;</span>]</span><br><span class="line">            self.get_data(page_load_url)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_data</span>(<span class="params">self,url</span>):</span></span><br><span class="line">        headers = &#123;</span><br><span class="line">            <span class="string">&#x27;Accept&#x27;</span>: <span class="string">&#x27;text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Encoding&#x27;</span>: <span class="string">&#x27;gzip, deflate, br&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Accept-Language&#x27;</span>: <span class="string">&#x27;zh-CN,zh;q=0.9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Cache-Control&#x27;</span>: <span class="string">&#x27;max-age=0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Connection&#x27;</span>: <span class="string">&#x27;keep-alive&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Host&#x27;</span>: <span class="string">&#x27;wkbjcloudbos.bdimg.com&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Dest&#x27;</span>: <span class="string">&#x27;document&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Mode&#x27;</span>: <span class="string">&#x27;navigate&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-Site&#x27;</span>: <span class="string">&#x27;none&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Sec-Fetch-User&#x27;</span>: <span class="string">&#x27;?1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;Upgrade-Insecure-Requests&#x27;</span>: <span class="string">&#x27;1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;User-Agent&#x27;</span>: <span class="string">&#x27;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        response = self.session.get(url=url,headers=headers)</span><br><span class="line">        print(response.content.decode(<span class="string">&#x27;unicode_escape&#x27;</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    WenKu()</span><br></pre></td></tr></table></figure>
+
+<h3 id="Response"><a href="#Response" class="headerlink" title="Response"></a>Response</h3><p><img data-src="https://i.loli.net/2021/06/05/HzgZkCqL15JyNTj.png"></p>
+]]></content>
       <categories>
         <category>Python</category>
       </categories>
