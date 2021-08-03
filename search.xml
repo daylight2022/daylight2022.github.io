@@ -3,9 +3,9 @@
   <entry>
     <title>Ctrl + D</title>
     <url>/archives/49905.html</url>
-    <content><![CDATA[<center>聚合各领域链接，资源、博客、工具、素材等</center>
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/06/06/IPuV6z1y24rSGws.png"  />
 
-<img data-src="https://i.loli.net/2021/06/06/IPuV6z1y24rSGws.png"  />
+<center>聚合各领域链接，资源、博客、工具、素材等</center>
 
 <span id="more"></span>
 
@@ -209,32 +209,241 @@
       </tags>
   </entry>
   <entry>
-    <title>复杂度分析（下）：浅析最好、最坏、平均、均摊时间复杂度</title>
-    <url>/archives/a1a87ec3.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/9e/ee/9efe0a80fac815101324e1d4de1e49ee.jpg" style="zoom:50%;" />
+    <title>递归</title>
+    <url>/archives/c6654282.html</url>
+    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/e1/f4/e15d9f05aadeb469258016d0901a38f4.jpg" style="zoom:50%;" />
 
-<p>同一段代码，在不同输入的情况下，复杂度量级有可能是不一样的由此区分出四个复杂度方面的分析，<strong>最好情况时间复杂度</strong>（best case time complexity）、<strong>最坏情况时间复杂度</strong>（worst case time complexity）、<strong>平均情况时间复杂度</strong>（average case time complexity）、<strong>均摊时间复杂度</strong>（amortized time complexity）</p>
+<p>现在很多APP都有注册返佣的功能，用户 A 推荐用户 B 来注册，用户 B 又推荐了用户 C 来注册。我们可以说，用户 C 的“最终推荐人”为用户 A，用户 B 的“最终推荐人”也为用户 A，而用户 A 没有“最终推荐人”。</p>
+<p><strong>那给定一个用户ID，如何查找该用户的“最终推荐人”？</strong></p>
 <span id="more"></span>
 
-<p>先看一个例子，在一个无序的数组（array）中，查找变量 x 出现的位置</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; n表示数组array的长度</span><br><span class="line">int find(int[] array, int n, int x) &#123; </span><br><span class="line">	int i &#x3D; 0; </span><br><span class="line">	int pos &#x3D; -1; </span><br><span class="line">	for (; i &lt; n; ++i) &#123; </span><br><span class="line">		if (array[i] &#x3D;&#x3D; x) &#123; </span><br><span class="line">			pos &#x3D; i; break; </span><br><span class="line">		&#125; </span><br><span class="line">	&#125; </span><br><span class="line">	return pos;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="如何理解递归？"><a href="#如何理解递归？" class="headerlink" title="如何理解递归？"></a>如何理解递归？</h3><p>递归是一种应用非常广泛的算法（或者编程技巧）。很多数据结构和算法的编码实现都要用到递归，比如 DFS 深度优先搜索、前中后序二叉树遍历等等。</p>
+<p>举个例子，周末带着女票去看电影，她问你咱们坐在第几排啊？电影院太黑没法数，这会递归法就能上场了，你可以问你前面一排的哥们是第几排，你只要在他的数字上加一就能知道了。但是，前面的人也不清楚，所以他也问前面的人，依次前推，知道第一排的人说了答案，然后再一排排传回数字，最终你就能告诉女票位置了。</p>
+<p>这就是一个非常标准的递归求解问题的分解过程，去的过程叫“递”，回来的过程叫“归”。基本上，所有的递归问题都可以用递推公式来表示。刚刚这个生活中的例子，我们用递推公式将它表示出来就是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">f(n)&#x3D;f(n-1)+1 其中，f(1)&#x3D;1</span><br></pre></td></tr></table></figure>
+
+<p>f(n) 表示你想知道自己在哪一排，f(n-1) 表示前面一排所在的排数，f(1)=1 表示第一排的人知道自己在第一排。有了这个递推公式，我们就可以很轻松地将它改为递归代码，如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int f(int n) &#123;</span><br><span class="line">  if (n &#x3D;&#x3D; 1) return 1;</span><br><span class="line">  return f(n-1) + 1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="递归需要满足的三个条件？"><a href="#递归需要满足的三个条件？" class="headerlink" title="递归需要满足的三个条件？"></a>递归需要满足的三个条件？</h3><p>只要问题满足以下三个条件，就可以用递归来解决。</p>
+<ol>
+<li>一个问题的解可以分解为几个子问题的解</li>
+<li>这个问题与分解之后的子问题，除了数据规模不同，求解思路完全一样</li>
+<li>存在递归终止条件</li>
+</ol>
+<h3 id="如何编写递归代码？"><a href="#如何编写递归代码？" class="headerlink" title="如何编写递归代码？"></a>如何编写递归代码？</h3><p>最关键的就是<strong>写出递推公式，找到终止条件</strong>。</p>
+<p>举个例子。假设有n个台阶，每次你可以跨越1个台阶或2个台阶，请问走着n个台阶有多少种走法？如果有7个台阶，可以选择2,2,2,1走上去，也可以选择1,2,1,1,2走上去。</p>
+<p>仔细思考，走法可以分为两类，第一步走1个台阶，以及第一步走2个台阶。n个台阶的走法就等于先走1阶后，n-1的走法，加上先走2阶后，n-2个台阶的走法，公式表示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">f(n) &#x3D; f(n-1)+f(n-2)</span><br></pre></td></tr></table></figure>
+
+<p>有了递推公式，再来考虑终止条件。当只有一个台阶时，不需要递归，只有一种走法。所以$f(1)=1$​​。这个条件够了吗？我们可以用$n=2，n=3$靠近临界点的数试验。</p>
+<p>$n=2$​时，$f(2)=f(1)+f(0)$。如果终止条件只有$f(1)=1$​，那f(2)​就无法求解了，还需要满足$f(0)=1$，表示走0个台阶有一种走法，但这不符合逻辑。所以，还要把$f(2)=2$​也作为一种终止条件，表示走2个台阶有两种走法，一次走完或两次一步。</p>
+<p>最后得到，递归终止条件就是$f(1)=1，f(2)=2$，当然，可以也应该再拿n=3，n=4来验证是否正确。得到：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">f(<span class="number">1</span>) = <span class="number">1</span>;</span><br><span class="line">f(<span class="number">2</span>) = <span class="number">2</span>;</span><br><span class="line">f(n) = f(n-<span class="number">1</span>)+f(n-<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+<p>转成递归代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">return</span> f(n-<span class="number">1</span>) + f(n-<span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结一下，写递归代码的关键就是<strong>找到如何将大问题分解为小问题的规律，并且基于此写出递推公式，然后再推敲终止条件，最后将递推公式和终止条件翻译成代码</strong>。</p>
+<p>前面电影院的例子比较简单，递归只调用一个分支，但实际问题往往更为复杂，需要分解为多个子问题。</p>
+<p>人脑是有限的，更倾向于平铺直叙的思维方式，不要试图想清楚递和归的过程，这就进入了一个思维误区，重复的事让计算机来完成。</p>
+<p>如果一个问题 A 可以分解为若干子问题 B、C、D，你可以假设子问题 B、C、D 已经解决，在此基础上思考如何解决问题 A。而且，你只需要思考问题 A 与子问题 B、C、D 两层之间的关系即可，不需要一层一层往下思考子问题与子子问题，子子问题与子子子问题之间的关系。屏蔽掉递归细节，这样子理解起来就简单多了。</p>
+<p>因此，<strong>编写递归代码的关键是，只要遇到递归，我们就把它抽象成一个递推公式，不用想一层层的调用关系，不要试图用人脑去分解递归的每个步骤</strong>。</p>
+<h3 id="递归代码要警惕堆栈溢出"><a href="#递归代码要警惕堆栈溢出" class="headerlink" title="递归代码要警惕堆栈溢出"></a>递归代码要警惕堆栈溢出</h3><p>函数调用会使用栈来保存临时变量。每调用一个函数，都会将临时变量封装为栈帧压入内存栈，等函数执行完成返回时，才出栈。系统栈或者虚拟机栈空间一般都不大。如果递归求解的数据规模很大，调用层次很深，一直压入栈，就会有堆栈溢出的风险。</p>
+<p><strong>那么，如何避免出现堆栈溢出呢？</strong></p>
+<p>可以通过在代码中限制调用递归的最大深度的方法来解决，递归调用超过一定深度（比如 1000）之后，我们就不继续往下再递归了，直接返回报错。还是电影院那个例子，我们可以改造成下面这样子，就可以避免堆栈溢出了。下面代码是伪代码，为了代码简洁，有些边界条件没有考虑，比如 x&lt;=0。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 全局变量，表示递归的深度。</span></span><br><span class="line"><span class="keyword">int</span> depth = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  ++depth；</span><br><span class="line">  <span class="keyword">if</span> (depth &gt; <span class="number">1000</span>) <span class="keyword">throw</span> exception;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">return</span> f(n-<span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但这种做法并不能完全解决问题，因为最大允许的递归深度跟当前线程剩余的栈空间大小有关，事先无法计算。如果实时计算，代码过于复杂，就会影响代码的可读性。所以，如果最大深度比较小，比如 10、50，就可以用这种方法，否则这种方法并不是很实用。</p>
+<h3 id="递归代码要警惕重复计算"><a href="#递归代码要警惕重复计算" class="headerlink" title="递归代码要警惕重复计算"></a>递归代码要警惕重复计算</h3><p>除此之外，使用递归时还会出现重复计算的问题。刚才第二个递归代码的例子，如果我们把整个递归过程分解一下的话，那就是这样的:</p>
+<img data-src="https://static001.geekbang.org/resource/image/e7/bf/e7e778994e90265344f6ac9da39e01bf.jpg" style="zoom:50%;" />
+
+<p>从图中，我们可以直观地看到，想要计算 f(5)，需要先计算 f(4) 和 f(3)，而计算 f(4) 还需要计算 f(3)，因此，f(3) 就被计算了很多次，这就是重复计算问题。为了避免重复计算，我们可以通过一个数据结构（比如散列表）来保存已经求解过的 f(k)。当递归调用到 f(k) 时，先看下是否已经求解过了。如果是，则直接从散列表中取值返回，不需要重复计算，这样就能避免刚讲的问题了。</p>
+<p>改造代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// hasSolvedList可以理解成一个Map，key是n，value是f(n)</span></span><br><span class="line">  <span class="keyword">if</span> (hasSolvedList.containsKey(n)) &#123;</span><br><span class="line">    <span class="keyword">return</span> hasSolvedList.get(n);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> ret = f(n-<span class="number">1</span>) + f(n-<span class="number">2</span>);</span><br><span class="line">  hasSolvedList.put(n, ret);</span><br><span class="line">  <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了这两个常见问题，递归还有很多其他问题。在时间效率上，递归代码里多了很多函数调用，当这些函数调用的数量较大时，就会积聚成一个可观的时间成本。在空间复杂度上，因为递归调用一次就会在内存栈中保存一次现场数据，所以在分析递归代码空间复杂度时，需要额外考虑这部分的开销，比如我们前面讲到的电影院递归代码，空间复杂度并不是 O(1)，而是 O(n)。</p>
+<h3 id="怎么将递归代码改写为非递归代码？"><a href="#怎么将递归代码改写为非递归代码？" class="headerlink" title="怎么将递归代码改写为非递归代码？"></a>怎么将递归代码改写为非递归代码？</h3><p>递归有利有弊，利是递归代码的表达力很强，写起来非常简洁；而弊就是空间复杂度高、有堆栈溢出的风险、存在重复计算、过多的函数调用会耗时较多等问题。所以，在开发过程中，我们要根据实际情况来选择是否需要用递归的方式来实现。</p>
+<p>电影院的例子，抛开场景，只看f(n)=f(n-1)+1这个递推公式，可以改写成：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> ret = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">2</span>; i &lt;= n; ++i) &#123;</span><br><span class="line">    ret = ret + <span class="number">1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二个例子也可以改写：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> ret = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> pre = <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">int</span> prepre = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">3</span>; i &lt;= n; ++i) &#123;</span><br><span class="line">    ret = pre + prepre;</span><br><span class="line">    prepre = pre;</span><br><span class="line">    pre = ret;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>基本上，所有的递归代码都可以改为这种迭代循环的非递归写法，因为递归本身就是借助栈来实现的，如果我们自己在内存堆上实现栈，手动模拟入栈、出栈过程，这样任何递归代码都可以改写成看上去不是递归代码的样子。</p>
+<p>但是这种思路实际上是将递归改为了“手动”递归，本质并没有变，而且也并没有解决前面讲到的某些问题，徒增了实现的复杂度。</p>
+<h3 id="调试递归"><a href="#调试递归" class="headerlink" title="调试递归"></a>调试递归</h3><ol>
+<li>打印日志发现，递归值。</li>
+<li>结合条件断点进行调试。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>队列</title>
+    <url>/archives/b6c47025.html</url>
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/03/jAIGtd1VcyDXRLP.jpg" style="zoom:50%;" />
+
+<p>当我们向固定大小的线程池中请求一个线程时，如果线程池中没有空闲资源了，这个时候线程池如何处理这个请求？是拒绝请求还是排队请求？各种处理策略又是怎么实现的呢？</p>
+<span id="more"></span>
+
+<h3 id="如何理解队列？"><a href="#如何理解队列？" class="headerlink" title="如何理解队列？"></a>如何理解队列？</h3><p><strong>先进先出者，就是典型的“队列”</strong></p>
+<p>队列和栈十分相似，基本操作也是两个：**入队 enqueue()<strong>，放一个数据到队列尾部；</strong>出队 dequeue()**，从队列头部取一个元素</p>
+<img data-src="https://static001.geekbang.org/resource/image/9e/3e/9eca53f9b557b1213c5d94b94e9dce3e.jpg" style="zoom:50%;" />
+
+<p>所以，队列跟栈一样，也是一种<strong>操作受限的线性表数据结构</strong>。</p>
+<p>队列的概念很好理解，基本操作也很容易掌握。作为一种非常基础的数据结构，队列的应用也非常广泛，特别是一些具有某些额外特性的队列，比如循环队列、阻塞队列、并发队列。它们在很多偏底层系统、框架、中间件的开发中，起着关键性的作用。比如高性能队列 Disruptor、Linux 环形缓存，都用到了循环并发队列；Java concurrent 并发包利用 ArrayBlockingQueue 来实现公平锁等。</p>
+<h3 id="顺序队列和链式队列"><a href="#顺序队列和链式队列" class="headerlink" title="顺序队列和链式队列"></a>顺序队列和链式队列</h3><p>用数组实现的队列叫作<strong>顺序队列</strong>，用链表实现的队列叫作<strong>链式队列</strong>。</p>
+<p>对于栈来说，我们只需要一个栈顶指针就可以了。但是队列需要两个指针：一个是 head 指针，指向队头；一个是 tail 指针，指向队尾。</p>
+<p>你可以结合下面这张图来理解。当 a、b、c、d 依次入队之后，队列中的 head 指针指向下标为 0 的位置，tail 指针指向下标为 4 的位置。</p>
+<img data-src="https://static001.geekbang.org/resource/image/5c/cb/5c0ec42eb797e8a7d48c9dbe89dc93cb.jpg" style="zoom:50%;" />
+
+<p>当我们调用两次出队操作之后，队列中 head 指针指向下标为 2 的位置，tail 指针仍然指向下标为 4 的位置。</p>
+<img data-src="https://static001.geekbang.org/resource/image/de/0d/dea27f2c505dd8d0b6b86e262d03430d.jpg" style="zoom:50%;" />
+
+<p>当队列的 tail 指针移动到数组的最右边后，如果有新的数据入队，我们可以将 head 到 tail 之间的数据，整体搬移到数组中 0 到 tail-head 的位置。</p>
+<img data-src="https://i.loli.net/2021/08/03/wB1kazey4TXJsli.jpg" style="zoom:50%;" />
+
+<h3 id="循环队列"><a href="#循环队列" class="headerlink" title="循环队列"></a>循环队列</h3><p>上面用数组实现队列时，当 tail == n，会有数据搬移操作，循环队列就能解决这个问题</p>
+<img data-src="https://i.loli.net/2021/08/03/ulLfAPcW8H29kDx.jpg" style="zoom:50%;" />
+
+<p>要想写出没有 bug 的循环队列的实现代码，最关键的是，<strong>确定好队空和队满的判定条件</strong>。</p>
+<p>队列为空的判断条件仍然是 head == tail。但队列满的判断条件就稍微有点复杂了。</p>
+<img data-src="https://static001.geekbang.org/resource/image/3d/ec/3d81a44f8c42b3ceee55605f9aeedcec.jpg" style="zoom:50%;" />
+
+<p>就像图中画的队满的情况，tail=3，head=4，n=8，所以总结一下规律就是：(3+1)%8=4。多画几张队满的图，你就会发现，当队满时，(tail+1)%n=head。</p>
+<h3 id="阻塞队列和并发队列"><a href="#阻塞队列和并发队列" class="headerlink" title="阻塞队列和并发队列"></a>阻塞队列和并发队列</h3><p><strong>阻塞队列</strong>其实就是在队列基础上增加了阻塞操作。简单来说，就是在队列为空的时候，从队头取数据会被阻塞。因为此时还没有数据可取，直到队列中有了数据才能返回；如果队列已经满了，那么插入数据的操作就会被阻塞，直到队列中有空闲位置后再插入数据，然后再返回。</p>
+<img data-src="https://static001.geekbang.org/resource/image/5e/eb/5ef3326181907dea0964f612890185eb.jpg" style="zoom:50%;" />
+
+<p>上述的定义其实就是一个“生产者 - 消费者模型”！是的，我们可以使用阻塞队列，轻松实现一个“生产者 - 消费者模型”！</p>
+<p>这种基于阻塞队列实现的“生产者 - 消费者模型”，可以有效地协调生产和消费的速度。当“生产者”生产数据的速度过快，“消费者”来不及消费时，存储数据的队列很快就会满了。这个时候，生产者就阻塞等待，直到“消费者”消费了数据，“生产者”才会被唤醒继续“生产”。</p>
+<p>而且不仅如此，基于阻塞队列，我们还可以通过协调“生产者”和“消费者”的个数，来提高数据的处理效率。比如前面的例子，我们可以多配置几个“消费者”，来应对一个“生产者”。</p>
+<img data-src="https://static001.geekbang.org/resource/image/9f/67/9f539cc0f1edc20e7fa6559193898067.jpg" style="zoom:50%;" />
+
+<p>线程安全的队列我们叫作<strong>并发队列</strong>。最简单直接的实现方式是直接在 enqueue()、dequeue() 方法上加锁，但是锁粒度大并发度会比较低，同一时刻仅允许一个存或者取操作。实际上，基于数组的循环队列，利用 CAS 原子操作，可以实现非常高效的并发队列。这也是循环队列比链式队列应用更加广泛的原因。</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>栈</title>
+    <url>/archives/1f4ac2fb.html</url>
+    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/79/aa/79d1a08a0a016b4648a764fc62bed8aa.jpg" style="zoom:50%;" />
+
+<p>后进者先出，先进者后出，这就是典型的“栈”结构。</p>
+<span id="more"></span>
+
+<h3 id="如何理解“栈”？"><a href="#如何理解“栈”？" class="headerlink" title="如何理解“栈”？"></a>如何理解“栈”？</h3><img data-src="https://static001.geekbang.org/resource/image/3e/0b/3e20cca032c25168d3cc605fa7a53a0b.jpg" style="zoom:50%;" />
+
+<p>从栈的操作特性上来看，<strong>栈是一种“操作受限”的线性表</strong>，只允许在一端插入和删除数据。</p>
+<p>事实上，从功能上来说，数组或链表确实可以替代栈，但你要知道，特定的数据结构是对特定场景的抽象，而且，数组或链表暴露了太多的操作接口，操作上的确灵活自由，但使用时就比较不可控，自然也就更容易出错。</p>
+<p>当某个数据集合只涉及在一端插入和删除数据，并且满足后进先出、先进后出的特性，这时我们就应该首选“栈”这种数据结构。</p>
+<p>栈既可以用数组来实现，也可以用链表来实现。用数组实现的栈，我们叫作<strong>顺序栈</strong>，用链表实现的栈，我们叫作<strong>链式栈</strong>。</p>
+<p>实现：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 基于数组实现的顺序栈</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ArrayStack</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> String[] items;  <span class="comment">// 数组</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> count;       <span class="comment">// 栈中元素个数</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> n;           <span class="comment">//栈的大小</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 初始化数组，申请一个大小为n的数组空间</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ArrayStack</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.items = <span class="keyword">new</span> String[n];</span><br><span class="line">    <span class="keyword">this</span>.n = n;</span><br><span class="line">    <span class="keyword">this</span>.count = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 入栈操作</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">push</span><span class="params">(String item)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 数组空间不够了，直接返回false，入栈失败。</span></span><br><span class="line">    <span class="keyword">if</span> (count == n) <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    <span class="comment">// 将item放到下标为count的位置，并且count加一</span></span><br><span class="line">    items[count] = item;</span><br><span class="line">    ++count;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 出栈操作</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">pop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 栈为空，则直接返回null</span></span><br><span class="line">    <span class="keyword">if</span> (count == <span class="number">0</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    <span class="comment">// 返回下标为count-1的数组元素，并且栈中元素个数count减一</span></span><br><span class="line">    String tmp = items[count-<span class="number">1</span>];</span><br><span class="line">    --count;</span><br><span class="line">    <span class="keyword">return</span> tmp;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    Stack based upon linked list</span></span><br><span class="line"><span class="string">    基于链表实现的栈(Python) - linked_stack.py</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> Optional</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Node</span>:</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, data: <span class="built_in">int</span>, <span class="built_in">next</span>=<span class="literal">None</span></span>):</span></span><br><span class="line">        self._data = data</span><br><span class="line">        self._next = <span class="built_in">next</span></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LinkedStack</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;A stack based upon singly-linked list.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self._top: Node = <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">push</span>(<span class="params">self, value: <span class="built_in">int</span></span>):</span></span><br><span class="line">        new_top = Node(value)</span><br><span class="line">        new_top._next = self._top</span><br><span class="line">        self._top = new_top</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">pop</span>(<span class="params">self</span>) -&gt; Optional[int]:</span></span><br><span class="line">        <span class="keyword">if</span> self._top:</span><br><span class="line">            value = self._top._data</span><br><span class="line">            self._top = self._top._next</span><br><span class="line">            <span class="keyword">return</span> value</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span>(<span class="params">self</span>) -&gt; str:</span></span><br><span class="line">        current = self._top</span><br><span class="line">        nums = []</span><br><span class="line">        <span class="keyword">while</span> current:</span><br><span class="line">            nums.append(current._data)</span><br><span class="line">            current = current._next</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot; &quot;</span>.join(<span class="string">f&quot;<span class="subst">&#123;num&#125;</span>]&quot;</span> <span class="keyword">for</span> num <span class="keyword">in</span> nums)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    stack = LinkedStack()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">9</span>):</span><br><span class="line">        stack.push(i)</span><br><span class="line">    print(stack)</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">3</span>):</span><br><span class="line">        stack.pop()</span><br><span class="line">    print(stack)</span><br></pre></td></tr></table></figure>
 
 
 
-<h3 id="最好情况时间复杂度"><a href="#最好情况时间复杂度" class="headerlink" title="最好情况时间复杂度"></a>最好情况时间复杂度</h3><p>在最理想的情况下，执行这段代码的时间复杂度，即 O(1)</p>
-<h3 id="最坏情况时间复杂度"><a href="#最坏情况时间复杂度" class="headerlink" title="最坏情况时间复杂度"></a>最坏情况时间复杂度</h3><p>在最糟糕的情况下，执行这段代码的时间复杂度，即 O(n)</p>
-<h3 id="平均情况时间复杂度"><a href="#平均情况时间复杂度" class="headerlink" title="平均情况时间复杂度"></a>平均情况时间复杂度</h3><p>在上面这个例子中，查找变量 x 在数组中位置，有 n+1 种情况：<strong>在数组的 0~n-1 位置中</strong>和<strong>不在数组#中</strong>，同时，还要考虑每种情况发生的概率，最终计算过程为：</p>
-<img data-src="https://static001.geekbang.org/resource/image/36/7f/36c0aabdac69032f8a43368f5e90c67f.jpg?wh=718*214" style="zoom: 50%;" />
+<p>时间复杂度和空间复杂度均为 O(1)。</p>
+<h3 id="栈的应用"><a href="#栈的应用" class="headerlink" title="栈的应用"></a>栈的应用</h3><p><strong>函数调用栈</strong>：操作系统给每个线程分配了一块独立的内存空间，这块内存被组织成“栈”这种结构, 用来存储函数调用时的临时变量。每进入一个函数，就会将临时变量作为一个栈帧入栈，当被调用函数执行完成，返回之后，将这个函数对应的栈帧出栈。</p>
+<p><strong>表达式求值</strong>：为方便解释，将算术表达式简化为只包含加减乘除四则运算。</p>
+<p>实际上，编译器就是通过两个栈来实现的。其中一个保存操作数的栈，另一个是保存运算符的栈。我们从左向右遍历表达式，当遇到数字，我们就直接压入操作数栈；当遇到运算符，就与运算符栈的栈顶元素进行比较。</p>
+<p>如果比运算符栈顶元素的优先级高，就将当前运算符压入栈；如果比运算符栈顶元素的优先级低或者相同，从运算符栈中取栈顶运算符，从操作数栈的栈顶取 2 个操作数，然后进行计算，再把计算完的结果压入操作数栈，继续比较。</p>
+<p>下面将 3+5*8-6 这个表达式的计算过程画成了一张图，结合图来理解刚讲的计算过程。</p>
+<img data-src="https://static001.geekbang.org/resource/image/bc/00/bc77c8d33375750f1700eb7778551600.jpg" style="zoom:50%;" />
 
-<p>这个值在概率论中称为<strong>加权平均值</strong>，也叫做期望值，所以平均时间复杂度的全称应该叫<strong>加权平均时间复杂度</strong>或者期望时间复杂度。用大 O 表示法来表示，去掉系数和常量，加权平均时间复杂度仍然是 O(n)。</p>
-<h3 id="均摊时间复杂度"><a href="#均摊时间复杂度" class="headerlink" title="均摊时间复杂度"></a>均摊时间复杂度</h3><p>首先，均摊时间复杂度就是一种特殊的平均时间复杂度。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; array表示一个长度为n的数组</span><br><span class="line">&#x2F;&#x2F; 代码中的array.length就等于n</span><br><span class="line">int[] array &#x3D; new int[n];</span><br><span class="line">int count &#x3D; 0;</span><br><span class="line"></span><br><span class="line">void insert(int val) &#123;</span><br><span class="line">   if (count &#x3D;&#x3D; array.length) &#123;</span><br><span class="line">      int sum &#x3D; 0;</span><br><span class="line">      for (int i &#x3D; 0; i &lt; array.length; ++i) &#123;</span><br><span class="line">         sum &#x3D; sum + array[i];</span><br><span class="line">      &#125;</span><br><span class="line">      array[0] &#x3D; sum;</span><br><span class="line">      count &#x3D; 1;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   array[count] &#x3D; val;</span><br><span class="line">   ++count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>括号匹配</strong>：我们可以借助栈来检查表达式中的括号是否匹配。假设表达式中只包含三种括号，圆括号 ()、方括号[]和花括号{}，并且它们可以任意嵌套。</p>
+<p>我们用栈来保存未匹配的左括号，从左到右依次扫描字符串。当扫描到左括号时，则将其压入栈中；当扫描到右括号时，从栈顶取出一个左括号。如果能够匹配，比如“(”跟“)”匹配，“[”跟“]”匹配，“{”跟“}”匹配，则继续扫描剩下的字符串。如果扫描的过程中，遇到不能配对的右括号，或者栈中没有数据，则说明为非法格式。</p>
+<p>当所有的括号都扫描完成之后，如果栈为空，则说明字符串为合法格式；否则，说明有未匹配的左括号，为非法格式。</p>
+<h3 id="如何实习浏览器的前进、后退功能？"><a href="#如何实习浏览器的前进、后退功能？" class="headerlink" title="如何实习浏览器的前进、后退功能？"></a>如何实习浏览器的前进、后退功能？</h3><p>使用两个栈，X 和 Y，我们把首次浏览的页面依次压入栈 X，当点击后退按钮时，再依次从栈 X 中出栈，并将出栈的数据依次放入栈 Y。当我们点击前进按钮时，我们依次从栈 Y 中取出数据，放入栈 X 中。当栈 X 中没有数据时，那就说明没有页面可以继续后退浏览了。当栈 Y 中没有数据，那就说明没有页面可以点击前进按钮浏览了</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="comment"># 引用当前文件夹下的single_linked_list</span></span><br><span class="line">sys.path.append(<span class="string">&#x27;linked_stack.py&#x27;</span>)</span><br><span class="line"><span class="keyword">from</span> linked_stack <span class="keyword">import</span> LinkedStack</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NewLinkedStack</span>(<span class="params">LinkedStack</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">is_empty</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">not</span> self._top</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Browser</span>():</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        self.forward_stack = NewLinkedStack()</span><br><span class="line">        self.back_stack = NewLinkedStack()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">can_forward</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.back_stack.is_empty():</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">can_back</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.forward_stack.is_empty():</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">open</span>(<span class="params">self, url</span>):</span></span><br><span class="line">        print(<span class="string">&quot;Open new url %s&quot;</span> % url, end=<span class="string">&quot;\n&quot;</span>)</span><br><span class="line">        self.forward_stack.push(url)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">back</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.forward_stack.is_empty():</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">        top = self.forward_stack.pop()</span><br><span class="line">        self.back_stack.push(top)</span><br><span class="line">        print(<span class="string">&quot;back to %s&quot;</span> % top, end=<span class="string">&quot;\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">if</span> self.back_stack.is_empty():</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">        top = self.back_stack.pop()</span><br><span class="line">        self.forward_stack.push(top)</span><br><span class="line">        print(<span class="string">&quot;forward to %s&quot;</span> % top, end=<span class="string">&quot;\n&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line"></span><br><span class="line">    browser = Browser()</span><br><span class="line">    browser.<span class="built_in">open</span>(<span class="string">&#x27;a&#x27;</span>)</span><br><span class="line">    browser.<span class="built_in">open</span>(<span class="string">&#x27;b&#x27;</span>)</span><br><span class="line">    browser.<span class="built_in">open</span>(<span class="string">&#x27;c&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> browser.can_back():</span><br><span class="line">        browser.back()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> browser.can_forward():</span><br><span class="line">        browser.forward()</span><br><span class="line"></span><br><span class="line">    browser.back()</span><br><span class="line">    browser.back()</span><br><span class="line">    browser.back()</span><br></pre></td></tr></table></figure>
 
-<p>此例中平均时间复杂度为：</p>
-<img data-src="https://static001.geekbang.org/resource/image/6d/ed/6df62366a60336d9de3bc34f488d8bed.jpg?wh=1142*156" style="zoom:50%;" />
 
-<p>这里引入<strong>摊还分析法</strong>，每一次 O(n) 的插入操作，都会跟着 n-1 次 O(1) 的插入操作，所以把耗时多的那次操作均摊到接下来的 n-1 次耗时少的操作上，均摊下来，这一组连续的操作的均摊时间复杂度就是 O(1)。这就是均摊分析的大致思路，得到的就是均摊时间复杂度。</p>
-<p>两个条件满足时使用：1）代码在绝大多数情况下是低级别复杂度，只有极少数情况是高级别复杂度；2）低级别和高级别复杂度出现具有时序规律。均摊结果一般都等于低级别复杂度。</p>
+
+
+
+<h3 id="为什么函数调用要用“栈”来保存临时变量呢？用其他数据结构不行吗？"><a href="#为什么函数调用要用“栈”来保存临时变量呢？用其他数据结构不行吗？" class="headerlink" title="为什么函数调用要用“栈”来保存临时变量呢？用其他数据结构不行吗？"></a>为什么函数调用要用“栈”来保存临时变量呢？用其他数据结构不行吗？</h3><p>其实，我们不一定非要用栈来保存临时变量，只不过如果这个函数调用符合后进先出的特性，用栈这种数据结构来实现，是最顺理成章的选择。</p>
+<p>从调用函数进入被调用函数，对于数据来说，变化的是什么呢？是作用域。所以根本上，只要能保证每进入一个新的函数，都是一个新的作用域就可以。而要实现这个，用栈就非常方便。在进入被调用函数的时候，分配一段栈空间给这个函数的变量，在函数结束的时候，将栈顶复位，正好回到调用函数的作用域内。</p>
+<h3 id="JVM内存管理中的“堆栈”概念和文中的“栈”是不是一回事？"><a href="#JVM内存管理中的“堆栈”概念和文中的“栈”是不是一回事？" class="headerlink" title="JVM内存管理中的“堆栈”概念和文中的“栈”是不是一回事？"></a>JVM内存管理中的“堆栈”概念和文中的“栈”是不是一回事？</h3><p>内存中的堆栈和数据结构堆栈不是一个概念，可以说内存中的堆栈是真实存在的物理区，数据结构中的堆栈是抽象的数据存储结构。 内存空间在逻辑上分为三部分：代码区、静态数据区和动态数据区，动态数据区又分为栈区和堆区。 代码区：存储方法体的二进制代码。高级调度（作业调度）、中级调度（内存调度）、低级调度（进程调度）控制代码区执行代码的切换。 静态数据区：存储全局变量、静态变量、常量，常量包括final修饰的常量和String常量。系统自动分配和回收。 栈区：存储运行方法的形参、局部变量、返回值。由系统自动分配和回收。 堆区：new一个对象的引用或地址存储在栈区，指向该对象存储在堆区中的真实数据。</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode</title>
+    <url>/archives/6096f3d5.html</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>LeetCode</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数组</title>
+    <url>/archives/340249a9.html</url>
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/07/28/OoNQVyXiz58dxjb.jpg" style="zoom: 50%;" />
+
+<p>数组，不仅仅是一种编程语言中的数据类型，还是一种最基础的数据结构</p>
+<span id="more"></span>
+
+<p><strong>数组（Array）是一种线性表数据结构。它用一组连续的内存空间，来存储一组具有相同类型的数据。</strong></p>
+<p>第一是<strong>线性表</strong>（Linear List）。顾名思义，线性表就是数据排成像一条线一样的结构。每个线性表上的数据最多只有前和后两个方向。其实除了数组，链表、队列、栈等也是线性表结构。</p>
+<img data-src="https://static001.geekbang.org/resource/image/b6/77/b6b71ec46935130dff5c4b62cf273477.jpg" style="zoom:50%;" />
+
+<p>而与它相对立的概念是<strong>非线性表</strong>，比如二叉树、堆、图等。之所以叫非线性，是因为，在非线性表中，数据之间并不是简单的前后关系。</p>
+<img data-src="https://static001.geekbang.org/resource/image/6e/69/6ebf42641b5f98f912d36f6bf86f6569.jpg" style="zoom:50%;" />
+
+<p>第二个是<strong>连续的内存空间和相同类型的数据</strong>。正是因为这两个限制，它才有了一个堪称“杀手锏”的特性：“随机访问”。但有利就有弊，这两个限制也让数组的很多操作变得非常低效，比如要想在数组中删除、插入一个数据，为了保证连续性，就需要做大量的数据搬移工作。</p>
+<h3 id="数组是如何实现根据下标随机访问数组元素的？"><a href="#数组是如何实现根据下标随机访问数组元素的？" class="headerlink" title="数组是如何实现根据下标随机访问数组元素的？"></a>数组是如何实现根据下标随机访问数组元素的？</h3><p>我们拿一个长度为 10 的 int 类型的数组 int[] a = new int[10]来举例。在这个图中，计算机给数组 a[10]，分配了一块连续内存空间 1000～1039，其中，内存块的首地址为 base_address = 1000。</p>
+<img data-src="https://static001.geekbang.org/resource/image/98/c4/98df8e702b14096e7ee4a5141260cdc4.jpg" style="zoom:50%;" />
+
+<p>计算机会给每个内存单元分配一个地址，计算机通过地址来访问内存中的数据。当计算机需要随机访问数组中的某个元素时，它会首先通过下面的寻址公式，计算出该元素存储的内存地址：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">a[i]_address &#x3D; base_address + i * data_type_size</span><br></pre></td></tr></table></figure>
+
+<p>其中 data_type_size 表示数组中每个元素的大小.。</p>
+<p>数组适合查找操作，支持随机访问，<strong>根据下标随机访问</strong>的时间复杂度为 O(1)</p>
+<h3 id="低效的“插入”和“删除”"><a href="#低效的“插入”和“删除”" class="headerlink" title="低效的“插入”和“删除”"></a>低效的“插入”和“删除”</h3><p>先看<strong>插入操作</strong>，假设数组的长度为 n，现在，如果我们需要将一个数据插入到数组中的第 k 个位置。为了把第 k 个位置腾出来，给新来的数据，我们需要将第 k～n 这部分的元素都顺序地往后挪一位。那插入操作的时间复杂度是多少呢？</p>
+<p>最好时间复杂度是 O(1)，最坏时间复杂度是 O(n)，平均情况时间复杂度为 (1+2+…n)/n=O(n)。</p>
+<p>而如果数组中存储的数据没有规律，只是当做存储集合，为避免大规模数据迁移，还有个办法就是直接将第 k 位的数据移到数组最后，新元素放到 k 位置。</p>
+<p>再看<strong>删除操作</strong>，复杂度分析过程类似，结果是一样的。</p>
+<p>实际上，在某些特殊场景下，我们并不一定非得追求数组中数据的连续性。如果我们将多次删除操作集中在一起执行，删除的效率是不是会提高很多呢？</p>
+<p>我们再看个例子。数组 a[10]中存储了 8 个元素：a，b，c，d，e，f，g，h。现在，我们要依次删除 a，b，c 三个元素。</p>
+<img data-src="https://static001.geekbang.org/resource/image/b6/e5/b69b8c5dbf6248649ddab7d3e7cfd7e5.jpg" style="zoom:50%;" />
+
+<p>为了避免 d，e，f，g，h 这几个数据会被搬移三次，我们可以先记录下已经删除的数据。每次的删除操作并不是真正地搬移数据，只是记录数据已经被删除。当数组没有更多空间存储数据时，我们再触发执行一次真正的删除操作，这样就大大减少了删除操作导致的数据搬移。</p>
+<p>其实这也就是 JVM 标记清除垃圾回收算法的核心思想。数据结构和算法的魅力就在于此，很多时候我们并不是要去死记硬背某个数据结构或者算法，而是要学习它背后的思想和处理技巧，这些东西才是最有价值的。如果你细心留意，不管是在软件开发还是架构设计中，总能找到某些算法和数据结构的影子。</p>
+<p><strong>JVM标记清除垃圾回收算法</strong></p>
+<blockquote>
+<p>大多数主流虚拟机采用可达性分析算法来判断对象是否存活，在标记阶段，会遍历所有 GC（Garbage Collection， 垃圾回收）ROOTS，将所有 GC ROOTS 可达的对象标记为存活。只有当标记工作完成后，清理工作才会开始。<br>不足：1.效率问题。标记和清理效率都不高，但是当知道只有少量垃圾产生时会很高效。2.空间问题。会产生不连续的内存空间碎片</p>
+</blockquote>
+<h3 id="警惕数组的访问越界问题"><a href="#警惕数组的访问越界问题" class="headerlink" title="警惕数组的访问越界问题"></a>警惕数组的访问越界问题</h3><p>现在聊聊数据访问越界的问题，先分析以下这段 C 语言代码运行结果：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">int main(int argc, char* argv[])&#123;</span><br><span class="line">    int i &#x3D; 0;</span><br><span class="line">    int arr[3] &#x3D; &#123;0&#125;;</span><br><span class="line">    for(; i&lt;&#x3D;3; i++)&#123;</span><br><span class="line">        arr[i] &#x3D; 0;</span><br><span class="line">        printf(&quot;hello world\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果并非是三行“hello world”，而是会无限打印（不同编辑器表现可能会不一样）</p>
+<p>编译器按照内存地址<strong>递减</strong>的方式给变量分配内存</p>
+<h3 id="为什么大多数编程语言中，数组要从-0-开始编号，而不是从-1-开始呢？"><a href="#为什么大多数编程语言中，数组要从-0-开始编号，而不是从-1-开始呢？" class="headerlink" title="为什么大多数编程语言中，数组要从 0 开始编号，而不是从 1 开始呢？"></a>为什么大多数编程语言中，数组要从 0 开始编号，而不是从 1 开始呢？</h3><p>根据寻址公式，如果数组从 1 开始计数，那我们计算数组元素 a[k]的内存地址就会变为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">a[k]_address &#x3D; base_address + (k-1)*type_size</span><br></pre></td></tr></table></figure>
+
+<p>从 1 开始编号，每次随机访问数组元素都多了一次减法运算，对于 CPU 来说，就是多了一次减法指令。</p>
+<p>数组作为非常基础的数据结构，通过下标随机访问数组元素又是其非常基础的编程操作，效率的优化就要尽可能做到极致。所以为了减少一次减法操作，数组选择了从 0 开始编号，而不是从 1 开始。</p>
+<p>不过最主要的原因可能是历史原因。C 语言设计者用 0 开始计数数组下标，之后的 Java、JavaScript 等高级语言都效仿了 C 语言，或者说，为了在一定程度上减少 C 语言程序员学习 Java 的学习成本，因此继续沿用了从 0 开始计数的习惯。实际上，很多语言中数组也并不是从 0 开始计数的，比如 Matlab。甚至还有一些语言支持负数下标，比如 Python。</p>
 ]]></content>
       <categories>
         <category>数据结构与算法</category>
@@ -285,12 +494,11 @@
       </tags>
   </entry>
   <entry>
-    <title>复杂度分析（上）：如何分析、统计算法的执行效率和资源消耗？</title>
+    <title>复杂度分析</title>
     <url>/archives/aaaaf04a.html</url>
     <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/ed/5a/edc6039771a3bdfa2ff132000710e85a.jpg" style="zoom: 50%;" />
 
-
-
+<p><strong>如何分析、统计算法的执行效率和资源消耗？</strong></p>
 <p>我们都知道，数据结构和算法本身解决的是“快”和“省”的问题，即如何让代码运行得更快，如何让代码更省存储空间。所以，执行效率是算法一个非常重要的考量指标。那如何来衡量你编写的算法代码的执行效率呢？这里就要用到我们今天要讲的内容：时间、空间复杂度分析。</p>
 <span id="more"></span>
 
@@ -333,7 +541,33 @@
 <h3 id="空间复杂度分析"><a href="#空间复杂度分析" class="headerlink" title="空间复杂度分析"></a>空间复杂度分析</h3><p><strong>渐进空间复杂度</strong>（asymptotic space complexity），<strong>表示算法的存储空间与数据规模之间的增长关系</strong></p>
 <p>和时间复杂度分析一样。常见的空间复杂度就是 O(1)、O(n)、O(n2 )，像 O(logn)、O(nlogn) 这样的对数阶复杂度平时用不到。</p>
 <h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>复杂度也叫渐进复杂度，包括时间复杂度和空间复杂度，用来分析算法执行效率与数据规模之间的增长关系，可以粗略地表示，越高阶复杂度的算法，执行效率越低</p>
-<img data-src="https://i.loli.net/2021/07/27/tiReMnHlyrqVUDY.png" style="zoom: 50%;" />]]></content>
+<img data-src="https://i.loli.net/2021/07/27/tiReMnHlyrqVUDY.png" style="zoom: 50%;" />
+
+
+
+<hr>
+<img data-src="https://static001.geekbang.org/resource/image/9e/ee/9efe0a80fac815101324e1d4de1e49ee.jpg" style="zoom:50%;" />
+
+<p><strong>浅析最好、最坏、平均、均摊时间复杂度</strong></p>
+<p>同一段代码，在不同输入的情况下，复杂度量级有可能是不一样的由此区分出四个复杂度方面的分析，<strong>最好情况时间复杂度</strong>（best case time complexity）、<strong>最坏情况时间复杂度</strong>（worst case time complexity）、<strong>平均情况时间复杂度</strong>（average case time complexity）、<strong>均摊时间复杂度</strong>（amortized time complexity）</p>
+<p>先看一个例子，在一个无序的数组（array）中，查找变量 x 出现的位置</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; n表示数组array的长度</span><br><span class="line">int find(int[] array, int n, int x) &#123; </span><br><span class="line">	int i &#x3D; 0; </span><br><span class="line">	int pos &#x3D; -1; </span><br><span class="line">	for (; i &lt; n; ++i) &#123; </span><br><span class="line">		if (array[i] &#x3D;&#x3D; x) &#123; </span><br><span class="line">			pos &#x3D; i; break; </span><br><span class="line">		&#125; </span><br><span class="line">	&#125; </span><br><span class="line">	return pos;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="最好情况时间复杂度"><a href="#最好情况时间复杂度" class="headerlink" title="最好情况时间复杂度"></a>最好情况时间复杂度</h3><p>在最理想的情况下，执行这段代码的时间复杂度，即 O(1)</p>
+<h3 id="最坏情况时间复杂度"><a href="#最坏情况时间复杂度" class="headerlink" title="最坏情况时间复杂度"></a>最坏情况时间复杂度</h3><p>在最糟糕的情况下，执行这段代码的时间复杂度，即 O(n)</p>
+<h3 id="平均情况时间复杂度"><a href="#平均情况时间复杂度" class="headerlink" title="平均情况时间复杂度"></a>平均情况时间复杂度</h3><p>在上面这个例子中，查找变量 x 在数组中位置，有 n+1 种情况：<strong>在数组的 0~n-1 位置中</strong>和<strong>不在数组#中</strong>，同时，还要考虑每种情况发生的概率，最终计算过程为：</p>
+<img data-src="https://static001.geekbang.org/resource/image/36/7f/36c0aabdac69032f8a43368f5e90c67f.jpg?wh=718*214" style="zoom: 50%;" />
+
+<p>这个值在概率论中称为<strong>加权平均值</strong>，也叫做期望值，所以平均时间复杂度的全称应该叫<strong>加权平均时间复杂度</strong>或者期望时间复杂度。用大 O 表示法来表示，去掉系数和常量，加权平均时间复杂度仍然是 O(n)。</p>
+<h3 id="均摊时间复杂度"><a href="#均摊时间复杂度" class="headerlink" title="均摊时间复杂度"></a>均摊时间复杂度</h3><p>首先，均摊时间复杂度就是一种特殊的平均时间复杂度。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; array表示一个长度为n的数组</span><br><span class="line">&#x2F;&#x2F; 代码中的array.length就等于n</span><br><span class="line">int[] array &#x3D; new int[n];</span><br><span class="line">int count &#x3D; 0;</span><br><span class="line"></span><br><span class="line">void insert(int val) &#123;</span><br><span class="line">   if (count &#x3D;&#x3D; array.length) &#123;</span><br><span class="line">      int sum &#x3D; 0;</span><br><span class="line">      for (int i &#x3D; 0; i &lt; array.length; ++i) &#123;</span><br><span class="line">         sum &#x3D; sum + array[i];</span><br><span class="line">      &#125;</span><br><span class="line">      array[0] &#x3D; sum;</span><br><span class="line">      count &#x3D; 1;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   array[count] &#x3D; val;</span><br><span class="line">   ++count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此例中平均时间复杂度为：</p>
+<img data-src="https://static001.geekbang.org/resource/image/6d/ed/6df62366a60336d9de3bc34f488d8bed.jpg?wh=1142*156" style="zoom:50%;" />
+
+<p>这里引入<strong>摊还分析法</strong>，每一次 O(n) 的插入操作，都会跟着 n-1 次 O(1) 的插入操作，所以把耗时多的那次操作均摊到接下来的 n-1 次耗时少的操作上，均摊下来，这一组连续的操作的均摊时间复杂度就是 O(1)。这就是均摊分析的大致思路，得到的就是均摊时间复杂度。</p>
+<p>两个条件满足时使用：1）代码在绝大多数情况下是低级别复杂度，只有极少数情况是高级别复杂度；2）低级别和高级别复杂度出现具有时序规律。均摊结果一般都等于低级别复杂度。</p>
+]]></content>
       <categories>
         <category>数据结构与算法</category>
       </categories>
