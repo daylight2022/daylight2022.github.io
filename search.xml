@@ -209,6 +209,246 @@
       </tags>
   </entry>
   <entry>
+    <title>排序优化</title>
+    <url>/archives/7418344d.html</url>
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/05/5DAt1oVdSKu4Bqr.jpg" style="zoom:50%;" />
+
+<p>如何实现一个通用的、高性能的排序函数？</p>
+<span id="more"></span>
+
+<h3 id="如何选择合适的排序算法？"><a href="#如何选择合适的排序算法？" class="headerlink" title="如何选择合适的排序算法？"></a>如何选择合适的排序算法？</h3><p>先回顾下前面讲过的几种算法</p>
+<img data-src="https://static001.geekbang.org/resource/image/1f/fd/1f6ef7e0a5365d6e9d68f0ccc71755fd.jpg" style="zoom:50%;" />
+
+<p>线性排序算法的时间复杂度比较低，适用场景比较特殊。所以如果要写一个通用的排序函数，不能选择线性排序算法。</p>
+<p>如果对小规模数据进行排序，可以选择时间复杂度是 O(n2) 的算法；如果对大规模数据进行排序，时间复杂度是 O(nlogn) 的算法更加高效。所以，为了兼顾任意规模数据的排序，一般都会首选时间复杂度是 O(nlogn) 的排序算法来实现排序函数。</p>
+<p>堆排序和快速排序都有比较多的应用，比如 Java 语言采用堆排序实现排序函数，C 语言使用快速排序实现排序函数。一般不适用归并排序的原因是它不是原地排序算法，空间复杂度是$O(n)$。​</p>
+<h3 id="如何优化快速排序？"><a href="#如何优化快速排序？" class="headerlink" title="如何优化快速排序？"></a>如何优化快速排序？</h3><p>快排在最坏情况下时间复杂度是$O(n^2)$​，主要原因还是因为我们分区点选得不够合理。最理想的分区点是：被分区点分开的两个分区中，数据的数量差不多。下面介绍两个常用简单的分区算法。</p>
+<ol>
+<li><strong>三数取中法</strong></li>
+</ol>
+<p>区间的首、尾、中间，分别取出一个数，然后对比大小，取这 3 个数的中间值作为分区点。这样每间隔某个固定的长度，取数据出来比较，将中间值作为分区点的分区算法，肯定要比单纯取某一个数据更好。但是，如果要排序的数组比较大，那“三数取中”可能就不够了，可能要“五数取中”或者“十数取中”</p>
+<ol start="2">
+<li><strong>随机法</strong></li>
+</ol>
+<p>每次从要排序的区间中，随机选择一个元素作为分区点。这种方法并不能保证每次分区点都选的比较好，但是从概率的角度来看，也不大可能会出现每次分区点都选得很差的情况，所以平均情况下，这样选的分区点是比较好的。时间复杂度退化为最糟糕的 O(n2) 的情况，出现的可能性不大。</p>
+<p>递归要警惕堆栈溢出。为了避免快速排序里，递归过深而堆栈过小，导致堆栈溢出，我们有两种解决办法：第一种是限制递归深度。一旦递归过深，超过了我们事先设定的阈值，就停止递归。第二种是通过在堆上模拟实现一个函数调用栈，手动模拟递归压栈、出栈的过程，这样就没有了系统栈大小的限制。</p>
+<h3 id="举例分析排序函数"><a href="#举例分析排序函数" class="headerlink" title="举例分析排序函数"></a>举例分析排序函数</h3><p>这里拿 Glibc 中的 qsort() 函数举例说明一下</p>
+<p>qsort() 会优先使用归并排序来排序输入数据，因为归并排序的空间复杂度是 O(n)，所以对于小数据量的排序，比如 1KB、2KB 等，归并排序额外需要 1KB、2KB 的内存空间，这个问题不大。</p>
+<p>要排序的数据量比较大的时候，qsort() 会改为用快速排序算法来排序。那 qsort() 是如何选择快速排序算法的分区点的呢？如果去看源码，你就会发现，qsort() 选择分区点的方法就是“三数取中法”。</p>
+<p>还有我们前面提到的递归太深会导致堆栈溢出的问题，qsort() 是通过自己实现一个堆上的栈，手动模拟递归来解决的.</p>
+<p>实际上，qsort() 并不仅仅用到了归并排序和快速排序，它还用到了插入排序。在快速排序的过程中，当要排序的区间中，元素的个数小于等于 4 时，qsort() 就退化为插入排序，不再继续用递归来做快速排序，因为我们前面也讲过，在小规模数据面前，O(n2) 时间复杂度的算法并不一定比 O(nlogn) 的算法执行时间长。</p>
+<p>时间复杂度代表的是一个增长趋势，如果画成增长曲线图，你会发现 O(n2) 比 O(nlogn) 要陡峭，也就是说增长趋势要更猛一些。但是，我们前面讲过，在大 O 复杂度表示法中，我们会省略低阶、系数和常数，也就是说，O(nlogn) 在没有省略低阶、系数、常数之前可能是 O(knlogn + c)，而且 k 和 c 有可能还是一个比较大的数。</p>
+<p>在 qsort() 插入排序的算法实现中，也利用了哨兵这种编程技巧。虽然哨兵可能只是少做一次判断，但是毕竟排序函数是非常常用、非常基础的函数，性能的优化要做到极致。</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>线性排序</title>
+    <url>/archives/89c5f6b.html</url>
+    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/53/3a/538f4aefb62df6171579293a87d9ca3a.jpg" style="zoom:50%;" />
+
+<p>如何根据年龄给 100 万用户排序？</p>
+<span id="more"></span>
+
+<p> 这个问题用归并、快排也能搞定，但时间复杂度最低也是$O(nlongn)$，这次我们学习几种线性排序（Linear sort）：桶排序、计数排序、基数排序，时间复杂度都是$O(n)$。</p>
+<h3 id="桶排序（Bucket-sort）"><a href="#桶排序（Bucket-sort）" class="headerlink" title="桶排序（Bucket sort）"></a>桶排序（Bucket sort）</h3><p>桶排序，顾名思义，会用到“桶”，核心思想是将要排序的数据分到几个有序的桶里，每个桶里的数据再单独进行排序。桶内排完序之后，再把每个桶里的数据按照顺序依次取出，组成的序列就是有序的了。</p>
+<img data-src="https://static001.geekbang.org/resource/image/98/ae/987564607b864255f81686829503abae.jpg?wh=1142*705" style="zoom:50%;" />
+
+<p>如果要排序的数据有 n 个，我们把它们均匀地划分到 m 个桶内，每个桶里就有 k=n/m 个元素。每个桶内部使用快速排序，时间复杂度为 O(k * logk)。m 个桶排序的时间复杂度就是 O(m * k * logk)，因为 k=n/m，所以整个桶排序的时间复杂度就是 O(n*log(n/m))。当桶的个数 m 接近数据个数 n 时，log(n/m) 就是一个非常小的常量，这个时候桶排序的时间复杂度接近 O(n)。</p>
+<p><strong>桶排序看起来很优秀，那它是不是可以替代我们之前讲的排序算法呢？</strong></p>
+<p>当然是否定的。首先，要排序的数据需要很容易就能划分成 m 个桶，并且，桶与桶之间有着天然的大小顺序。这样每个桶内的数据都排序完之后，桶与桶之间的数据不需要再进行排序。</p>
+<p>其次，数据在各个桶之间的分布是比较均匀的。如果数据经过桶的划分之后，有些桶里的数据非常多，有些非常少，很不平均，那桶内数据排序的时间复杂度就不是常量级了。在极端情况下，如果数据都被划分到一个桶里，那就退化为 O(nlogn) 的排序算法了。</p>
+<p><strong>桶排序比较适合用在外部排序中</strong>。所谓的外部排序就是数据存储在外部磁盘中，数据量比较大，内存有限，无法将数据全部加载到内存中。</p>
+<p>举个例子，有10GB的订单数据需要按照订单金额进行排序（假设金额都是正数），但我们内存有限，只有几百MB，无法一次性加载10GB数据。</p>
+<p>首先可以扫描一遍文件，看订单金额数据范围，假设扫描后得到金额在1元到10万元间，我们将订单金额划分到100个桶里，第一个桶存储1元到1000元之间的订单，第二桶存储1001元到2000元之间的订单，以此类推。每一个桶对应一个文件，并且按照金额范围的大小顺序编号命名（00，01，02…99）。</p>
+<p>理想情况下，订单金额在1元到10万元之间均匀分布， 那订单就会均匀划分到100个文件中，每个小文件存储约100MB数据，再依次对其进行快排排序，等文件都排好序后，再按照文件编号，从小到大依次取出每个文件中的订单数据即可。</p>
+<p>不过，你也发现了，订单按照金额不一定是均匀分布的，假如金额在1元到1000元之间的较多，那还可以将这个区间在此划分为跨度为100元的10个小区间，甚至继续划分，直到所有文件可以读入内存为止。</p>
+<h3 id="计数排序（Counting-sort）"><a href="#计数排序（Counting-sort）" class="headerlink" title="计数排序（Counting sort）"></a>计数排序（Counting sort）</h3><p><strong>计数排序其实是桶排序的一种特殊情况</strong>。当要排序的 n 个数据，所处的范围并不大的时候，比如最大值是 k，我们就可以把数据划分成 k 个桶。每个桶内的数据值都是相同的，省掉了桶内排序的时间。</p>
+<p>现在假设所在省有 50 万考生，如何通过成绩快速排序得出名次呢？考生的满分是 900 分，最小是 0 分，这个数据的范围很小，所以我们可以分成 901 个桶，对应分数从 0 分到 900 分。根据考生的成绩，我们将这 50 万考生划分到这 901 个桶里。桶内的数据都是分数相同的考生，所以并不需要再进行排序。我们只需要依次扫描每个桶，将桶内的考生依次输出到一个数组中，就实现了 50 万考生的排序。因为只涉及扫描遍历操作，所以时间复杂度是 O(n)。</p>
+<p>这就是计数排序的算法思想，跟桶排序非常类似，只是桶的大小粒度不一样。<strong>不过，为什么这个排序算法叫“计数”排序呢？“计数”的含义来自哪里呢？</strong></p>
+<p>要搞明白这个问题，先简化下数据规模，假设只有8个考生，分数在0~5分之间，将其放到一个数组A[8]中：2,5,3,0,2,3,0,3</p>
+<p>用C[6]表示桶，遍历考生分数，容易得到：</p>
+<img data-src="https://i.loli.net/2021/08/05/kT19nlmAj87CShK.jpg" style="zoom:50%;" />
+
+<p>从图中可以看出，分数为 3 分的考生有 3 个，小于 3 分的考生有 4 个，所以，成绩为 3 分的考生在排序之后的有序数组 R[8]中，会保存下标 4，5，6 的位置。</p>
+<img data-src="https://i.loli.net/2021/08/05/fn1N4psSJZb3W26.jpg" style="zoom:50%;" />
+
+<p>现在问题是如何快速计算出每个分数的考生在有序数组中对应的存储位置呢？</p>
+<p>我们先对C[6]数组顺序求和，C[k]里存储小于等于分数 k 的考生个数。</p>
+<img data-src="https://i.loli.net/2021/08/05/DnK3VLPW6ywCQbk.jpg" style="zoom:50%;" />
+
+<p>我们<strong>从后往前</strong>（为了稳定排序）扫描数组A，比如扫描到3，从数组C中取出下标为3的值7，表示分数小于等于3的考生有7个，即3是数组R的第7个元素，取出3放入数组R中，相应的C[3]减1。依次类推，扫描完整个数组A，数组R中的数据就是按照分数大小有序排序了。</p>
+<img data-src="https://static001.geekbang.org/resource/image/1d/84/1d730cb17249f8e92ef5cab53ae65784.jpg?wh=1142*1522" style="zoom:50%;" />
+
+<p>代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 计数排序，a是数组，n是数组大小。假设数组中存储的都是非负整数。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">countingSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 查找数组中数据的范围</span></span><br><span class="line">  <span class="keyword">int</span> max = a[<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="keyword">if</span> (max &lt; a[i]) &#123;</span><br><span class="line">      max = a[i];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span>[] c = <span class="keyword">new</span> <span class="keyword">int</span>[max + <span class="number">1</span>]; <span class="comment">// 申请一个计数数组c，下标大小[0,max]</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= max; ++i) &#123;</span><br><span class="line">    c[i] = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 计算每个元素的个数，放入c中</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    c[a[i]]++;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 依次累加</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= max; ++i) &#123;</span><br><span class="line">    c[i] = c[i-<span class="number">1</span>] + c[i];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 临时数组r，存储排序之后的结果</span></span><br><span class="line">  <span class="keyword">int</span>[] r = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">  <span class="comment">// 计算排序的关键步骤，有点难理解</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = n - <span class="number">1</span>; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">    <span class="keyword">int</span> index = c[a[i]]-<span class="number">1</span>;</span><br><span class="line">    r[index] = a[i];</span><br><span class="line">    c[a[i]]--;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将结果拷贝给a数组</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    a[i] = r[i];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如此，利用另一个数组来计数的实习方式就是将其称为计数排序的原因。</p>
+<p><strong>计数排序只能用在数据范围不大的场景中，如果数据范围 k 比要排序的数据 n 大很多，就不适合用计数排序了。而且，计数排序只能给非负整数排序，如果要排序的数据是其他类型的，要将其在不改变相对大小的情况下，转化为非负整数。</strong></p>
+<p>比如，还是拿考生这个例子。如果考生成绩精确到小数后一位，我们就需要将所有的分数都先乘以 10，转化成整数，然后再放到 9010 个桶内。再比如，如果要排序的数据中有负数，数据的范围是[-1000, 1000]，那我们就需要先对每个数据都加 1000，转化成非负整数。</p>
+<h3 id="基数排序（Radix-sort）"><a href="#基数排序（Radix-sort）" class="headerlink" title="基数排序（Radix sort）"></a>基数排序（Radix sort）</h3><p>我们再来看这样一个排序问题。假设我们有 10 万个手机号码，希望将这 10 万个手机号码从小到大排序，你有什么比较快速的排序方法呢？</p>
+<p>之前讲的快排，时间复杂度可以做到 O(nlogn)，还有更高效的排序算法吗？桶排序、计数排序能派上用场吗？手机号码有 11 位，范围太大，显然不适合用这两种排序算法。针对这个排序问题，就可以用上基础排序了。</p>
+<p>可以先按照最后一位来排序手机号码，然后，再按照倒数第二位重新排序，以此类推，最后按照第一位重新排序。经过 11 次排序之后，手机号码就都有序了。先来看张过程分解图：</p>
+<img data-src="https://static001.geekbang.org/resource/image/df/0c/df0cdbb73bd19a2d69a52c54d8b9fc0c.jpg?wh=1142*511" style="zoom:50%;" />
+
+<p>根据每一位来排序，我们可以用刚讲过的桶排序或者计数排序，它们的时间复杂度可以做到 O(n)。如果要排序的数据有 k 位，那我们就需要 k 次桶排序或者计数排序，总的时间复杂度是 O(k*n)。当 k 不大的时候，比如手机号码排序的例子，k 最大就是 11，所以基数排序的时间复杂度就近似于 O(n)。</p>
+<p>当要排序的数据不是等长的，比如英文单词，可以把所有的单词补齐到相同长度，位数不够可以在后面补“0”。</p>
+<p>总结一下，基数排序对要排序的数据是有要求的，需要可以分割出独立的“位”来比较，而且位之间有递进的关系，如果 a 数据的高位比 b 数据大，那剩下的低位就不用比较了。除此之外，每一位的数据范围不能太大，要可以用线性排序算法来排序，否则，基数排序的时间复杂度就无法做到 O(n) 了。</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>排序</title>
+    <url>/archives/a444b428.html</url>
+    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/7c/67/7c40ffed3d9263a00af4d83198b54a67.jpg" style="zoom:50%;" />
+
+<p>插入排序和冒泡排序的时间复杂度相同，都是 O(n2)，在实际的软件开发里，为什么我们更倾向于使用插入排序算法而不是冒泡排序算法呢？</p>
+<span id="more"></span>
+
+<h3 id="如何分析一个“排序算法”？"><a href="#如何分析一个“排序算法”？" class="headerlink" title="如何分析一个“排序算法”？"></a>如何分析一个“排序算法”？</h3><p><strong>排序算法的执行效率</strong></p>
+<ul>
+<li>最好情况、最坏情况、平均情况时间复杂度</li>
+<li>时间复杂度的系数、常数 、低阶</li>
+<li>比较次数和交换（或移动）次数</li>
+</ul>
+<p><strong>排序算法的内存消耗</strong></p>
+<p>我们前面讲过，算法的内存消耗可以通过空间复杂度来衡量，排序算法也不例外。不过，针对排序算法的空间复杂度，我们还引入了一个新的概念，原地排序（Sorted in place）。原地排序算法，就是特指空间复杂度是 O(1) 的排序算法</p>
+<p><strong>排序算法的稳定性</strong></p>
+<p><strong>稳定性</strong>这个概念是说，如果待排序的序列中存在值相等的元素，经过排序之后，相等元素之间原有的先后顺序不变 – 稳点排序算法 &amp; 不稳定排序算法</p>
+<h3 id="冒泡排序（Bubble-Sort）"><a href="#冒泡排序（Bubble-Sort）" class="headerlink" title="冒泡排序（Bubble Sort）"></a>冒泡排序（Bubble Sort）</h3><p>冒泡排序只会操作相邻的两个数据。每次冒泡操作都会对相邻的两个元素进行比较，看是否满足大小关系要求。如果不满足就让它俩互换。一次冒泡会让至少一个元素移动到它应该在的位置，重复 n 次，就完成了 n 个数据的排序工作。</p>
+<p>下面用一个例子，带你看下冒泡排序的整个过程。我们要对一组数据 4，5，6，3，2，1，从小到大进行排序。第一次冒泡操作的详细过程就是这样。</p>
+<img data-src="https://static001.geekbang.org/resource/image/40/e9/4038f64f47975ab9f519e4f739e464e9.jpg" style="zoom:50%;" />
+
+<p>可以看出，经过一次冒泡操作之后，6 这个元素已经存储在正确的位置上。要想完成所有数据的排序，我们只要进行 6 次这样的冒泡操作就行了。</p>
+<img data-src="https://static001.geekbang.org/resource/image/92/09/9246f12cca22e5d872cbfce302ef4d09.jpg" style="zoom:50%;" />
+
+<p>实际上，刚讲的冒泡过程还可以优化。当某次冒泡操作已经没有数据交换时，说明已经达到完全有序，不用再继续执行后续的冒泡操作。我这里还有另外一个例子，这里面给 6 个元素排序，只需要 4 次冒泡操作就可以了。</p>
+<img data-src="https://static001.geekbang.org/resource/image/a9/e6/a9783a3b13c11a5e064c5306c261e8e6.jpg" style="zoom:50%;" />
+
+<p>代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 冒泡排序，a表示数组，n表示数组大小</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line"> <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="comment">// 提前退出冒泡循环的标志位</span></span><br><span class="line">    <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n - i - <span class="number">1</span>; ++j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (a[j] &gt; a[j+<span class="number">1</span>]) &#123; <span class="comment">// 交换</span></span><br><span class="line">        <span class="keyword">int</span> tmp = a[j];</span><br><span class="line">        a[j] = a[j+<span class="number">1</span>];</span><br><span class="line">        a[j+<span class="number">1</span>] = tmp;</span><br><span class="line">        flag = <span class="keyword">true</span>;  <span class="comment">// 表示有数据交换      </span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!flag) <span class="keyword">break</span>;  <span class="comment">// 没有数据交换，提前退出</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在思考上面说的排序算法的三个方面。</p>
+<ol>
+<li>冒泡排序是原地排序算法吗？</li>
+</ol>
+<p>冒泡的过程只涉及相邻数据的交换操作，只需要常量级的临时空间，所以它的空间复杂度为 O(1)，是一个原地排序算法</p>
+<ol start="2">
+<li>冒泡排序是稳定的排序算法吗？</li>
+</ol>
+<p>在冒泡排序中，只有交换才可以改变两个元素的前后顺序。为了保证冒泡排序算法的稳定性，当有相邻的两个元素大小相等的时候，我们不做交换，相同大小的数据在排序前后不会改变顺序，所以冒泡排序是稳定的排序算法。</p>
+<ol start="3">
+<li>冒泡排序的时间复杂度是多少？</li>
+</ol>
+<p>最好情况下，要排序的数据已经是有序的了，我们只需要进行一次冒泡操作，就可以结束了，所以最好情况时间复杂度是 O(n)。而最坏的情况是，要排序的数据刚好是倒序排列的，我们需要进行 n 次冒泡操作，所以最坏情况时间复杂度为 O(n2)。</p>
+<p>再来分析下平均情况下的时间复杂度。对于包含n个数据的数组，有n!种排列方式，不同的排列方式，冒泡排序执行的时间肯定是不同的。比如我们前面举的那两个例子，其中一个要进行 6 次冒泡，而另一个只需要 4 次。如果用概率论方法定量分析平均时间复杂度，涉及的数学推理和计算就会很复杂。这里换一种思路，通过“<strong>有序度</strong>”和“<strong>逆序度</strong>”这两个概念来进行分析。</p>
+<p><strong>有序度</strong>是数组中具有有序关系的元素对的个数。有序元素对用数学表达式表示就是这样：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">有序元素对：a[i] &lt;&#x3D; a[j], 如果i &lt; j。</span><br></pre></td></tr></table></figure>
+
+<img data-src="https://static001.geekbang.org/resource/image/a1/20/a1ef4cc1999d6bd0af08d8417ee55220.jpg" style="zoom:50%;" />
+
+<p>同理，对于一个倒序排列的数组，比如 6，5，4，3，2，1，有序度是 0；对于一个完全有序的数组，比如 1，2，3，4，5，6，有序度就是 $n*(n-1)/2$，也就是 15。我们把这种完全有序的数组的有序度叫作<strong>满有序度</strong>。</p>
+<p>逆序度的定义正好跟有序度相反。关于这三个概念，我们还可以得到一个公式：逆序度 = 满有序度 - 有序度。我们排序的过程就是一种增加有序度，减少逆序度的过程，最后达到满有序度，就说明排序完成了</p>
+<p>我还是拿前面举的那个冒泡排序的例子来说明。要排序的数组的初始状态是 4，5，6，3，2，1 ，其中，有序元素对有 (4，5) (4，6)(5，6)，所以有序度是 3。n=6，所以排序完成之后终态的满有序度为 $n*(n-1)/2=15$。</p>
+<img data-src="https://i.loli.net/2021/08/04/rSBdM6AUv7FTuxD.jpg" style="zoom:50%;" />
+
+<p>冒泡排序包含两个操作原子，<strong>比较</strong>和<strong>交换</strong>。每交换一次，有序度就加 1。不管算法怎么改进，交换次数总是确定的，即为<em><em>逆序度，也就是$n</em>(n-1)/2$初始有序度</em>*。此例中就是 15–3=12，要进行 12 次交换操作。</p>
+<p>对于包含 n 个数据的数组进行冒泡排序，平均交换次数是多少呢？最坏情况下，初始状态的有序度是 0，所以要进行$n*(n-1)/2$​次交换。最好情况下，初始状态的有序度是 $n*(n-1)/2$​，就不需要进行交换。我们可以取个中间值 $n*(n-1)/4$，来表示初始有序度既不是很高也不是很低的平均情况。</p>
+<p>换句话说，平均情况下，需要 $n*(n-1)/4$​ 次交换操作，比较操作肯定要比交换操作多，而复杂度的上限是 $O(n^2)$​，所以平均情况下的时间复杂度就是 $O(n^2)$​。</p>
+<p>这个平均时间复杂度推导过程其实并不严格，但是很多时候很实用，毕竟概率论的定量分析太复杂，不太好用</p>
+<h3 id="插入排序（Insertion-Sort）"><a href="#插入排序（Insertion-Sort）" class="headerlink" title="插入排序（Insertion Sort）"></a>插入排序（Insertion Sort）</h3><p>一个有序的数组，我们往里面添加一个新的数据后，如何继续保持数据有序呢？很简单，我们只要遍历数组，找到数据应该插入的位置将其插入即可。</p>
+<img data-src="https://static001.geekbang.org/resource/image/7b/a6/7b257e179787c633d2bd171a764171a6.jpg" style="zoom:50%;" />
+
+<p>首先，我们将数组中的数据分为两个区间，已排序区间和未排序区间。初始已排序区间只有一个元素，就是数组的第一个元素。插入算法的核心思想是取未排序区间中的元素，在已排序区间中找到合适的插入位置将其插入，并保证已排序区间数据一直有序。重复这个过程，直到未排序区间中元素为空，算法结束。</p>
+<p>如图所示，要排序的数据是 4，5，6，1，3，2，其中左侧为已排序区间，右侧是未排序区间。</p>
+<img data-src="https://static001.geekbang.org/resource/image/b6/e1/b60f61ec487358ac037bf2b6974d2de1.jpg" style="zoom:50%;" />
+
+<p>插入排序也包含两种操作，一种是元素的比较，一种是元素的移动。当我们需要将一个数据 a 插入到已排序区间时，需要拿 a 与已排序区间的元素依次比较大小，找到合适的插入位置。找到插入点之后，我们还需要将插入点之后的元素顺序往后移动一位，这样才能腾出位置给元素 a 插入。</p>
+<p>对于不同的查找插入点方法（从头到尾、从尾到头），元素的比较次数是有区别的。但对于一个给定的初始序列，移动操作的次数总是固定的，就等于逆序度。</p>
+<p>为什么说移动次数就等于逆序度呢？我拿刚才的例子画了一个图表，你一看就明白了。满有序度是$n*(n-1)/2=15$，初始序列的有序度是 5，所以逆序度是 10。插入排序中，数据移动的个数总和也等于 10=3+3+4。</p>
+<img data-src="https://static001.geekbang.org/resource/image/fd/01/fd6582d5e5927173ee35d7cc74d9c401.jpg" style="zoom:50%;" />
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 插入排序，a表示数组，n表示数组大小</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertionSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="keyword">int</span> value = a[i];</span><br><span class="line">    <span class="keyword">int</span> j = i - <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 查找插入的位置</span></span><br><span class="line">    <span class="keyword">for</span> (; j &gt;= <span class="number">0</span>; --j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (a[j] &gt; value) &#123;</span><br><span class="line">        a[j+<span class="number">1</span>] = a[j];  <span class="comment">// 数据移动</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    a[j+<span class="number">1</span>] = value; <span class="comment">// 插入数据</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>插入排序空间复杂度为$O(1)$​，是原地排序算法，也是稳定排序算法。最好时间复杂度是$O(n)$​，最坏是$O(n^2)$​，我们在数组中插入一个数据的平均时间复杂度是$O(n)$，所以插入排序循环n次插入操作的平均时间复杂度就是$O(n^2)$。​</p>
+<h3 id="选择排序（Selection-Sort）"><a href="#选择排序（Selection-Sort）" class="headerlink" title="选择排序（Selection Sort）"></a>选择排序（Selection Sort）</h3><p>选择排序算法的实现思路有点类似插入排序，也分已排序区间和未排序区间。但是选择排序每次会从未排序区间中找到最小的元素，将其放到已排序区间的末尾。</p>
+<img data-src="https://static001.geekbang.org/resource/image/32/1d/32371475a0b08f0db9861d102474181d.jpg" style="zoom:50%;" />
+
+<p>选择排序空间复杂度为 O(1)，是一种原地排序算法。选择排序的最好情况时间复杂度、最坏情况和平均情况时间复杂度都为 O(n2)。但是，选择排序是一种不稳定的排序算法。从我前面画的那张图中，你可以看出来，选择排序每次都要找剩余未排序元素中的最小值，并和前面的元素交换位置，这样破坏了稳定性。</p>
+<h3 id="为什么插入排序要比冒泡排序更受欢迎呢？"><a href="#为什么插入排序要比冒泡排序更受欢迎呢？" class="headerlink" title="为什么插入排序要比冒泡排序更受欢迎呢？"></a>为什么插入排序要比冒泡排序更受欢迎呢？</h3><p>冒泡排序的数据交换要比插入排序的数据移动要复杂，冒泡排序需要 3 个赋值操作，而插入排序只需要 1 个。对于数据规模大的问题，插入排序更有效率。而且，冒泡排序不管怎么优化，元素交换的次数是一个固定值，是原始数据的逆序度。插入排序是同样的，不管怎么优化，元素移动的次数也等于原始数据的逆序度。插入排序的算法有很大的优化空间。</p>
+<img data-src="https://static001.geekbang.org/resource/image/ae/fb/ae97df138c98e6c130f76d93c02095fb.jpg" style="zoom:50%;" />
+
+<p>再讲两种时间复杂度为 O(nlogn) 的排序算法，<strong>归并排序</strong>和<strong>快速排序</strong>。这两种排序算法适合大规模的数据排序。</p>
+<p>归并排序和快速排序都用到了分治思想，非常巧妙。我们可以借鉴这个思想，来解决非排序的问题，比如：<strong>如何在 O(n) 的时间复杂度内查找一个无序数组中的第 K 大元素？</strong></p>
+<h3 id="归并排序的原理"><a href="#归并排序的原理" class="headerlink" title="归并排序的原理"></a>归并排序的原理</h3><p>归并排序的核心思想还是蛮简单的。如果要排序一个数组，我们先把数组从中间分成前后两部分，然后对前后两部分分别排序，再将排好序的两部分合并在一起，这样整个数组就都有序了。</p>
+<img data-src="https://static001.geekbang.org/resource/image/db/2b/db7f892d3355ef74da9cd64aa926dc2b.jpg" style="zoom:50%;" />
+
+<p>归并排序使用的就是<strong>分治思想</strong>。分治，顾名思义，就是分而治之，将一个大问题分解成小的子问题来解决。小的子问题解决了，大问题也就解决了。</p>
+<p>分治思想跟我们前面讲的递归思想很像。是的，分治算法一般都是用递归来实现的。<strong>分治是一种解决问题的处理思想，递归是一种编程技巧</strong>。</p>
+<p>归并排序的递推公式：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">递推公式：</span><br><span class="line">merge_sort(p…r) &#x3D; merge(merge_sort(p…q), merge_sort(q+1…r))</span><br><span class="line"></span><br><span class="line">终止条件：</span><br><span class="line">p &gt;&#x3D; r 不用再继续分解</span><br></pre></td></tr></table></figure>
+
+<p>代码：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 归并排序算法, A是数组，n表示数组大小</span><br><span class="line">merge_sort(A, n) &#123;</span><br><span class="line">  merge_sort_c(A, 0, n-1)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 递归调用函数</span><br><span class="line">merge_sort_c(A, p, r) &#123;</span><br><span class="line">  &#x2F;&#x2F; 递归终止条件</span><br><span class="line">  if p &gt;&#x3D; r  then return</span><br><span class="line"></span><br><span class="line">  &#x2F;&#x2F; 取p到r之间的中间位置q</span><br><span class="line">  q &#x3D; (p+r) &#x2F; 2</span><br><span class="line">  &#x2F;&#x2F; 分治递归</span><br><span class="line">  merge_sort_c(A, p, q)</span><br><span class="line">  merge_sort_c(A, q+1, r)</span><br><span class="line">  &#x2F;&#x2F; 将A[p...q]和A[q+1...r]合并为A[p...r]</span><br><span class="line">  merge(A[p...r], A[p...q], A[q+1...r])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>merge()函数示意图：</p>
+<img data-src="https://static001.geekbang.org/resource/image/95/2f/95897ade4f7ad5d10af057b1d144a22f.jpg" style="zoom:50%;" />
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">merge(A[p...r], A[p...q], A[q+1...r]) &#123;</span><br><span class="line">  var i :&#x3D; p，j :&#x3D; q+1，k :&#x3D; 0 &#x2F;&#x2F; 初始化变量i, j, k</span><br><span class="line">  var tmp :&#x3D; new array[0...r-p] &#x2F;&#x2F; 申请一个大小跟A[p...r]一样的临时数组</span><br><span class="line">  while i&lt;&#x3D;q AND j&lt;&#x3D;r do &#123;</span><br><span class="line">    if A[i] &lt;&#x3D; A[j] &#123;</span><br><span class="line">      tmp[k++] &#x3D; A[i++] &#x2F;&#x2F; i++等于i:&#x3D;i+1</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      tmp[k++] &#x3D; A[j++]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; 判断哪个子数组中有剩余的数据</span><br><span class="line">  var start :&#x3D; i，end :&#x3D; q</span><br><span class="line">  if j&lt;&#x3D;r then start :&#x3D; j, end:&#x3D;r</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; 将剩余的数据拷贝到临时数组tmp</span><br><span class="line">  while start &lt;&#x3D; end do &#123;</span><br><span class="line">    tmp[k++] &#x3D; A[start++]</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; 将tmp中的数组拷贝回A[p...r]</span><br><span class="line">  for i:&#x3D;0 to r-p do &#123;</span><br><span class="line">    A[p+i] &#x3D; tmp[i]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>归并排序是稳定排序算法</p>
+<p>来分析一下归并排序的时间复杂度，假设对 n 个元素进行归并排序需要的时间是 T(n)，那分解成两个子数组排序的时间都是 T(n/2)。merge() 函数合并两个有序子数组的时间复杂度是 O(n)，归并排序的时间复杂度的计算公式就是：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">T(1) &#x3D; C;   n&#x3D;1时，只需要常量级的执行时间，所以表示为C。</span><br><span class="line">T(n) &#x3D; 2*T(n&#x2F;2) + n   &#x2F;&#x2F; n&gt;1</span><br><span class="line">     &#x3D; 2*(2*T(n&#x2F;4) + n&#x2F;2) + n &#x3D; 4*T(n&#x2F;4) + 2*n</span><br><span class="line">     &#x3D; 4*(2*T(n&#x2F;8) + n&#x2F;4) + 2*n &#x3D; 8*T(n&#x2F;8) + 3*n</span><br><span class="line">     &#x3D; 8*(2*T(n&#x2F;16) + n&#x2F;8) + 3*n &#x3D; 16*T(n&#x2F;16) + 4*n</span><br><span class="line">     ......</span><br><span class="line">     &#x3D; 2^k * T(n&#x2F;2^k) + k * n</span><br><span class="line">     ......</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>通过这样一步一步分解推导，我们可以得到 T(n) = 2^kT(n/2^k)+kn。当 T(n/2^k)=T(1) 时，也就是 n/2^k=1，我们得到 k=log2n 。我们将 k 值代入上面的公式，得到 T(n)=Cn+nlog2n 。如果我们用大 O 标记法来表示的话，T(n) 就等于 O(nlogn)。</p>
+<p>从原理分析和伪代码可以看出，归并排序的执行效率与要排序的原始数组的有序程度无关，所以其时间复杂度是非常稳定的，不管是最好情况、最坏情况，还是平均情况，时间复杂度都是 O(nlogn)。</p>
+<p>归并排序不是原地排序算法（致命“弱点”）,递归代码的空间复杂度并不能像时间复杂度那样累加，尽管每次合并操作都需要申请额外的内存空间，但在合并完成之后，临时开辟的内存空间就被释放掉了。在任意时刻，CPU 只会有一个函数在执行，也就只会有一个临时的内存空间在使用。临时内存空间最大也不会超过 n 个数据的大小，所以空间复杂度是 O(n)。</p>
+<h3 id="快速排序的原理"><a href="#快速排序的原理" class="headerlink" title="快速排序的原理"></a>快速排序的原理</h3><p>快排的思想是这样的：如果要排序数组中下标从 p 到 r 之间的一组数据，我们选择 p 到 r 之间的任意一个数据作为 pivot（分区点）。</p>
+<p>遍历 p 到 r 之间的数据，将小于 pivot 的放到左边，将大于 pivot 的放到右边，将 pivot 放到中间。再使用递归处理思想，用递归排序下标从 p 到 q-1 之间的数据和下标从 q+1 到 r 之间的数据，直到区间缩小为 1。</p>
+<img data-src="https://static001.geekbang.org/resource/image/4d/81/4d892c3a2e08a17f16097d07ea088a81.jpg" style="zoom:50%;" />
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 快速排序，A是数组，n表示数组的大小</span><br><span class="line">quick_sort(A, n) &#123;</span><br><span class="line">  quick_sort_c(A, 0, n-1)</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; 快速排序递归函数，p,r为下标</span><br><span class="line">quick_sort_c(A, p, r) &#123;</span><br><span class="line">  if p &gt;&#x3D; r then return</span><br><span class="line">  </span><br><span class="line">  q &#x3D; partition(A, p, r) &#x2F;&#x2F; 获取分区点</span><br><span class="line">  quick_sort_c(A, p, q-1)</span><br><span class="line">  quick_sort_c(A, q+1, r)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>和归并排序的merge函数类似，这里也有一个partition分区函数，如果我们不考虑空间消耗的话，partition() 分区函数可以写得非常简单。我们申请两个临时数组 X 和 Y，遍历 A[p…r]，将小于 pivot 的元素都拷贝到临时数组 X，将大于 pivot 的元素都拷贝到临时数组 Y，最后再将数组 X 和数组 Y 中数据顺序拷贝到 A[p….r]。</p>
+<img data-src="https://static001.geekbang.org/resource/image/66/dc/6643bc3cef766f5b3e4526c332c60adc.jpg" style="zoom:50%;" />
+
+<p>我们希望快排是原地排序算法，有一个巧妙地实现思路：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">partition(A, p, r) &#123;</span><br><span class="line">  pivot :&#x3D; A[r]</span><br><span class="line">  i :&#x3D; p</span><br><span class="line">  for j :&#x3D; p to r-1 do &#123;</span><br><span class="line">    if A[j] &lt; pivot &#123;</span><br><span class="line">      swap A[i] with A[j]</span><br><span class="line">      i :&#x3D; i+1</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  swap A[i] with A[r]</span><br><span class="line">  return i</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>图示：</p>
+<img data-src="https://static001.geekbang.org/resource/image/08/e7/086002d67995e4769473b3f50dd96de7.jpg" style="zoom:50%;" />
+
+<p>因为分区的过程涉及交换操作，如果数组中有两个相同的元素，比如序列 6，8，7，6，3，5，9，4，在经过第一次分区操作之后，两个 6 的相对先后顺序就会改变。所以，快速排序并不是一个稳定的排序算法。</p>
+<p>快排和归并用的都是分治思想，递推公式和递归代码也非常相似，那它们的区别在哪里呢?</p>
+<img data-src="https://static001.geekbang.org/resource/image/aa/05/aa03ae570dace416127c9ccf9db8ac05.jpg" style="zoom:50%;" />
+
+<p>可以发现，归并排序的处理过程是由下到上的，先处理子问题，然后再合并。而快排正好相反，它的处理过程是由上到下的，先分区，然后再处理子问题。归并排序虽然是稳定的、时间复杂度为 O(nlogn) 的排序算法，但是它是非原地排序算法。我们前面讲过，归并之所以是非原地排序算法，主要原因是合并函数无法在原地执行。快速排序通过设计巧妙的原地分区函数，可以实现原地排序，解决了归并排序占用太多内存的问题</p>
+<p><strong>快速排序的性能分析</strong></p>
+<p>如果每次分区操作，都能正好把数组分成大小接近相等的两个小区间，那快排的时间复杂度递推求解公式跟归并是相同的。所以，快排的时间复杂度也是 O(nlogn)；如果我们每次选择最后一个元素作为 pivot，那每次分区得到的两个区间都是不均等的。我们需要进行大约 n 次分区操作，才能完成快排的整个过程。每次分区我们平均要扫描大约 n/2 个元素，这种情况下，快排的时间复杂度就从 O(nlogn) 退化成了 O(n2)</p>
+<p>刚刚讲了两个极端情况下的时间复杂度，一个是分区极其均衡，一个是分区极其不均衡。它们分别对应快排的最好情况时间复杂度和最坏情况时间复杂度。那快排的平均情况时间复杂度是多少呢？</p>
+<p>假设每次分区操作都将区间分成大小为 9:1 的两个小区间。我们继续套用递归时间复杂度的递推公式，就会变成这样：T(1) = C； n=1时，只需要常量级的执行时间，所以表示为C。T(n) = T(n/10) + T(9*n/10) + n； n&gt;1</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">T(1) &#x3D; C；   n&#x3D;1时，只需要常量级的执行时间，所以表示为C。</span><br><span class="line">T(n) &#x3D; T(n&#x2F;10) + T(9*n&#x2F;10) + n； n&gt;1</span><br></pre></td></tr></table></figure>
+
+<p>这个公式的递推求解的过程非常复杂，虽然可以求解，但我不推荐用这种方法。实际上，递归的时间复杂度的求解方法除了递推公式之外，还有递归树。这里直接给你结论：T(n) 在大部分情况下的时间复杂度都可以做到 O(nlogn)，只有在极端情况下，才会退化到 O(n2)。而且，我们也有很多方法将这个概率降到很低。</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>递归</title>
     <url>/archives/c6654282.html</url>
     <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/e1/f4/e15d9f05aadeb469258016d0901a38f4.jpg" style="zoom:50%;" />
@@ -376,6 +616,125 @@
 <h3 id="为什么函数调用要用“栈”来保存临时变量呢？用其他数据结构不行吗？"><a href="#为什么函数调用要用“栈”来保存临时变量呢？用其他数据结构不行吗？" class="headerlink" title="为什么函数调用要用“栈”来保存临时变量呢？用其他数据结构不行吗？"></a>为什么函数调用要用“栈”来保存临时变量呢？用其他数据结构不行吗？</h3><p>其实，我们不一定非要用栈来保存临时变量，只不过如果这个函数调用符合后进先出的特性，用栈这种数据结构来实现，是最顺理成章的选择。</p>
 <p>从调用函数进入被调用函数，对于数据来说，变化的是什么呢？是作用域。所以根本上，只要能保证每进入一个新的函数，都是一个新的作用域就可以。而要实现这个，用栈就非常方便。在进入被调用函数的时候，分配一段栈空间给这个函数的变量，在函数结束的时候，将栈顶复位，正好回到调用函数的作用域内。</p>
 <h3 id="JVM内存管理中的“堆栈”概念和文中的“栈”是不是一回事？"><a href="#JVM内存管理中的“堆栈”概念和文中的“栈”是不是一回事？" class="headerlink" title="JVM内存管理中的“堆栈”概念和文中的“栈”是不是一回事？"></a>JVM内存管理中的“堆栈”概念和文中的“栈”是不是一回事？</h3><p>内存中的堆栈和数据结构堆栈不是一个概念，可以说内存中的堆栈是真实存在的物理区，数据结构中的堆栈是抽象的数据存储结构。 内存空间在逻辑上分为三部分：代码区、静态数据区和动态数据区，动态数据区又分为栈区和堆区。 代码区：存储方法体的二进制代码。高级调度（作业调度）、中级调度（内存调度）、低级调度（进程调度）控制代码区执行代码的切换。 静态数据区：存储全局变量、静态变量、常量，常量包括final修饰的常量和String常量。系统自动分配和回收。 栈区：存储运行方法的形参、局部变量、返回值。由系统自动分配和回收。 堆区：new一个对象的引用或地址存储在栈区，指向该对象存储在堆区中的真实数据。</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>链表</title>
+    <url>/archives/2362a8ea.html</url>
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/07/29/Y576HhpLyZSwtdR.jpg" style="zoom:50%;" />
+
+<p>链表（Linked list）有一个经典应用场景：<strong>LRU缓存淘汰算法</strong>。</p>
+<span id="more"></span>
+
+<p>缓存是一种提高数据读取性能的技术，在硬件设计、软件开发中都有着非常广泛的应用，比如常见的 CPU 缓存、数据库缓存、浏览器缓存等等。</p>
+<p>缓存的大小有限，当缓存被用满时，哪些数据应该被清理出去，哪些数据应该被保留？这就需要缓存淘汰策略来决定。常见的策略有三种：先进先出策略 FIFO（First In，First Out）、最少使用策略 LFU（Least Frequently Used）、最近最少使用策略 LRU（Least Recently Used）。</p>
+<h3 id="五花八门的链表结构"><a href="#五花八门的链表结构" class="headerlink" title="五花八门的链表结构"></a>五花八门的链表结构</h3><p>链表，是通过“指针”将一组<strong>零散的内存块</strong>串联起来使用，常见的有三种链表结构：单链表、双向链表和循环链表。</p>
+<img data-src="https://i.loli.net/2021/07/29/HniWdagVZIUA9MS.jpg" style="zoom:50%;" />
+
+<p>先来看<strong>单链表</strong>，所谓的内存块我们称为<strong>“结点”</strong>，为了将结点串起来，每个链表结点除了存储数据外，还要记录下一个结点地址，我们这个记录指针叫做<strong>后继指针next</strong></p>
+<img data-src="https://i.loli.net/2021/07/29/z3OrpVFKA98bLxW.jpg" style="zoom:50%;" />
+
+<p>我们习惯性把第一个结点叫做<strong>头结点</strong>，记录链表的基地址，最后一个结点叫做尾结点，指向一个<strong>空地址NULL</strong> 。</p>
+<p>在进行数组的插入、删除操作时，为了保持内存数据的连续性，需要做大量的数据搬移，所以时间复杂度是 O(n)。而在链表中插入或者删除一个数据，我们并不需要为了保持内存的连续性而搬移结点，因为链表的存储空间本身就不是连续的。所以，在链表中插入和删除一个数据是非常快速的，时间复杂度为 O(1)。</p>
+<img data-src="https://i.loli.net/2021/07/29/7Z5nfTOEFGueJbv.jpg" style="zoom:50%;" />
+
+<p>有利就有弊，链表的随机访问效率教数组差，因为需要一个结点一个结点依次遍历，需要 O(n)的时间复杂度。</p>
+<p><strong>循环链表</strong>是一种特殊的单链表，区别在于尾结点是指向链表的头结点。</p>
+<img data-src="https://i.loli.net/2021/07/29/QYUpe2c1oOZSVGt.jpg" style="zoom:50%;" />
+
+<p>在实际软件开发中，更加常用的链表结构是另外一种：<strong>双向链表</strong>。它需要额外的两个空间来存储后继结点和前驱结点的地址，占用更多内存空间，但可以支持双向遍历，以此换来操作的灵活性。</p>
+<img data-src="https://i.loli.net/2021/07/29/n3ZDTsVouNEgGvl.jpg" style="zoom:50%;" />
+
+<p>要明白双向链表的高效性体现在哪里，我们可以看一下<strong>删除操作</strong>。</p>
+<ul>
+<li>删除结点中“值等于某个给定值”的结点；</li>
+<li>删除给定指针指向的结点。</li>
+</ul>
+<p>第一种情况，单链表和双向链表都需要遍历查找值而后进行删除，仅删除操作复杂度为 O(1)，但遍历查找是主要耗时步骤，复杂度为 O(n)。</p>
+<p>第二种情况，已经明确要删除的结点，而单链表不支持获取前驱结点，仍需要从头遍历，直到 <code>p-&gt;next=q</code>,说明 p 是 q 的前驱结点。双向链表就可以在 O(1) 复杂度内完成，插入、查询操作同理分析。</p>
+<p>在java语言中，LingedHashMap容器就是使用了双向链表结构。</p>
+<p>一个很重要的知识点，<strong>用空间换时间</strong>的设计思想在实际开发中应用广泛。缓存实际上就是利用了空间换时间的设计思想。如果我们把数据存储在硬盘上，会比较节省内存，但每次查找数据都要询问一次硬盘，会比较慢。但如果我们通过缓存技术，事先将数据加载在内存中，虽然会比较耗费内存空间，但是每次数据查询的速度就大大提高了。</p>
+<p>将循环链表和双向链表整合到一起，就是一个新的版本：<strong>双向循环链表</strong></p>
+<img data-src="https://i.loli.net/2021/07/29/wZFghGe3OvS8iPs.jpg" style="zoom:50%;" />
+
+<h3 id="链表-VS-数组性能对比"><a href="#链表-VS-数组性能对比" class="headerlink" title="链表 VS 数组性能对比"></a>链表 VS 数组性能对比</h3><img data-src="https://i.loli.net/2021/07/29/Iizay4gULP2dmKR.jpg" style="zoom:50%;" />
+
+<p>不过，实际软件开发中，不能仅用复杂度分析就决定使用那个数据结构。数组简单易用，在实现上使用的是连续的内存空间，可以借助CPU的缓存机制，预读数组中的数据，所以访问效率更高，而链表在内存中并不是连续存储，对CPU缓存不友好，没法有效预读。</p>
+<p>数组缺点是大小固定，一经声明就要占用连续内存空间，如果数组过小，就要重新申请一个更大的空间，将原数组拷贝进去，非常费时。链表本身没有大小限制，天然支持动态扩容，这也是它与数组最大区别。</p>
+<h3 id="如何实现LRU缓存淘汰算法"><a href="#如何实现LRU缓存淘汰算法" class="headerlink" title="如何实现LRU缓存淘汰算法?"></a>如何实现LRU缓存淘汰算法?</h3><p>通过哈希表辅以双向链表实现</p>
+<ul>
+<li>双向链表按照使用顺序存储键值对，越靠近头部是最近使用的，靠近尾部则是最久未使用的</li>
+<li>哈希表通过缓存数据的键映射到双向链表中的结点位置</li>
+</ul>
+<p>如此便可使用哈希表定位，找出缓存项在双向链表中位置，再将其移到头部即可在 O(1) 时间内完成 get 或者 put 操作</p>
+<ul>
+<li>get 操作，首先判断 key 是否存在<ul>
+<li>如果 key 存在，返回 -1</li>
+<li>如果 key 存在，通过 hash 表定位后将结点移到头部位置，返回结点值</li>
+</ul>
+</li>
+<li>put 操作，首先判断 key 是否存在<ul>
+<li>如果key 存在，更新结点值，将其移动到头部</li>
+<li>如果key 不存在，使用 key 和 value 创建一个新结点，在链表头部添加盖结点，并将key 和结点添加到哈希表中。然后判断双向链表结点数是否超出容量，是则删除尾结点，并删除哈希表中对应项 </li>
+</ul>
+</li>
+</ul>
+<p>Tips：在双向链表的实现中，使用一个伪头部（dummy head）和伪尾部（dummy tail）标记界限，这样在添加节点和删除节点的时候就不需要检查相邻的节点是否存在。</p>
+<hr>
+<img data-src="https://i.loli.net/2021/07/29/JCDU5BngouvNVYh.jpg" style="zoom:50%;" />
+
+<h3 id="如何轻松写出正确的链表代码？"><a href="#如何轻松写出正确的链表代码？" class="headerlink" title="如何轻松写出正确的链表代码？"></a>如何轻松写出正确的链表代码？</h3><p><strong>理解指针或引用的含义</strong></p>
+<p>将某个变量赋值给指针，实际上就是将这个变量的地址赋值给指针，或者反过来说，指针中存储了这个变量的内存地址，指向了这个变量，通过指针就能找到这个变量。</p>
+<p><strong>警惕指针丢失和内存泄漏</strong></p>
+<p>看下面代码，现在需要在结点 a 和相邻的结点 b 之间插入结点 x，假设当前 p 指向结点 a，下面写法就会发生指针丢失和内存泄漏。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">p-&gt;next &#x3D; x;  &#x2F;&#x2F; 将p的next指针指向x结点；</span><br><span class="line">x-&gt;next &#x3D; p-&gt;next;  &#x2F;&#x2F; 将x的结点的next指针指向b结点；</span><br></pre></td></tr></table></figure>
+
+<p>p-&gt;next 指针在完成第一步后已经不再指向结点 b 而是结点 a，第二行代码相当于将 x 赋值给 x-&gt;next。</p>
+<p>插入结点时，一定要注意操作顺序，同理，删除结点时，也一定要记得手动释放内存空间。</p>
+<ul>
+<li>利用哨兵简化实现难度</li>
+</ul>
+<p>针对链表的插入、删除操作，需要对插入第一个结点和删除最后一个结点的情况进行特殊处理。引入哨兵结点后不管链表是否为空，head指针都会指向这个哨兵结点，我们把这种链表叫<strong>带头链表</strong>，没有哨兵结点的链表就叫做<strong>不带头链表</strong>。如此便可统一相同的代码实现逻辑。</p>
+<img data-src="https://static001.geekbang.org/resource/image/7d/c7/7d22d9428bdbba96bfe388fe1e3368c7.jpg" style="zoom:50%;" />
+
+<p>哨兵是用来解决边界问题的，可以理解为它可以减少特殊情况的判断，比如判空、越界等，增加效率。</p>
+<p>代码一：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 在数组a中，查找key，返回key所在的位置</span></span><br><span class="line"><span class="comment">// 其中，n表示数组a的长度</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">char</span>* a, <span class="keyword">int</span> n, <span class="keyword">char</span> key)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 边界条件处理，如果a为空，或者n&lt;=0，说明数组中没有数据，就不用while循环比较了</span></span><br><span class="line">  <span class="keyword">if</span>(a == null || n &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">  <span class="comment">// 这里有两个比较操作：i&lt;n和a[i]==key.</span></span><br><span class="line">  <span class="keyword">while</span> (i &lt; n) &#123;</span><br><span class="line">    <span class="keyword">if</span> (a[i] == key) &#123;</span><br><span class="line">      <span class="keyword">return</span> i;</span><br><span class="line">    &#125;</span><br><span class="line">    ++i;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码二：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">// 在数组a中，查找key，返回key所在的位置</span></span><br><span class="line"><span class="comment">// 其中，n表示数组a的长度</span></span><br><span class="line"><span class="comment">// 我举2个例子，你可以拿例子走一下代码</span></span><br><span class="line"><span class="comment">// a = &#123;4, 2, 3, 5, 9, 6&#125;  n=6 key = 7</span></span><br><span class="line"><span class="comment">// a = &#123;4, 2, 3, 5, 9, 6&#125;  n=6 key = 6</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">char</span>* a, <span class="keyword">int</span> n, <span class="keyword">char</span> key)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span>(a == null || n &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 这里因为要将a[n-1]的值替换成key，所以要特殊处理这个值</span></span><br><span class="line">  <span class="keyword">if</span> (a[n<span class="number">-1</span>] == key) &#123;</span><br><span class="line">    <span class="keyword">return</span> n<span class="number">-1</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 把a[n-1]的值临时保存在变量tmp中，以便之后恢复。tmp=6。</span></span><br><span class="line">  <span class="comment">// 之所以这样做的目的是：希望find()代码不要改变a数组中的内容</span></span><br><span class="line">  <span class="keyword">char</span> tmp = a[n<span class="number">-1</span>];</span><br><span class="line">  <span class="comment">// 把key的值放到a[n-1]中，此时a = &#123;4, 2, 3, 5, 9, 7&#125;</span></span><br><span class="line">  a[n<span class="number">-1</span>] = key;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">  <span class="comment">// while 循环比起代码一，少了i&lt;n这个比较操作</span></span><br><span class="line">  <span class="keyword">while</span> (a[i] != key) &#123;</span><br><span class="line">    ++i;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 恢复a[n-1]原来的值,此时a= &#123;4, 2, 3, 5, 9, 6&#125;</span></span><br><span class="line">  a[n<span class="number">-1</span>] = tmp;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">if</span> (i == n<span class="number">-1</span>) &#123;</span><br><span class="line">    <span class="comment">// 如果i == n-1说明，在0...n-2之间都没有key，所以返回-1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 否则，返回i，就是等于key值的元素的下标</span></span><br><span class="line">    <span class="keyword">return</span> i;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对比两段代码，在字符串 a 很长的时候，比如几万、几十万，你觉得哪段代码运行得更快点呢？答案是代码二，因为两段代码中执行次数最多就是 while 循环那一部分。第二段代码中，我们通过一个哨兵 a[n-1] = key，成功省掉了一个比较语句 i，不要小看这一条语句，当累积执行万次、几十万次时，累积的时间就很明显了。</p>
+<p><strong>重点留意边界条件处理</strong></p>
+<ul>
+<li><p>如果链表为空时，代码是否能正常工作？</p>
+</li>
+<li><p>如果链表只包含一个结点时，代码是否能正常工作？</p>
+</li>
+<li><p>如果链表只包含两个结点时，代码是否能正常工作？</p>
+</li>
+<li><p>代码逻辑在处理头结点和尾结点的时候，是否能正常工作？</p>
+</li>
+</ul>
+<p><strong>举例画图，辅助思考</strong></p>
+<p>找个具体例子，释放脑容量，进行更多的逻辑思考，有助于思路清晰。比如往单链表中插入一个数据，如图所示：</p>
+<img data-src="https://static001.geekbang.org/resource/image/4a/f8/4a701dd79b59427be654261805b349f8.jpg" style="zoom:50%;" />
+
+<p><strong>多写多练，没有捷径</strong></p>
+<p>5个常见的链表操作：</p>
+<ul>
+<li>单链表反转</li>
+<li>链表中环的检测 </li>
+<li>两个有序的链表合并</li>
+<li>删除链表倒数第 n 个结点</li>
+<li>求链表的中间结点</li>
+</ul>
 ]]></content>
       <categories>
         <category>数据结构与算法</category>
