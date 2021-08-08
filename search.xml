@@ -209,6 +209,114 @@
       </tags>
   </entry>
   <entry>
+    <title>跳表</title>
+    <url>/archives/2e152a56.html</url>
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/08/xe4MyIJXcmufOQa.jpg" style="zoom:50%;" />
+
+<p>跳表是一种各方面性能都比较优秀的<strong>动态数据结构</strong>，可以支持快速地插入、删除、查找操作，写起来也不复杂，甚至可以替代红黑树（Red-black tree）</p>
+<span id="more"></span>
+
+<p>对于存储在链表中的数据，只需要对链表稍加改造，就可以支持类似“二分”的查找算法，我们把改造后的数据结构叫做<strong>跳表</strong>（Skip list）</p>
+<h3 id="如何理解“跳表”？"><a href="#如何理解“跳表”？" class="headerlink" title="如何理解“跳表”？"></a>如何理解“跳表”？</h3><p>对于一个单链表来讲，即便链表中存储的数据是有序的，如果我们要想在其中查找某个数据，也只能从头到尾遍历链表。这样查找效率就会很低，时间复杂度会很高，是 O(n)。</p>
+<img data-src="https://static001.geekbang.org/resource/image/e1/6d/e18303fcedc068e5a168de04df956f6d.jpg" style="zoom:50%;" />
+
+<p>那怎么来提高查找效率呢？如果像图中那样，对链表建立一级“索引”，查找起来是不是就会更快一些呢？每两个结点提取一个结点到上一级，我们把抽出来的那一级叫做<strong>索引</strong>或<strong>索引层</strong>。</p>
+<img data-src="https://static001.geekbang.org/resource/image/14/8e/14753c824a5ee4a976ea799727adc78e.jpg" style="zoom:50%;" />
+
+<p>假如现在要查找结点16，我们可以先在索引层遍历，当遍历到索引值为13时，发现下一结点是17，那要查找的结点16就在这两结点之间。然后我们通过索引层结点的down指针，下降到原始链表层，继续遍历即可。原来需要遍历10个结点，现在只需要7个结点。</p>
+<p>从这个例子里，我们看出，<strong>加来一层索引之后，查找一个结点需要遍历的结点个数减少了，也就是说查找效率提高了</strong>。</p>
+<p>数据量大的话，可以添加多层索引提升效率。<strong>这种链表加多级索引的结构，就是跳表</strong>。</p>
+<img data-src="https://i.loli.net/2021/08/08/tKFQ2YcO1dnWS9E.jpg" style="zoom:50%;" />
+
+<h3 id="用跳表查询到底有多快？"><a href="#用跳表查询到底有多快？" class="headerlink" title="用跳表查询到底有多快？"></a>用跳表查询到底有多快？</h3><p>每两个结点会抽出一个结点作为上一级索引的结点，那第一级索引的结点个数大约就是 n/2，第二级索引的结点个数大约就是 n/4，第三级索引的结点个数大约就是 n/8，依次类推，也就是说，**第 k 级索引的结点个数是第 k-1 级索引的结点个数的 1/2，那第 k级索引结点的个数就是 $n/(2k)$**。</p>
+<p>假设索引有 h 级，最高级的索引有 2 个结点。通过上面的公式，我们可以得到 n/(2h)=2，从而求得 h=log2n-1。如果包含原始链表这一层，整个跳表的高度就是 log2n。我们在跳表中查询某个数据的时候，如果每一层都要遍历 m 个结点，那在跳表中查询一个数据的时间复杂度就是 O(m*logn)。</p>
+<p>假设我们要查找的数据是 x，在第 k 级索引中，我们遍历到 y 结点之后，发现 x 大于 y，小于后面的结点 z，所以我们通过 y 的 down 指针，从第 k 级索引下降到第 k-1 级索引。在第 k-1 级索引中，y 和 z 之间只有 3 个结点（包含 y 和 z），所以，我们在 K-1 级索引中最多只需要遍历 3 个结点，依次类推，每一级索引都最多只需要遍历 3 个结点，即 m=3。</p>
+<img data-src="https://i.loli.net/2021/08/08/2tfn93XdPqk5oKi.jpg" style="zoom:50%;" />
+
+<h3 id="跳表是不是很浪费内存？"><a href="#跳表是不是很浪费内存？" class="headerlink" title="跳表是不是很浪费内存？"></a>跳表是不是很浪费内存？</h3><p>跳表就是通过空间换时间的设计思路来实现了和二分查找一样的时间复杂度。根据前面的公式，可以得到跳表的空间复杂度就是$n/2+n/4+n/8…+8+4+2=n-2$​。</p>
+<p>如果想要降低索引占用的内存空间，也可以选择三个结点或五个结点抽取一个到上级索引。</p>
+<p>实际上，在软件开发中，我们不必太在意索引占用的额外空间。在讲数据结构和算法时，我们习惯性地把要处理的数据看成整数，但是在实际的软件开发中，原始链表中存储的有可能是很大的对象，而索引结点只需要存储关键值和几个指针，并不需要存储对象，所以当对象比索引结点大很多时，那索引占用的额外空间就可以忽略了</p>
+<h3 id="高效的动态插入和删除"><a href="#高效的动态插入和删除" class="headerlink" title="高效的动态插入和删除"></a>高效的动态插入和删除</h3><p>跳表这个动态数据结构，不仅支持查找操作，还支持动态的插入、删除操作，而且插入、删除操作的时间复杂度也是 O(logn)。因为插入、删除操作的耗时都在查找遍历上，要注意删除时如果结点在索引中也有出现，那要同事删除原始链表和索引的结点</p>
+<h3 id="跳表索引动态更新"><a href="#跳表索引动态更新" class="headerlink" title="跳表索引动态更新"></a>跳表索引动态更新</h3><p>当我们不停地往跳表中插入数据时，如果我们不更新索引，就有可能出现某 2 个索引结点之间数据非常多的情况。极端情况下，跳表还会退化成单链表。</p>
+<img data-src="https://static001.geekbang.org/resource/image/c8/c5/c863074c01c26538cf0134eaf8dc67c5.jpg" style="zoom:50%;" />
+
+<p>作为一种动态数据结构，我们需要某种手段来维护索引与原始链表大小之间的平衡，也就是说，如果链表中结点多了，索引结点就相应地增加一些，避免复杂度退化，以及查找、插入、删除操作性能下降。</p>
+<p>当我们往跳表中插入数据的时候，我们可以选择同时将这个数据插入到部分索引层中。如何选择加入哪些索引层呢？</p>
+<p>我们通过一个随机函数，来决定将这个结点插入到哪几级索引中，比如随机函数生成了值 K，那我们就将这个结点添加到第一级到第 K 级这 K 级索引中。</p>
+<img data-src="https://static001.geekbang.org/resource/image/a8/a7/a861445d0b53fc842f38919365b004a7.jpg" style="zoom:50%;" />
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>二分查找</title>
+    <url>/archives/e8eb0481.html</url>
+    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/ca/df/ca9c8119a7532fc8a7b249af019bf3df.jpg" style="zoom:50%;" />
+
+<p>假设我们有 1000 万个整数数据，每个数据占 8 个字节，如何设计数据结构和算法，快速判断某个整数是否出现在这 1000 万数据中？ 我们希望这个功能不要占用太多的内存空间，最多不要超过 100MB，你会怎么做呢？</p>
+<span id="more"></span>
+
+<h3 id="无处不在的二分思想"><a href="#无处不在的二分思想" class="headerlink" title="无处不在的二分思想"></a>无处不在的二分思想</h3><p>随机写一个 0 到 99 之间的数字，然后你来猜我写的是什么。猜的过程中，你每猜一次，我就会告诉你猜的大了还是小了，直到猜中为止。</p>
+<p>假设数字是 23，你可以按照下面的步骤来试一试。</p>
+<img data-src="https://i.loli.net/2021/08/07/u6aGvywhBXeCHbm.jpg" style="zoom:50%;" />
+
+<p>这个例子用的就是二分思想，按照这个思想，即便我让你猜的是 0 到 999 的数字，最多也只要 10 次就能猜中。</p>
+<p>这是一个生活中的例子，我们现在回到实际的开发场景中。假设有 1000 条订单数据，已经按照订单金额从小到大排序，每个订单金额都不同，并且最小单位是元。我们现在想知道是否存在金额等于 19 元的订单。如果存在，则返回订单数据，如果不存在则返回 null。</p>
+<p>最简单的办法当然是从第一个订单开始，一个一个遍历这 1000 个订单，直到找到金额等于 19 元的订单为止。但这样查找会比较慢，最坏情况下，可能要遍历完这 1000 条记录才能找到。那用二分查找能不能更快速地解决呢？</p>
+<p>为了方便讲解，我们假设只有 10 个订单，订单金额分别是：8，11，19，23，27，33，45，55，67，98。</p>
+<p>还是利用二分思想，每次都与区间的中间数据比对大小，缩小查找区间的范围。为了更加直观，我画了一张查找过程的图。其中，low 和 high 表示待查找区间的下标，mid 表示待查找区间的中间元素下标。</p>
+<img data-src="https://static001.geekbang.org/resource/image/8b/29/8bce81259abf0e9a06f115e22586b829.jpg" style="zoom:50%;" />
+
+<p><strong>二分查找针对的是一个有序的数据集合，查找思想有点类似分治思想。每次都通过跟区间的中间元素对比，将待查找的区间缩小为之前的一半，直到找到要查找的元素，或者区间被缩小为 0。</strong></p>
+<h3 id="O-logn-​​惊人的查找"><a href="#O-logn-​​惊人的查找" class="headerlink" title="$O(logn)$​​惊人的查找"></a>$O(logn)$​​惊人的查找</h3><p>二分查找十分高效。我们假设数据大小是 n，每次查找后数据都会缩小为原来的一半，也就是会除以 2。最坏情况下，直到查找区间被缩小为空，才停止。</p>
+<img data-src="https://i.loli.net/2021/08/07/cDUVBderYRxmXht.jpg" style="zoom:50%;" />
+
+<p>可以求得 k=log2n，所以时间复杂度就是 O(logn)。O(logn) 这种对数时间复杂度。这是一种极其高效的时间复杂度，有的时候甚至比时间复杂度是常量级 O(1) 的算法还要高效。</p>
+<p>因为 logn 是一个非常“恐怖”的数量级，即便 n 非常非常大，对应的 logn 也很小。比如 n 等于 2 的 32 次方，这个数很大了吧？大约是 42 亿。也就是说，如果我们在 42 亿个数据中用二分查找一个数据，最多需要比较 32 次。</p>
+<p>用大 O 标记法表示时间复杂度的时候，会省略掉常数、系数和低阶。对于常量级时间复杂度的算法来说，O(1) 有可能表示的是一个非常大的常量值，比如 O(1000)、O(10000)。所以，常量级时间复杂度的算法有时候可能还没有 O(logn) 的算法执行效率高。</p>
+<h3 id="二分查找的递归与非递归实现"><a href="#二分查找的递归与非递归实现" class="headerlink" title="二分查找的递归与非递归实现"></a>二分查找的递归与非递归实现</h3><p>最简单的情况就是有序数组中不存在重复元素。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">bsearch</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n, <span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> low = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> high = n - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (low &lt;= high) &#123;</span><br><span class="line">    <span class="keyword">int</span> mid = (low + high) / <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">if</span> (a[mid] == value) &#123;</span><br><span class="line">      <span class="keyword">return</span> mid;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (a[mid] &lt; value) &#123;</span><br><span class="line">      low = mid + <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      high = mid - <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要着重强调一下容易出错的 3 个地方。</p>
+<ol>
+<li><p><strong>循环退出条件</strong></p>
+<p>注意是 low&lt;=high，而不是 low&gt;1</p>
+</li>
+<li><p><strong>mid 的取值</strong></p>
+<p>实际上，mid=(low+high)/2 这种写法是有问题的。因为如果 low 和 high 比较大的话，两者之和就有可能会溢出。改进的方法是将 mid 的计算方式写成 low+(high-low)/2。更进一步，如果要将性能优化到极致的话，我们可以将这里的除以 2 操作转化成位运算 low+((high-low)&gt;&gt;1)。因为相比除法运算来说，计算机处理位运算要快得多。</p>
+</li>
+<li><p><strong>low 和 high 的更新</strong></p>
+<p>low=mid+1，high=mid-1。注意这里的 +1 和 -1，如果直接写成 low=mid 或者 high=mid，就可能会发生死循环。比如，当 high=3，low=3 时，如果 a[3]不等于 value，就会导致一直循环不退出。</p>
+</li>
+</ol>
+<p><strong>二分查找的递归实现：</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 二分查找的递归实现</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">bsearch</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> bsearchInternally(a, <span class="number">0</span>, n - <span class="number">1</span>, val);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">bsearchInternally</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> low, <span class="keyword">int</span> high, <span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (low &gt; high) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span> mid =  low + ((high - low) &gt;&gt; <span class="number">1</span>);</span><br><span class="line">  <span class="keyword">if</span> (a[mid] == value) &#123;</span><br><span class="line">    <span class="keyword">return</span> mid;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (a[mid] &lt; value) &#123;</span><br><span class="line">    <span class="keyword">return</span> bsearchInternally(a, mid+<span class="number">1</span>, high, value);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> bsearchInternally(a, low, mid-<span class="number">1</span>, value);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="二分查找应用场景的局限性"><a href="#二分查找应用场景的局限性" class="headerlink" title="二分查找应用场景的局限性"></a>二分查找应用场景的局限性</h3><p><strong>二分查找依赖的是顺序表结构，简单点说就是数组</strong></p>
+<p>二分查找需要按照下标随机访问元素，如果使用链表这种数据结构，时间复杂会变得很高。</p>
+<p><strong>二分查找针对的是有序数据</strong></p>
+<p>如果数据没有序，我们需要先排序。前面章节里我们讲到，排序的时间复杂度最低是 O(nlogn)。所以，如果我们针对的是一组静态的数据，没有频繁地插入、删除，我们可以进行一次排序，多次二分查找。这样排序的成本可被均摊，二分查找的边际成本就会比较低。</p>
+<p>但是，如果我们的数据集合有频繁的插入和删除操作，要想用二分查找，要么每次插入、删除操作之后保证数据仍然有序，要么在每次二分查找之前都先进行排序。针对这种动态数据集合，无论哪种方法，维护有序的成本都是很高的。</p>
+<p>所以，二分查找只能用在插入、删除操作不频繁，一次排序多次查找的场景中。针对动态变化的数据集合，二分查找将不再适用。</p>
+<p><strong>数据量太小不适合二分查找。</strong></p>
+<p>比如我们在一个大小为 10 的数组中查找一个元素，不管用二分查找还是顺序遍历，查找速度都差不多。只有数据量比较大的时候，二分查找的优势才会比较明显。</p>
+<p>不过，这里有一个例外。如果数据之间的比较操作非常耗时，不管数据量大小，我都推荐使用二分查找。比如，数组中存储的都是长度超过 300 的字符串，如此长的两个字符串之间比对大小，就会非常耗时。我们需要尽可能地减少比较次数，而比较次数的减少会大大提高性能，这个时候二分查找就比顺序遍历更有优势。</p>
+<p><strong>数据量太大也不适合二分查找。</strong></p>
+<p>二分查找的底层需要依赖数组这种数据结构，而数组为了支持随机访问的特性，要求内存空间连续，对内存的要求比较苛刻。比如，我们有 1GB 大小的数据，如果希望用数组来存储，那就需要 1GB 的连续内存空间。</p>
+<p>注意这里的“连续”二字，也就是说，即便有 2GB 的内存空间剩余，但是如果这剩余的 2GB 内存空间都是零散的，没有连续的 1GB 大小的内存空间，那照样无法申请一个 1GB 大小的数组。而我们的二分查找是作用在数组这种数据结构之上的，所以太大的数据用数组存储就比较吃力了，也就不能用二分查找了。</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>排序优化</title>
     <url>/archives/7418344d.html</url>
     <content><![CDATA[<img data-src="https://i.loli.net/2021/08/05/5DAt1oVdSKu4Bqr.jpg" style="zoom:50%;" />
@@ -381,11 +489,11 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 插入排序，a表示数组，n表示数组大小</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertionSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="keyword">int</span> value = a[i];</span><br><span class="line">    <span class="keyword">int</span> j = i - <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 查找插入的位置</span></span><br><span class="line">    <span class="keyword">for</span> (; j &gt;= <span class="number">0</span>; --j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (a[j] &gt; value) &#123;</span><br><span class="line">        a[j+<span class="number">1</span>] = a[j];  <span class="comment">// 数据移动</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    a[j+<span class="number">1</span>] = value; <span class="comment">// 插入数据</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>插入排序空间复杂度为$O(1)$​，是原地排序算法，也是稳定排序算法。最好时间复杂度是$O(n)$​，最坏是$O(n^2)$​，我们在数组中插入一个数据的平均时间复杂度是$O(n)$，所以插入排序循环n次插入操作的平均时间复杂度就是$O(n^2)$。​</p>
-<h3 id="选择排序（Selection-Sort）"><a href="#选择排序（Selection-Sort）" class="headerlink" title="选择排序（Selection Sort）"></a>选择排序（Selection Sort）</h3><p>选择排序算法的实现思路有点类似插入排序，也分已排序区间和未排序区间。但是选择排序每次会从未排序区间中找到最小的元素，将其放到已排序区间的末尾。</p>
+<h3 id="选择排序（Sort）"><a href="#选择排序（Sort）" class="headerlink" title="选择排序（Sort）"></a>选择排序（Sort）</h3><p>选择排序算法的实现思路有点类似插入排序，也分已排序区间和未排序区间。但是选择排序每次会从未排序区间中找到最小的元素，将其放到已排序区间的末尾。</p>
 <img data-src="https://static001.geekbang.org/resource/image/32/1d/32371475a0b08f0db9861d102474181d.jpg" style="zoom:50%;" />
 
 <p>选择排序空间复杂度为 O(1)，是一种原地排序算法。选择排序的最好情况时间复杂度、最坏情况和平均情况时间复杂度都为 O(n2)。但是，选择排序是一种不稳定的排序算法。从我前面画的那张图中，你可以看出来，选择排序每次都要找剩余未排序元素中的最小值，并和前面的元素交换位置，这样破坏了稳定性。</p>
-<h3 id="为什么插入排序要比冒泡排序更受欢迎呢？"><a href="#为什么插入排序要比冒泡排序更受欢迎呢？" class="headerlink" title="为什么插入排序要比冒泡排序更受欢迎呢？"></a>为什么插入排序要比冒泡排序更受欢迎呢？</h3><p>冒泡排序的数据交换要比插入排序的数据移动要复杂，冒泡排序需要 3 个赋值操作，而插入排序只需要 1 个。对于数据规模大的问题，插入排序更有效率。而且，冒泡排序不管怎么优化，元素交换的次数是一个固定值，是原始数据的逆序度。插入排序是同样的，不管怎么优化，元素移动的次数也等于原始数据的逆序度。插入排序的算法有很大的优化空间。</p>
+<h3 id="为什么插入排序要比冒泡排序更受欢迎呢？"><a href="#为什么插入排序要比冒泡排序更受欢迎呢？" class="headerlink" title="为什么插入排序要比冒泡排序更受欢迎呢？"></a>为什么插入排序要比冒泡排序更受欢迎呢？</h3><p>冒泡排序的数据交换要比插入排序的数据移动要复杂，冒泡排序需要 3 个赋值操作，而插入排序只需要 1 个。对于数据规模大的问题，插入排序更有效率。而且插入排序的算法有很大的优化空间，参考[希尔排序](<a href="https://zh.wikipedia.org/wiki/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F">希尔排序 - 维基百科，自由的百科全书 (wikipedia.org)</a>)。</p>
 <img data-src="https://static001.geekbang.org/resource/image/ae/fb/ae97df138c98e6c130f76d93c02095fb.jpg" style="zoom:50%;" />
 
 <p>再讲两种时间复杂度为 O(nlogn) 的排序算法，<strong>归并排序</strong>和<strong>快速排序</strong>。这两种排序算法适合大规模的数据排序。</p>
