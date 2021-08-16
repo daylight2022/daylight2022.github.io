@@ -209,9 +209,387 @@
       </tags>
   </entry>
   <entry>
+    <title>递归树</title>
+    <url>/archives/66071d43.html</url>
+    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/2f/6d/2fde598f081f84187695fbf1937c446d.jpg" style="zoom:50%;" />
+
+<p>我们可以借助借助递归树来分析递归算法的时间复杂度</p>
+<span id="more"></span>
+
+<h3 id="递归树与时间复杂度分析"><a href="#递归树与时间复杂度分析" class="headerlink" title="递归树与时间复杂度分析"></a>递归树与时间复杂度分析</h3><p>递归的思想就是，将大问题分解为小问题来求解，然后再将小问题分解为小小问题。这样一层一层地分解，直到问题的数据规模被分解得足够小，不用继续递归分解为止。</p>
+<p>如果我们把这个一层一层的分解过程画成图，它其实就是一棵树。我们给这棵树起一个名字，叫作递归树。下图是斐波那契数列的递归树，结点数字表示数据规模，一个节点的求解可以分解为左右子节点两个问题的求解。</p>
+<img data-src="https://static001.geekbang.org/resource/image/1d/a3/1d9648b7f43e430473d76d24803159a3.jpg" style="zoom:50%;" />
+
+<p>我们借助归并排序来看看如何用递归树来分析递归代码的时间复杂度。</p>
+<img data-src="https://static001.geekbang.org/resource/image/c6/d0/c66bfc3d02d3b7b8f64c208bf4c948d0.jpg" style="zoom:50%;" />
+
+<p>因为每次分解都是一分为二，所以代价很低，我们把时间上的消耗记作常量 1。归并算法中比较耗时的是归并操作，也就是把两个子数组合并为大数组。从图中我们可以看出，每一层归并操作消耗的时间总和是一样的，跟要排序的数据规模有关。我们把每一层归并操作消耗的时间记作 n。</p>
+<p>现在，我们只需要知道这棵树的高度 h，用高度 h 乘以每一层的时间消耗 n，就可以得到总的时间复杂度 $O(n∗h)$。从归并排序的原理和递归树，可以看出来，归并排序递归树是一棵满二叉树。</p>
+<p>满二叉树的高度大约是 $log_2n$，所以，归并排序递归实现的时间复杂度就是 $O(nlogn)$。我这里的时间复杂度都是估算的，对树的高度的计算也没有那么精确，但是这并不影响复杂度的计算结果。</p>
+<h3 id="实战一：分析快速排序的时间复杂度"><a href="#实战一：分析快速排序的时间复杂度" class="headerlink" title="实战一：分析快速排序的时间复杂度"></a>实战一：分析快速排序的时间复杂度</h3><p>快速排序在最好情况下，每次分区都能一分为二，这个时候用递推公式 $T(n)=2T(2n)+n$​，很容易就能推导出时间复杂度是 $O(nlogn)$。但是，我们并不可能每次分区都这么幸运，正好一分为二。</p>
+<p>我们假设平均情况下，每次分区之后，两个分区的大小比例为 1:k。当 k=9 时，如果用递推公式的方法来求解时间复杂度的话，递推公式就写成 $T(n)=T(10n)+T(109n)+n$。</p>
+<p>我们还是取 k 等于 9，也就是说，每次分区都很不平均，一个分区是另一个分区的 9 倍。如果我们把递归分解的过程画成递归树:</p>
+<img data-src="https://static001.geekbang.org/resource/image/44/43/44972a3531dae0b7a0ccc935bc13f243.jpg" style="zoom:50%;" />
+
+<p>快速排序的过程中，每次分区都要遍历待分区区间的所有数据，所以，每一层分区操作所遍历的数据的个数之和就是 n。我们现在只要求出递归树的高度 $h$，这个快排过程遍历的数据个数就是 $h∗n$ ，也就是说，时间复杂度就是 $O(h∗n)$。因为每次分区并不是均匀地一分为二，所以递归树并不是满二叉树。这样一个递归树的高度是多少呢？</p>
+<p>我们知道，快速排序结束的条件就是待排序的小区间，大小为 1，也就是说叶子节点里的数据规模是 1。从根节点 n 到叶子节点 1，递归树中最短的一个路径每次都乘以 $\frac{1}{10}$​​，最长的一个路径每次都乘以$\frac{9}{10}$​​。通过计算，我们可以得到，从根节点到叶子节点的最短路径是 $log_{10}n$​​，最长的路径是 $log_{\frac{10}{9}}n$​​。</p>
+<img data-src="https://static001.geekbang.org/resource/image/7c/ed/7cea8607f0d92a901f3152341830d6ed.jpg" style="zoom:50%;" />
+
+<p>所以，遍历数据的个数总和就介于 $log_{10}n$​ 和 $log_{\frac{10}{9}}n$​ 之间。根据复杂度的大 O 表示法，对数复杂度的底数不管是多少，我们统一写成 $logn$​，所以，当分区大小比例是 1:9 时，快速排序的时间复杂度仍然是 $O(nlogn)$​。</p>
+<p>依次类推，k=99 甚至更大时，时间复杂度仍是$O(nlogn)$</p>
+<h3 id="实战二：分析斐波那契数列的时间复杂度"><a href="#实战二：分析斐波那契数列的时间复杂度" class="headerlink" title="实战二：分析斐波那契数列的时间复杂度"></a>实战二：分析斐波那契数列的时间复杂度</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">return</span> f(n-<span class="number">1</span>) + f(n-<span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>把上面代码画成递归树：</p>
+<img data-src="https://static001.geekbang.org/resource/image/9c/ce/9ccbce1a70c7e2def52701dcf176a4ce.jpg" style="zoom:50%;" />
+
+<p>f(n) 分解为 f(n−1) 和 f(n−2)，每次数据规模都是 −1 或者 −2，叶子节点的数据规模是 1 或者 2。所以，从根节点走到叶子节点，每条路径是长短不一的。如果每次都是 −1，那最长路径大约就是 n；如果每次都是 −2，那最短路径大约就是 $\frac n2$。</p>
+<p>每次分解之后的合并操作只需要一次加法运算，我们把这次加法运算的时间消耗记作 1。所以，从上往下，第一层的总时间消耗是 1，第二层的总时间消耗是 2，第三层的总时间消耗就是 $2^2$。依次类推，第 k 层的时间消耗就是 $2^{k−1}$，​那整个算法的总的时间消耗就是每一层时间消耗之和。</p>
+<p>如果路径长度都为 n，那这个总和就是 $2^n−1$。</p>
+<img data-src="https://static001.geekbang.org/resource/image/86/1f/86d301fc5fa3088383fa5b45f01e4d1f.jpg" style="zoom:50%;" />
+
+<p>如果路径长度都是 $\frac n2$ ，那整个算法的总的时间消耗就是 $2^{\frac n2}−1$​。</p>
+<img data-src="https://i.loli.net/2021/08/16/XO7VnQdpHcPZeK2.jpg" style="zoom:50%;" />
+
+<p>所以，这个算法的时间复杂度就介于 O($2^n$​​) 和 O($2^{\frac n2}$​​) 之间。虽然这样得到的结果还不够精确，只是一个范围，但是我们也基本上知道了上面算法的时间复杂度是指数级的，非常高。</p>
+<h3 id="实战三：分析全排列的时间复杂度"><a href="#实战三：分析全排列的时间复杂度" class="headerlink" title="实战三：分析全排列的时间复杂度"></a>实战三：分析全排列的时间复杂度</h3><p>在高中的时候都学过排列组合。“如何把 n 个数据的所有排列都找出来”，这就是全排列的问题。</p>
+<p>如果我们确定了最后一位数据，那就变成了求解剩下 n−1 个数据的排列问题。而最后一位数据可以是 n 个数据中的任意一个，因此它的取值就有 n 种情况。所以，“n 个数据的排列”问题，就可以分解成 n 个“n−1 个数据的排列”的子问题。</p>
+<p>如果我们把它写成递推公式，就是下面这个样子：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">假设数组中存储的是<span class="number">1</span>，<span class="number">2</span>， <span class="number">3.</span>..n。</span><br><span class="line">        </span><br><span class="line">f(<span class="number">1</span>,<span class="number">2</span>,...n) = &#123;最后一位是<span class="number">1</span>, f(n-<span class="number">1</span>)&#125; + &#123;最后一位是<span class="number">2</span>, f(n-<span class="number">1</span>)&#125; +...+&#123;最后一位是n, f(n-<span class="number">1</span>)&#125;。</span><br></pre></td></tr></table></figure>
+
+<p>代码：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 调用方式：</span></span><br><span class="line"><span class="comment">// int[]a = a=&#123;1, 2, 3, 4&#125;; printPermutations(a, 4, 4);</span></span><br><span class="line"><span class="comment">// k表示要处理的子数组的数据个数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printPermutations</span><span class="params">(<span class="keyword">int</span>[] data, <span class="keyword">int</span> n, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (k == <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">      System.out.print(data[i] + <span class="string">&quot; &quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; k; ++i) &#123;</span><br><span class="line">    <span class="keyword">int</span> tmp = data[i];</span><br><span class="line">    data[i] = data[k-<span class="number">1</span>];</span><br><span class="line">    data[k-<span class="number">1</span>] = tmp;</span><br><span class="line"></span><br><span class="line">    printPermutations(data, n, k - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    tmp = data[i];</span><br><span class="line">    data[i] = data[k-<span class="number">1</span>];</span><br><span class="line">    data[k-<span class="number">1</span>] = tmp;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在，我们来看下，如何借助递归树，轻松分析出这个代码的时间复杂度。不过，这个递归树已经不是标准的二叉树了。</p>
+<img data-src="https://static001.geekbang.org/resource/image/82/9b/82f40bed489cf29b14192b44decf059b.jpg" style="zoom:50%;" />
+
+<p>第一层分解有 n 次交换操作，第二层有 n 个节点，每个节点分解需要 n−1 次交换，所以第二层总的交换次数是 $n∗(n−1)$。第三层有 $n∗(n−1)$ 个节点，每个节点分解需要 n−2 次交换，所以第三层总的交换次数是 $n∗(n−1)∗(n−2)$。</p>
+<p>以此类推，第 k 层总的交换次数就是 $n∗(n−1)∗(n−2)∗…∗(n−k+1)$。最后一层的交换次数就是 $n∗(n−1)∗(n−2)∗…∗2∗1$。每一层的交换次数之和就是总的交换次数。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">n + n*(n-<span class="number">1</span>) + n*(n-<span class="number">1</span>)*(n-<span class="number">2</span>) +... + n*(n-<span class="number">1</span>)*(n-<span class="number">2</span>)*...*<span class="number">2</span>*<span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>这个公式的求和比较复杂，我们看最后一个数，$n∗(n−1)∗(n−2)∗…∗2∗1$ 等于 $n!$，而前面的 $n−1$ 个数都小于最后一个数，所以，总和肯定小于 $n∗n!$，也就是说，全排列的递归算法的时间复杂度大于 $O(n!)$，小于 $O(n∗n!)$，虽然我们没法知道非常精确的时间复杂度，但是这样一个范围已经让我们知道，全排列的时间复杂度是非常高的。</p>
+<h3 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h3><p>1 个细胞的生命周期是 3 小时，1 小时分裂一次。求 n 小时后，容器内有多少细胞？请你用已经学过的递归时间复杂度的分析方法，分析一下这个递归问题的时间复杂度。</p>
+<p>假设细胞是先分裂再死亡，三个小时后开始死亡的细胞个数，也就是存活了三个小时的细胞，即四个小时前的细胞个数。由此得到递推公式</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">f(0) &#x3D; 1;</span><br><span class="line">f(1) &#x3D; 2;</span><br><span class="line">f(2) &#x3D; 4;</span><br><span class="line">f(4) &#x3D; 7;</span><br><span class="line">f(n) &#x3D; 2*f(n-1) - f(n-4);</span><br></pre></td></tr></table></figure>
+
+<p>和斐波那契数列类似，复杂度介于 O($2^n$​) 和 O($2^{\frac n4}$​​) 之间，也是指数级</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>红黑树</title>
+    <url>/archives/f89cb603.html</url>
+    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/b8/5d/b87b539ee593696aa7619bb950d1205d.jpg" style="zoom:50%;" />
+
+<p>二叉查找树在频繁的动态更新过程中，可能会出现树的高度远大于 log2n 的情况，从而导致各个操作的效率下降。极端情况下，二叉树会退化为链表，时间复杂度会退化到 O(n)，要解决这个复杂度退化的问题，需要设计一种平衡二叉查找树。</p>
+<p>很多书籍里，但凡讲到平衡二叉查找树，就会拿红黑树作为例子。不仅如此，如果你有一定的开发经验，你会发现，在工程中，很多用到平衡二叉查找树的地方都会用红黑树。你有没有想过，<strong>为什么工程中都喜欢用红黑树，而不是其他平衡二叉查找树呢？</strong></p>
+<span id="more"></span>
+
+<h3 id="什么是“平衡二叉查找树”？"><a href="#什么是“平衡二叉查找树”？" class="headerlink" title="什么是“平衡二叉查找树”？"></a>什么是“平衡二叉查找树”？</h3><p>平衡二叉树的严格定义是这样的：二叉树中任意一个节点的左右子树的高度相差不能大于 1。</p>
+<p>平衡二叉查找树不仅满足上面平衡二叉树的定义，还满足二叉查找树的特点。最先被发明的平衡二叉查找树是[AVL](<a href="https://zh.wikipedia.org/wiki/AVL%E6%A0%91">AVL树 - 维基百科，自由的百科全书 (wikipedia.org)</a>) 树，它严格符合我刚讲到的平衡二叉查找树的定义，即任何节点的左右子树高度相差不超过 1，是一种高度平衡的二叉查找树。</p>
+<p>但是很多平衡二叉查找树其实并没有严格符合上面的定义（树中任意一个节点的左右子树的高度相差不能大于 1），比如我们下面要讲的红黑树，它从根节点到各个叶子节点的最长路径，有可能会比最短路径大一倍。</p>
+<p>平衡二叉查找树中“平衡”的意思，其实就是让整棵树左右看起来比较“对称”、比较“平衡”，不要出现左子树很高、右子树很矮的情况。这样就能让整棵树的高度相对来说低一些，相应的插入、删除、查找等操作的效率高一些。</p>
+<p>所以，如果我们现在设计一个新的平衡二叉查找树，只要树的高度不比 log2n 大很多（比如树的高度仍然是对数量级的），尽管它不符合我们前面讲的严格的平衡二叉查找树的定义，但我们仍然可以说，这是一个合格的平衡二叉查找树。</p>
+<h3 id="如何定义一棵“红黑树”？"><a href="#如何定义一棵“红黑树”？" class="headerlink" title="如何定义一棵“红黑树”？"></a>如何定义一棵“红黑树”？</h3><p>红黑树的英文是“Red-Black Tree”，简称 R-B Tree。它是一种不严格的平衡二叉查找树，它的定义是不严格符合平衡二叉查找树的定义的。红黑树中的节点，一类被标记为黑色，一类被标记为红色。除此之外，一棵红黑树还需要满足这样几个要求：</p>
+<ul>
+<li>根节点是黑色的；</li>
+<li>每个叶子节点都是黑色的空节点（NIL），也就是说，叶子节点不存储数据；</li>
+<li>任何相邻的节点都不能同时为红色，也就是说，红色节点是被黑色节点隔开的；</li>
+<li>每个节点，从该节点到达其可达叶子节点的所有路径，都包含相同数目的黑色节点；</li>
+</ul>
+<h3 id="为什么说红黑树是“近似平衡”的？"><a href="#为什么说红黑树是“近似平衡”的？" class="headerlink" title="为什么说红黑树是“近似平衡”的？"></a>为什么说红黑树是“近似平衡”的？</h3><p>平衡二叉查找树的初衷，是为了解决二叉查找树因为动态更新导致的性能退化问题。所以，<strong>“平衡”的意思可以等价为性能不退化。“近似平衡”就等价为性能不会退化得太严重</strong>。</p>
+<p>二叉查找树很多操作的性能都跟树的高度成正比。一棵极其平衡的二叉树（满二叉树或完全二叉树）的高度大约是 log2n，所以如果要证明红黑树是近似平衡的，我们只需要分析，红黑树的高度是否比较稳定地趋近 log2n 就好了。</p>
+<p>首先，我们来看，如果我们将红色节点从红黑树中去掉，那单纯包含黑色节点的红黑树的高度是多少呢？</p>
+<p>红色节点删除之后，有些节点就没有父节点了，它们会直接拿这些节点的祖父节点（父节点的父节点）作为父节点。所以，之前的二叉树就变成了四叉树。</p>
+<img data-src="https://static001.geekbang.org/resource/image/7e/ed/7e6ecc308fe44120f30de809822215ed.jpg" style="zoom:50%;" />
+
+<p>前面红黑树的定义里有这么一条：从任意节点到可达的叶子节点的每个路径包含相同数目的黑色节点。我们从四叉树中取出某些节点，放到叶节点位置，四叉树就变成了完全二叉树。所以，仅包含黑色节点的四叉树的高度，比包含相同节点个数的完全二叉树的高度还要小。</p>
+<p>完全二叉树的高度近似 log2n，这里的四叉“黑树”的高度要低于完全二叉树，所以去掉红色节点的“黑树”的高度也不会超过 log2n。我们现在知道只包含黑色节点的“黑树”的高度，那我们现在把红色节点加回去，高度会变成多少呢？</p>
+<p>从上面红黑树的例子和定义看，在红黑树中，红色节点不能相邻，也就是说，有一个红色节点就要至少有一个黑色节点，将它跟其他红色节点隔开。红黑树中包含最多黑色节点的路径不会超过 log2n，所以加入红色节点之后，最长路径不会超过 2log2n，也就是说，红黑树的高度近似 2log2n。</p>
+<p>所以，红黑树的高度只比高度平衡的 AVL 树的高度（log2n）仅仅大了一倍，在性能上，下降得并不多。这样推导出来的结果不够精确，实际上红黑树的性能更好。</p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><p>几种动态数据结构对比：</p>
+<ul>
+<li><p>散列表：插入删除查找都是O(1), 是最常用的，但其缺点是不能顺序遍历以及扩容缩容的性能损耗。适用于那些不需要顺序遍历，数据更新不那么频繁的。</p>
+</li>
+<li><p>跳表：插入删除查找都是O(logn), 并且能顺序遍历。缺点是空间复杂度O(n)。适用于不那么在意内存空间的，其顺序遍历和区间查找非常方便。</p>
+</li>
+<li><p>红黑树：插入删除查找都是O(logn), 中序遍历即是顺序遍历，稳定。缺点是难以实现，去查找不方便。其实跳表更佳，但红黑树已经用于很多地方了。</p>
+</li>
+</ul>
+<hr>
+<img data-src="https://static001.geekbang.org/resource/image/57/ed/578b1b7602a9f03a7e900145f91fa6ed.jpg" style="zoom:50%;" />
+
+<p>上一节，我们讲到红黑树定义的时候，提到红黑树的叶子节点都是黑色的空节点。当时我只是粗略地解释了，这是为了代码实现方便，那更加确切的原因是什么呢？</p>
+<h3 id="实现红黑树的基本思想"><a href="#实现红黑树的基本思想" class="headerlink" title="实现红黑树的基本思想"></a>实现红黑树的基本思想</h3><p>红黑树的平衡过程跟魔方复原非常神似，大致过程就是：<strong>遇到什么样的节点排布，我们就对应怎么去调整</strong>。只要按照这些固定的调整规则来操作，就能将一个非平衡的红黑树调整成平衡的。</p>
+<p>先介绍两个非常重要的操作，<strong>左旋（rotate left）、右旋（rotate right）</strong>。左旋全称其实是叫<strong>围绕某个节点的左旋</strong>，那右旋的全称估计你已经猜到了，就叫<strong>围绕某个节点的右旋</strong>。</p>
+<img data-src="https://static001.geekbang.org/resource/image/0e/1e/0e37e597737012593a93105ebbf4591e.jpg" style="zoom:50%;" />
+
+<h3 id="插入操作的平衡调整"><a href="#插入操作的平衡调整" class="headerlink" title="插入操作的平衡调整"></a>插入操作的平衡调整</h3><p>红黑树规定，插入的节点必须是红色的。而且，二叉查找树中新插入的节点都是放在叶子节点上。</p>
+<ul>
+<li>如果插入节点的父节点是黑色的，那我们什么都不用做，它仍然满足红黑树的定义。</li>
+<li>如果插入的节点是根节点，那我们直接改变它的颜色，把它变成黑色就可以了。</li>
+</ul>
+<p>除此之外，其他情况都会违背红黑树的定义，于是我们就需要进行调整，调整的过程包含两种基础的操作：<strong>左右旋转</strong>和<strong>改变颜色</strong>。</p>
+<p>红黑树的平衡调整过程是一个迭代的过程。我们把正在处理的节点叫做<strong>关注节点</strong>。关注节点会随着不停地迭代处理，而不断发生变化。最开始的关注节点就是新插入的节点。</p>
+<p>新节点插入之后，如果红黑树的平衡被打破，那一般会有下面三种情况。我们只需要根据每种情况的特点，不停地调整，就可以让红黑树继续符合定义，也就是继续保持平衡。</p>
+<p><strong>CASE 1：如果关注节点是 a，它的叔叔节点 d 是红色</strong>，我们就依次执行下面的操作：</p>
+<ul>
+<li>将关注节点 a 的父节点 b、叔叔节点 d 的颜色都设置成黑色；</li>
+<li>将关注节点 a 的祖父节点 c 的颜色设置成红色；</li>
+<li>关注节点变成 a 的祖父节点 c；</li>
+<li>跳到 CASE 2 或者 CASE 3。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/60/40/603cf91f54b5db21bd02c6c5678ecf40.jpg" style="zoom:50%;" />
+
+<p><strong>CASE 2：如果关注节点是 a，它的叔叔节点 d 是黑色，关注节点 a 是其父节点 b 的右子节点</strong>，我们就依次执行下面的操作：</p>
+<ul>
+<li>关注节点变成节点 a 的父节点 b；</li>
+<li>围绕新的关注节点b 左旋；</li>
+<li>跳到 CASE 3。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/44/ad/4480a314f9d83c343b8adbb28b6782ad.jpg" style="zoom:50%;" />
+
+<p><strong>CASE 3：如果关注节点是 a，它的叔叔节点 d 是黑色，关注节点 a 是其父节点 b 的左子节点</strong>，我们就依次执行下面的操作：</p>
+<ul>
+<li>围绕关注节点 a 的祖父节点 c 右旋；</li>
+<li>将关注节点 a 的父节点 b、兄弟节点 c 的颜色互换。</li>
+<li>调整结束。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/04/12/04650d9470b1e67899f5b8b7b8e33212.jpg" style="zoom:50%;" />
+
+<h3 id="删除操作的平衡调整"><a href="#删除操作的平衡调整" class="headerlink" title="删除操作的平衡调整"></a>删除操作的平衡调整</h3><p>删除操作的平衡调整分为两步，第一步是<strong>针对删除节点初步调整</strong>。初步调整只是保证整棵红黑树在一个节点删除之后，仍然满足最后一条定义的要求，也就是说，每个节点，从该节点到达其可达叶子节点的所有路径，都包含相同数目的黑色节点；第二步是<strong>针对关注节点进行二次调整</strong>，让它满足红黑树的第三条定义，即不存在相邻的两个红色节点。</p>
+<ol>
+<li><strong>针对删除节点初步调整</strong></li>
+</ol>
+<p>这里需要注意一下，红黑树的定义中“只包含红色节点和黑色节点”，经过初步调整之后，为了保证满足红黑树定义的最后一条要求，有些节点会被标记成两种颜色，“红 - 黑”或者“黑 - 黑”。如果一个节点被标记为了“黑 - 黑”，那在计算黑色节点个数的时候，要算成两个黑色节点。</p>
+<p>在下面的讲解中，如果一个节点既可以是红色，也可以是黑色，在画图的时候，我会用一半红色一半黑色来表示。如果一个节点是“红 - 黑”或者“黑 - 黑”，我会用左上角的一个小黑点来表示额外的黑色。</p>
+<p><strong>CASE 1：如果要删除的节点是 a，它只有一个子节点 b</strong>，那我们就依次进行下面的操作：</p>
+<ul>
+<li>删除节点 a，并且把节点 b 替换到节点 a 的位置，这一部分操作跟普通的二叉查找树的删除操作一样；</li>
+<li>节点 a 只能是黑色，节点 b 也只能是红色，其他情况均不符合红黑树的定义。这种情况下，我们把节点 b 改为黑色；</li>
+<li>调整结束，不需要进行二次调整。</li>
+</ul>
+<p><img data-src="https://i.loli.net/2021/08/15/31TUMeu7Ymi6Xvg.jpg"></p>
+<p><strong>CASE 2：如果要删除的节点 a 有两个非空子节点，并且它的后继节点就是节点 a 的右子节点 c</strong>。我们就依次进行下面的操作：</p>
+<ul>
+<li>如果节点 a 的后继节点就是右子节点 c，那右子节点 c 肯定没有左子树。我们把节点 a 删除，并且将节点 c 替换到节点 a 的位置。这一部分操作跟普通的二叉查找树的删除操作无异；</li>
+<li>然后把节点 c 的颜色设置为跟节点 a 相同的颜色；</li>
+<li>如果节点 c 是黑色，为了不违反红黑树的最后一条定义，我们给节点 c 的右子节点 d 多加一个黑色，这个时候节点 d 就成了“红 - 黑”或者“黑 - 黑”；</li>
+<li>这个时候，关注节点变成了节点 d，第二步的调整操作就会针对关注节点来做。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/48/4e/48e3bd2cdd66cb635f8a4df8fb8fd64e.jpg" style="zoom:50%;" />
+
+<p><strong>CASE 3：如果要删除的是节点 a，它有两个非空子节点，并且节点 a 的后继节点不是右子节点</strong>，我们就依次进行下面的操作：</p>
+<ul>
+<li>找到后继节点 d，并将它删除，删除后继节点 d 的过程参照 CASE 1；</li>
+<li>将节点 a 替换成后继节点 d；</li>
+<li>把节点 d 的颜色设置为跟节点 a 相同的颜色；</li>
+<li>如果节点 d 是黑色，为了不违反红黑树的最后一条定义，我们给节点 d 的右子节点 c 多加一个黑色，这个时候节点 c 就成了“红 - 黑”或者“黑 - 黑”；</li>
+<li>这个时候，关注节点变成了节点 c，第二步的调整操作就会针对关注节点来做。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/b9/29/b93c1fa4de16aee5482424ddf49f3c29.jpg" style="zoom:50%;" />
+
+<ol start="2">
+<li><strong>针对关注节点进行二次调整</strong></li>
+</ol>
+<p>经过初步调整之后，关注节点变成了“红 - 黑”或者“黑 - 黑”节点。针对这个关注节点，我们再分四种情况来进行二次调整。二次调整是为了让红黑树中不存在相邻的红色节点。</p>
+<p><strong>CASE 1：如果关注节点是 a，它的兄弟节点 c 是红色的</strong>，我们就依次进行下面的操作：</p>
+<ul>
+<li>围绕关注节点 a 的父节点 b 左旋；</li>
+<li>关注节点 a 的父节点 b 和祖父节点 c 交换颜色；</li>
+<li>关注节点不变；</li>
+<li>继续从四种情况中选择适合的规则来调整。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/ac/91/ac76d78c064a2486e2a5b4c4903acb91.jpg" style="zoom:50%;" />
+
+<p><strong>CASE 2：如果关注节点是 a，它的兄弟节点 c 是黑色的，并且节点 c 的左右子节点 d、e 都是黑色的</strong>，我们就依次进行下面的操作：</p>
+<ul>
+<li>将关注节点 a 的兄弟节点 c 的颜色变成红色；</li>
+<li>从关注节点 a 中去掉一个黑色，这个时候节点 a 就是单纯的红色或者黑色；</li>
+<li>给关注节点 a 的父节点 b 添加一个黑色，这个时候节点 b 就变成了“红 - 黑”或者“黑 - 黑”；</li>
+<li>关注节点从 a 变成其父节点 b；</li>
+<li>继续从四种情况中选择符合的规则来调整。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/ec/ec/eca118d673c607eb2b103f3476fb24ec.jpg" style="zoom:50%;" />
+
+<p><strong>CASE 3：如果关注节点是 a，它的兄弟节点 c 是黑色，c 的左子节点 d 是红色，c 的右子节点 e 是黑色</strong>，我们就依次进行下面的操作：</p>
+<ul>
+<li>围绕关注节点 a 的兄弟节点 c 右旋；</li>
+<li>节点 c 和节点 d 交换颜色；</li>
+<li>关注节点不变；</li>
+<li>跳转到 CASE 4，继续调整。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/44/af/44075213100edd70315e1492422c92af.jpg" style="zoom:50%;" />
+
+<p><strong>CASE 4：如果关注节点 a 的兄弟节点 c 是黑色的，并且 c 的右子节点是红色的</strong>，我们就依次进行下面的操作：</p>
+<ul>
+<li>围绕关注节点 a 的父节点 b 左旋；</li>
+<li>将关注节点 a 的兄弟节点 c 的颜色，跟关注节点 a 的父节点 b 设置成相同的颜色；</li>
+<li>将关注节点 a 的父节点 b 的颜色设置为黑色；</li>
+<li>从关注节点 a 中去掉一个黑色，节点 a 就变成了单纯的红色或者黑色；</li>
+<li>将关注节点 a 的叔叔节点 e 设置为黑色；</li>
+<li>调整结束。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/5f/44/5f73f61bf77a7f2bb75f168cf432ec44.jpg" style="zoom:50%;" />
+
+<h3 id="解答"><a href="#解答" class="headerlink" title="解答"></a>解答</h3><p><strong>为什么红黑树的定义中，要求叶子节点是黑色的空节点？</strong></p>
+<p>要我说，之所以有这么奇怪的要求，其实就是为了实现起来方便。只要满足这一条要求，那在任何时刻，红黑树的平衡操作都可以归结为我们刚刚讲的那几种情况。</p>
+<p>还是有点不好理解，我通过一个例子来解释一下。假设红黑树的定义中不包含刚刚提到的那一条“叶子节点必须是黑色的空节点”，我们往一棵红黑树中插入一个数据，新插入节点的父节点也是红色的，两个红色的节点相邻，这个时候，红黑树的定义就被破坏了。那我们应该如何调整呢？</p>
+<img data-src="https://static001.geekbang.org/resource/image/d9/c9/d9d1ce7d6bf3da4888f39f9d15be99c9.jpg" style="zoom: 50%;" />
+
+<p>你会发现，这个时候，我们前面在讲插入时，三种情况下的平衡调整规则，没有一种是适用的。但是，如果我们把黑色的空节点都给它加上，变成下面这样，你会发现，它满足 CASE 2 了。</p>
+<img data-src="https://static001.geekbang.org/resource/image/8b/9a/8b1fb8c8004d86f737d829ecbd3a599a.jpg" style="zoom:50%;" />
+
+<p>你可能会说，你可以调整一下平衡调整规则啊。比如把 CASE 2 改为“如果关注节点 a 的叔叔节点 b 是黑色或者不存在，a 是父节点的右子节点，就进行某某操作”。当然可以，但是这样的话规则就没有原来简洁了。</p>
+<p>你可能还会说，这样给红黑树添加黑色的空的叶子节点，会不会比较浪费存储空间呢？答案是不会的。虽然我们在讲解或者画图的时候，每个黑色的、空的叶子节点都是独立画出来的。实际上，在具体实现的时候，我们只需要像下面这样，共用一个黑色的、空的叶子节点就行了。</p>
+<img data-src="https://static001.geekbang.org/resource/image/d6/66/d63231acb0e9d54c3469055d8dbdb366.jpg" style="zoom:50%;" />
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>二叉树基础</title>
+    <url>/archives/84ac9751.html</url>
+    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/ab/79/abdc3641bada1a03f4444c36c1bc4879.jpg" style="zoom:50%;" />
+
+<p>二叉树有哪几种存储方式？什么样的二叉树适合用数组来存储？</p>
+<span id="more"></span>
+
+<h3 id="树（Tree）"><a href="#树（Tree）" class="headerlink" title="树（Tree）"></a>树（Tree）</h3><p>“树”里面每个元素我们叫做“节点”，用来连接相邻节点之间的关系，我们叫做“父子关系”。下图中，A 节点就是 B 节点的父节点，B 节点是 A 节点的子节点。B、C、D 这三个节点的父节点是同一个节点，所以它们之间互称为兄弟节点。我们把没有父节点的节点叫做根节点，也就是图中的节点 E。我们把没有子节点的节点叫做叶子节点或者叶节点，比如图中的 G、H、I、J、K、L 都是叶子节点。</p>
+<img data-src="https://static001.geekbang.org/resource/image/22/ae/220043e683ea33b9912425ef759556ae.jpg" style="zoom:50%;" />
+
+<p>除此之外，关于“树”，还有三个比较相似的概念：<strong>高度</strong>（Height）、<strong>深度</strong>（Depth）、<strong>层</strong>（Level）。它们的定义是这样的：</p>
+<img data-src="https://static001.geekbang.org/resource/image/40/1e/4094a733986073fedb6b9d03f877d71e.jpg" style="zoom:50%;" />
+
+<p>这三个概念的定义比较容易混淆，描述起来也比较空洞。我举个例子说明一下，你一看应该就能明白。</p>
+<img data-src="https://i.loli.net/2021/08/15/B5oAS48XL1f7lwj.jpg" style="zoom:50%;" />
+
+<h3 id="二叉树（Binary-Tree）"><a href="#二叉树（Binary-Tree）" class="headerlink" title="二叉树（Binary Tree）"></a>二叉树（Binary Tree）</h3><p>二叉树，顾名思义，每个节点最多有两个“叉”，也就是两个子节点，分别是左子节点和右子节点。不过，二叉树并不要求每个节点都有两个子节点。</p>
+<img data-src="https://static001.geekbang.org/resource/image/09/2b/09c2972d56eb0cf67e727deda0e9412b.jpg" style="zoom:50%;" />
+
+<p>上图中三个都是二叉树，其中，编号 2 的二叉树也叫做满二叉树，特征是除叶子结点外每个结点都有两个子节点。</p>
+<p>编号 3 的二叉树叫做完全二叉树，叶子节点都在最底下两层，最后一层的叶子节点都靠左排列，并且除了最后一层，其他层的节点个数都要达到最大。</p>
+<p>为什么偏偏把最后一层的叶子节点靠左排列的叫完全二叉树？如果靠右排列就不能叫完全二叉树了吗？这个定义的由来或者说目的在哪里？</p>
+<p>这是由二叉树的实现来定义的，先来了解下如何表示（存储）一棵二叉树？</p>
+<p>先来看比较简单、直观的链式存储法。从图中你应该可以很清楚地看到，每个节点有三个字段，其中一个存储数据，另外两个是指向左右子节点的指针。我们只要拎住根节点，就可以通过左右子节点的指针，把整棵树都串起来。这种存储方式我们比较常用。大部分二叉树代码都是通过这种结构来实现的。</p>
+<img data-src="https://static001.geekbang.org/resource/image/12/8e/12cd11b2432ed7c4dfc9a2053cb70b8e.jpg" style="zoom:50%;" />
+
+<p>我们再来看，基于数组的顺序存储法。我们把根节点存储在下标 i = 1 的位置，那左子节点存储在下标 2 * i = 2 的位置，右子节点存储在 2 * i + 1 = 3 的位置。以此类推，B 节点的左子节点存储在 2 * i = 2 * 2 = 4 的位置，右子节点存储在 2 * i + 1 = 2 * 2 + 1 = 5 的位置。</p>
+<img data-src="https://static001.geekbang.org/resource/image/14/30/14eaa820cb89a17a7303e8847a412330.jpg" style="zoom:50%;" />
+
+<p>上图是一棵完全二叉树，所以仅仅“浪费”了一个下标为 0 的存储位置。如果是非完全二叉树，其实会浪费比较多的数组存储空间。你可以看我举的下面这个例子。</p>
+<img data-src="https://static001.geekbang.org/resource/image/08/23/08bd43991561ceeb76679fbb77071223.jpg" style="zoom:50%;" />
+
+<p>所以，如果某棵二叉树是一棵完全二叉树，那用数组存储无疑是最节省内存的一种方式。因为数组的存储方式并不需要像链式存储法那样，要存储额外的左右子节点的指针。这也是为什么完全二叉树会单独拎出来的原因，也是为什么完全二叉树要求最后一层的子节点都靠左的原因。</p>
+<h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><p>经典的方法有三种，<strong>前序遍历</strong>、<strong>中序遍历</strong>和<strong>后序遍历</strong>。</p>
+<ul>
+<li>前序遍历是指，对于树中的任意节点来说，先打印这个节点，然后再打印它的左子树，最后打印它的右子树。</li>
+<li>中序遍历是指，对于树中的任意节点来说，先打印它的左子树，然后再打印它本身，最后打印它的右子树。</li>
+<li>后序遍历是指，对于树中的任意节点来说，先打印它的左子树，然后再打印它的右子树，最后打印这个节点本身。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/ab/16/ab103822e75b5b15c615b68560cb2416.jpg" style="zoom:50%;" />
+
+<p>实际上，二叉树的前、中、后序遍历就是一个递归的过程。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">前序遍历的递推公式：</span><br><span class="line">preOrder(r) = print r-&gt;preOrder(r-&gt;left)-&gt;preOrder(r-&gt;right)</span><br><span class="line"></span><br><span class="line">中序遍历的递推公式：</span><br><span class="line">inOrder(r) = inOrder(r-&gt;left)-&gt;print r-&gt;inOrder(r-&gt;right)</span><br><span class="line"></span><br><span class="line">后序遍历的递推公式：</span><br><span class="line">postOrder(r) = postOrder(r-&gt;left)-&gt;postOrder(r-&gt;right)-&gt;print r</span><br></pre></td></tr></table></figure>
+
+<p>每个结点最多会被访问两次，时间复杂度为O(n)。</p>
+<hr>
+<img data-src="https://static001.geekbang.org/resource/image/06/8d/06f9b45611d0c76761550851fdae858d.jpg" style="zoom:50%;" />
+
+<h3 id="二叉查找树（Binary-Search-Tree）"><a href="#二叉查找树（Binary-Search-Tree）" class="headerlink" title="二叉查找树（Binary Search Tree）"></a>二叉查找树（Binary Search Tree）</h3><p>二叉查找树要求，在树中的任意一个节点，其左子树中的每个节点的值，都要小于这个节点的值，而右子树节点的值都大于这个节点的值。</p>
+<img data-src="https://static001.geekbang.org/resource/image/f3/ae/f3bb11b6d4a18f95aa19e11f22b99bae.jpg" style="zoom:50%;" />
+
+<ol>
+<li><strong>二叉查找树的查找操作</strong></li>
+</ol>
+<p>先取根节点，如果它等于我们要查找的数据，那就返回。如果要查找的数据比根节点的值小，那就在左子树中递归查找；如果要查找的数据比根节点的值大，那就在右子树中递归查找。</p>
+<img data-src="https://static001.geekbang.org/resource/image/96/2a/96b3d86ed9b7c4f399e8357ceed0db2a.jpg" style="zoom:50%;" />
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BinarySearchTree</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> Node tree;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Node <span class="title">find</span><span class="params">(<span class="keyword">int</span> data)</span> </span>&#123;</span><br><span class="line">    Node p = tree;</span><br><span class="line">    <span class="keyword">while</span> (p != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (data &lt; p.data) p = p.left;</span><br><span class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (data &gt; p.data) p = p.right;</span><br><span class="line">      <span class="keyword">else</span> <span class="keyword">return</span> p;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> data;</span><br><span class="line">    <span class="keyword">private</span> Node left;</span><br><span class="line">    <span class="keyword">private</span> Node right;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Node</span><span class="params">(<span class="keyword">int</span> data)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>二叉查找树的插入操作</strong></li>
+</ol>
+<p>新插入的数据一般都是在叶子节点上，所以我们只需要从根节点开始，依次比较要插入的数据和节点的大小关系。</p>
+<p>如果要插入的数据比节点的数据大，并且节点的右子树为空，就将新数据直接插到右子节点的位置；如果不为空，就再递归遍历右子树，查找插入位置。同理，如果要插入的数据比节点数值小，并且节点的左子树为空，就将新数据插入到左子节点的位置；如果不为空，就再递归遍历左子树，查找插入位置。</p>
+<img data-src="https://static001.geekbang.org/resource/image/da/c5/daa9fb557726ee6183c5b80222cfc5c5.jpg" style="zoom:50%;" />
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(<span class="keyword">int</span> data)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (tree == <span class="keyword">null</span>) &#123;</span><br><span class="line">    tree = <span class="keyword">new</span> Node(data);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Node p = tree;</span><br><span class="line">  <span class="keyword">while</span> (p != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (data &gt; p.data) &#123;</span><br><span class="line">      <span class="keyword">if</span> (p.right == <span class="keyword">null</span>) &#123;</span><br><span class="line">        p.right = <span class="keyword">new</span> Node(data);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      p = p.right;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// data &lt; p.data</span></span><br><span class="line">      <span class="keyword">if</span> (p.left == <span class="keyword">null</span>) &#123;</span><br><span class="line">        p.left = <span class="keyword">new</span> Node(data);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      p = p.left;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>二叉查找树的删除操作</strong></li>
+</ol>
+<p>针对要删除节点的子节点个数的不同，我们需要分三种情况来处理。</p>
+<ul>
+<li>如果要删除的节点没有子节点，我们只需要直接将父节点中，指向要删除节点的指针置为 null。比如图中的删除节点 55。</li>
+<li>如果要删除的节点只有一个子节点（只有左子节点或者右子节点），我们只需要更新父节点中，指向要删除节点的指针，让它指向要删除节点的子节点就可以了。比如图中的删除节点 13。</li>
+<li>如果要删除的节点有两个子节点，这就比较复杂了。我们需要找到这个节点的右子树中的最小节点，把它替换到要删除的节点上。然后再删除掉这个最小节点，因为最小节点肯定没有左子节点（如果有左子结点，那就不是最小节点了），所以，我们可以应用上面两条规则来删除这个最小节点。比如图中的删除节点 18。</li>
+</ul>
+<img data-src="https://static001.geekbang.org/resource/image/29/2c/299c615bc2e00dc32225f4d9e3490e2c.jpg" style="zoom: 50%;" />
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">(<span class="keyword">int</span> data)</span> </span>&#123;</span><br><span class="line">  Node p = tree; <span class="comment">// p指向要删除的节点，初始化指向根节点</span></span><br><span class="line">  Node pp = <span class="keyword">null</span>; <span class="comment">// pp记录的是p的父节点</span></span><br><span class="line">  <span class="keyword">while</span> (p != <span class="keyword">null</span> &amp;&amp; p.data != data) &#123;</span><br><span class="line">    pp = p;</span><br><span class="line">    <span class="keyword">if</span> (data &gt; p.data) p = p.right;</span><br><span class="line">    <span class="keyword">else</span> p = p.left;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (p == <span class="keyword">null</span>) <span class="keyword">return</span>; <span class="comment">// 没有找到</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 要删除的节点有两个子节点</span></span><br><span class="line">  <span class="keyword">if</span> (p.left != <span class="keyword">null</span> &amp;&amp; p.right != <span class="keyword">null</span>) &#123; <span class="comment">// 查找右子树中最小节点</span></span><br><span class="line">    Node minP = p.right;</span><br><span class="line">    Node minPP = p; <span class="comment">// minPP表示minP的父节点</span></span><br><span class="line">    <span class="keyword">while</span> (minP.left != <span class="keyword">null</span>) &#123;</span><br><span class="line">      minPP = minP;</span><br><span class="line">      minP = minP.left;</span><br><span class="line">    &#125;</span><br><span class="line">    p.data = minP.data; <span class="comment">// 将minP的数据替换到p中</span></span><br><span class="line">    p = minP; <span class="comment">// 下面就变成了删除minP了</span></span><br><span class="line">    pp = minPP;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 删除节点是叶子节点或者仅有一个子节点</span></span><br><span class="line">  Node child; <span class="comment">// p的子节点</span></span><br><span class="line">  <span class="keyword">if</span> (p.left != <span class="keyword">null</span>) child = p.left;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (p.right != <span class="keyword">null</span>) child = p.right;</span><br><span class="line">  <span class="keyword">else</span> child = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (pp == <span class="keyword">null</span>) tree = child; <span class="comment">// 删除的是根节点</span></span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (pp.left == p) pp.left = child;</span><br><span class="line">  <span class="keyword">else</span> pp.right = child;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了插入、删除、查找操作之外，二叉查找树中还可以支持<strong>快速地查找最大节点和最小节点、前驱节点和后继节点</strong>。</p>
+<p>还有一个重要的特性，就是<strong>中序遍历二叉查找树，可以输出有序的数据序列，时间复杂度是 O(n)，非常高效</strong>。因此，二叉查找树也叫作二叉排序树。</p>
+<h3 id="支持重复数据的二叉查找树"><a href="#支持重复数据的二叉查找树" class="headerlink" title="支持重复数据的二叉查找树"></a>支持重复数据的二叉查找树</h3><p>在实际的软件开发中，我们在二叉查找树中存储的，是一个包含很多字段的对象。我们利用对象的某个字段作为键值（key）来构建二叉查找树。我们把对象中的其他字段叫作卫星数据。</p>
+<p>前面我们讲的二叉查找树的操作，针对的都是不存在键值相同的情况。那如果存储的两个对象键值相同，这种情况该怎么处理呢？</p>
+<p>第一种方法比较容易。二叉查找树中每一个节点不仅会存储一个数据，因此我们通过链表和支持动态扩容的数组等数据结构，把值相同的数据都存储在同一个节点上。</p>
+<p>第二种方法比较不好理解，不过更加优雅。每个节点仍然只存储一个数据。在查找插入位置的过程中，如果碰到一个节点的值，与要插入数据的值相同，我们就将这个要插入的数据放到这个节点的右子树，也就是说，把这个新插入的数据当作大于这个节点的值来处理。</p>
+<img data-src="https://static001.geekbang.org/resource/image/3f/5f/3f59a40e3d927f567022918d89590a5f.jpg" style="zoom:50%;" />
+
+<p>当要查找数据的时候，遇到值相同的节点，我们并不停止查找操作，而是继续在右子树中查找，直到遇到叶子节点，才停止。这样就可以把键值等于要查找值的所有节点都找出来。</p>
+<img data-src="https://static001.geekbang.org/resource/image/fb/ff/fb7b320efd59a05469d6d6fcf0c98eff.jpg" style="zoom:50%;" />
+
+<p>对于删除操作，我们也需要先查找到每个要删除的节点，然后再按前面讲的删除操作的方法，依次删除。</p>
+<img data-src="https://static001.geekbang.org/resource/image/25/17/254a4800703d31612c0af63870260517.jpg" style="zoom:50%;" />
+
+<h3 id="二叉查找树的时间复杂度分析"><a href="#二叉查找树的时间复杂度分析" class="headerlink" title="二叉查找树的时间复杂度分析"></a>二叉查找树的时间复杂度分析</h3><p>实际上，二叉查找树的形态各式各样。比如这个图中，对于同一组数据，我们构造了三种二叉查找树。它们的查找、插入、删除操作的执行效率都是不一样的。图中第一种二叉查找树，根节点的左右子树极度不平衡，已经退化成了链表，所以查找的时间复杂度就变成了 O(n)。</p>
+<img data-src="https://i.loli.net/2021/08/15/cCs2r4I61GBNz3U.jpg" style="zoom:50%;" />
+
+<p>现在来分析一个最理想的情况，二叉查找树是一棵完全二叉树（或满二叉树）。</p>
+<p>不管操作是插入、删除还是查找，时间复杂度其实都跟树的高度成正比，也就是 O(height)。既然这样，现在问题就转变成另外一个了，也就是，如何求一棵包含 n 个节点的完全二叉树的高度？</p>
+<p>树的高度就等于最大层数减一，为了方便计算，我们转换成层来表示。从图中可以看出，包含 n 个节点的完全二叉树中，第一层包含 1 个节点，第二层包含 2 个节点，第三层包含 4 个节点，依次类推，下面一层节点个数是上一层的 2 倍，第 K 层包含的节点个数就是 2^(K-1)。</p>
+<p>不过，对于完全二叉树来说，最后一层的节点个数有点儿不遵守上面的规律了。它包含的节点个数在 1 个到 2^(L-1) 个之间（我们假设最大层数是 L）。如果我们把每一层的节点个数加起来就是总的节点个数 n。也就是说，如果节点的个数是 n，那么 n 满足这样一个关系：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">n &gt;&#x3D; 1+2+4+8+...+2^(L-2)+1</span><br><span class="line">n &lt;&#x3D; 1+2+4+8+...+2^(L-2)+2^(L-1)</span><br></pre></td></tr></table></figure>
+
+<p>借助等比数列的求和公式，我们可以计算出，L 的范围是[log2(n+1), log2n +1]。完全二叉树的层数小于等于 log2n +1，也就是说，完全二叉树的高度小于等于 log2n。</p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><p>散列表的插入、删除、查找操作的时间复杂度可以做到常量级的 O(1)，非常高效。而二叉查找树在比较平衡的情况下，插入、删除、查找操作时间复杂度才是 O(logn)，相对散列表，好像并没有什么优势，<strong>那我们为什么还要用二叉查找树呢？</strong></p>
+<ul>
+<li>散列表中的数据是无序存储的，如果要输出有序的数据，需要先进行排序。而对于二叉查找树来说，我们只需要中序遍历，就可以在 O(n) 的时间复杂度内，输出有序的数据序列。</li>
+<li>散列表扩容耗时很多，而且当遇到散列冲突时，性能不稳定，尽管二叉查找树的性能不稳定，但是在工程中，我们最常用的平衡二叉查找树的性能非常稳定，时间复杂度稳定在 O(logn)。</li>
+<li>笼统地来说，尽管散列表的查找等操作的时间复杂度是常量级的，但因为哈希冲突的存在，这个常量不一定比 logn 小，所以实际的查找速度可能不一定比 O(logn) 快。加上哈希函数的耗时，也不一定就比平衡二叉查找树的效率高。</li>
+<li>散列表的构造比二叉查找树要复杂，需要考虑的东西很多。比如散列函数的设计、冲突解决办法、扩容、缩容等。平衡二叉查找树只需要考虑平衡性这一个问题，而且这个问题的解决方案比较成熟、固定。</li>
+<li>最后，为了避免过多的散列冲突，散列表装载因子不能太大，特别是基于开放寻址法解决冲突的散列表，不然会浪费一定的存储空间。</li>
+</ul>
+<p>综合这几点，平衡二叉查找树在某些方面还是优于散列表的，所以，这两者的存在并不冲突。我们在实际的开发过程中，需要结合具体的需求来选择使用哪一个。</p>
+<p><strong>如何通过编程，求出一棵给定二叉树的确切高度呢？</strong></p>
+<ul>
+<li><p>确定二叉树高度有两种思路：第一种是深度优先思想的递归，分别求左右子树的高度。当前节点的高度就是左右子树中较大的那个+1；第二种可以采用层次遍历的方式，每一层记录都记录下当前队列的长度，这个是队尾，每一层队头从0开始。然后每遍历一个元素，队头下标+1。直到队头下标等于队尾下标。这个时候表示当前层遍历完成。每一层刚开始遍历的时候，树的高度+1。最后队列为空，就能得到树的高度。</p>
+</li>
+<li><p>递归法，根节点高度=max(左子树高度，右子树高度)+1</p>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>哈希算法</title>
     <url>/archives/22e30075.html</url>
-    <content><![CDATA[<p><img data-src="https://i.loli.net/2021/08/14/ZHdMhOrVlLy8Cba.jpg"></p>
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/14/ZHdMhOrVlLy8Cba.jpg" style="zoom:50%;" />
+
 <p>将任意长度的二进制值串映射为固定长度的二进制值串，这个映射的规则就是哈希算法，而通过原始数据映射之后得到的二进制值串就是哈希值。</p>
 <span id="more"></span>
 
@@ -244,7 +622,8 @@
 <p>散列函数是设计一个散列表的关键。它直接决定了散列冲突的概率和散列表的性能。不过，相对哈希算法的其他应用，散列函数对于散列算法冲突的要求要低很多。即便出现个别散列冲突，只要不是过于严重，我们都可以通过开放寻址法或者链表法解决。</p>
 <p>不仅如此，散列函数对于散列算法计算得到的值，是否能反向解密也并不关心。散列函数中用到的散列算法，更加关注散列后的值是否能平均分布，也就是，一组数据是否能均匀地散列在各个槽中。除此之外，散列函数执行的快慢，也会影响散列表的性能，所以，散列函数用的散列算法一般都比较简单，比较追求效率。</p>
 <hr>
-<p><img data-src="https://i.loli.net/2021/08/14/qfg315so42LFanQ.jpg"></p>
+<img data-src="https://i.loli.net/2021/08/14/qfg315so42LFanQ.jpg" style="zoom:50%;" />
+
 <h3 id="应用五：负载均衡"><a href="#应用五：负载均衡" class="headerlink" title="应用五：负载均衡"></a>应用五：负载均衡</h3><p>我们知道，负载均衡算法有很多，比如轮询、随机、加权轮询等。那如何才能实现一个会话粘滞（session sticky）的负载均衡算法呢？也就是说，我们需要在同一个客户端上，在一次会话中的所有请求都路由到同一个服务器上。</p>
 <p>最直接的方法就是，维护一张映射关系表，这张表的内容是客户端 IP 地址或者会话 ID 与服务器编号的映射关系。客户端发出的每次请求，都要先在映射表中查找应该路由到的服务器编号，然后再请求编号对应的服务器。这种方法简单直观，但也有几个弊端：</p>
 <ul>
@@ -802,11 +1181,11 @@
 <h3 id="选择排序（Sort）"><a href="#选择排序（Sort）" class="headerlink" title="选择排序（Sort）"></a>选择排序（Sort）</h3><p>选择排序算法的实现思路有点类似插入排序，也分已排序区间和未排序区间。但是选择排序每次会从未排序区间中找到最小的元素，将其放到已排序区间的末尾。</p>
 <img data-src="https://static001.geekbang.org/resource/image/32/1d/32371475a0b08f0db9861d102474181d.jpg" style="zoom:50%;" />
 
-<p>选择排序空间复杂度为 O(1)，是一种原地排序算法。选择排序的最好情况时间复杂度、最坏情况和平均情况时间复杂度都为 O(n2)。但是，选择排序是一种不稳定的排序算法。从我前面画的那张图中，你可以看出来，选择排序每次都要找剩余未排序元素中的最小值，并和前面的元素交换位置，这样破坏了稳定性。</p>
+<p>选择排序空间复杂度为 $O(1)$，是一种原地排序算法。选择排序的最好情况时间复杂度、最坏情况和平均情况时间复杂度都为 $O(n2)$。但是，选择排序是一种不稳定的排序算法。从我前面画的那张图中，你可以看出来，选择排序每次都要找剩余未排序元素中的最小值，并和前面的元素交换位置，这样破坏了稳定性。</p>
 <h3 id="为什么插入排序要比冒泡排序更受欢迎呢？"><a href="#为什么插入排序要比冒泡排序更受欢迎呢？" class="headerlink" title="为什么插入排序要比冒泡排序更受欢迎呢？"></a>为什么插入排序要比冒泡排序更受欢迎呢？</h3><p>冒泡排序的数据交换要比插入排序的数据移动要复杂，冒泡排序需要 3 个赋值操作，而插入排序只需要 1 个。对于数据规模大的问题，插入排序更有效率。而且插入排序的算法有很大的优化空间，参考[希尔排序](<a href="https://zh.wikipedia.org/wiki/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F">希尔排序 - 维基百科，自由的百科全书 (wikipedia.org)</a>)。</p>
 <img data-src="https://static001.geekbang.org/resource/image/ae/fb/ae97df138c98e6c130f76d93c02095fb.jpg" style="zoom:50%;" />
 
-<p>再讲两种时间复杂度为 O(nlogn) 的排序算法，<strong>归并排序</strong>和<strong>快速排序</strong>。这两种排序算法适合大规模的数据排序。</p>
+<p>再讲两种时间复杂度为 $O(nlogn)$ 的排序算法，<strong>归并排序</strong>和<strong>快速排序</strong>。这两种排序算法适合大规模的数据排序。</p>
 <p>归并排序和快速排序都用到了分治思想，非常巧妙。我们可以借鉴这个思想，来解决非排序的问题，比如：<strong>如何在 O(n) 的时间复杂度内查找一个无序数组中的第 K 大元素？</strong></p>
 <h3 id="归并排序的原理"><a href="#归并排序的原理" class="headerlink" title="归并排序的原理"></a>归并排序的原理</h3><p>归并排序的核心思想还是蛮简单的。如果要排序一个数组，我们先把数组从中间分成前后两部分，然后对前后两部分分别排序，再将排好序的两部分合并在一起，这样整个数组就都有序了。</p>
 <img data-src="https://static001.geekbang.org/resource/image/db/2b/db7f892d3355ef74da9cd64aa926dc2b.jpg" style="zoom:50%;" />
@@ -825,12 +1204,12 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">merge(A[p...r], A[p...q], A[q+1...r]) &#123;</span><br><span class="line">  var i :&#x3D; p，j :&#x3D; q+1，k :&#x3D; 0 &#x2F;&#x2F; 初始化变量i, j, k</span><br><span class="line">  var tmp :&#x3D; new array[0...r-p] &#x2F;&#x2F; 申请一个大小跟A[p...r]一样的临时数组</span><br><span class="line">  while i&lt;&#x3D;q AND j&lt;&#x3D;r do &#123;</span><br><span class="line">    if A[i] &lt;&#x3D; A[j] &#123;</span><br><span class="line">      tmp[k++] &#x3D; A[i++] &#x2F;&#x2F; i++等于i:&#x3D;i+1</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      tmp[k++] &#x3D; A[j++]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; 判断哪个子数组中有剩余的数据</span><br><span class="line">  var start :&#x3D; i，end :&#x3D; q</span><br><span class="line">  if j&lt;&#x3D;r then start :&#x3D; j, end:&#x3D;r</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; 将剩余的数据拷贝到临时数组tmp</span><br><span class="line">  while start &lt;&#x3D; end do &#123;</span><br><span class="line">    tmp[k++] &#x3D; A[start++]</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; 将tmp中的数组拷贝回A[p...r]</span><br><span class="line">  for i:&#x3D;0 to r-p do &#123;</span><br><span class="line">    A[p+i] &#x3D; tmp[i]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>归并排序是稳定排序算法</p>
-<p>来分析一下归并排序的时间复杂度，假设对 n 个元素进行归并排序需要的时间是 T(n)，那分解成两个子数组排序的时间都是 T(n/2)。merge() 函数合并两个有序子数组的时间复杂度是 O(n)，归并排序的时间复杂度的计算公式就是：</p>
+<p>来分析一下归并排序的时间复杂度，假设对 n 个元素进行归并排序需要的时间是 $T(n)$，那分解成两个子数组排序的时间都是 $T(n/2)$。merge() 函数合并两个有序子数组的时间复杂度是 $O(n)$，归并排序的时间复杂度的计算公式就是：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">T(1) &#x3D; C;   n&#x3D;1时，只需要常量级的执行时间，所以表示为C。</span><br><span class="line">T(n) &#x3D; 2*T(n&#x2F;2) + n   &#x2F;&#x2F; n&gt;1</span><br><span class="line">     &#x3D; 2*(2*T(n&#x2F;4) + n&#x2F;2) + n &#x3D; 4*T(n&#x2F;4) + 2*n</span><br><span class="line">     &#x3D; 4*(2*T(n&#x2F;8) + n&#x2F;4) + 2*n &#x3D; 8*T(n&#x2F;8) + 3*n</span><br><span class="line">     &#x3D; 8*(2*T(n&#x2F;16) + n&#x2F;8) + 3*n &#x3D; 16*T(n&#x2F;16) + 4*n</span><br><span class="line">     ......</span><br><span class="line">     &#x3D; 2^k * T(n&#x2F;2^k) + k * n</span><br><span class="line">     ......</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p>通过这样一步一步分解推导，我们可以得到 T(n) = 2^kT(n/2^k)+kn。当 T(n/2^k)=T(1) 时，也就是 n/2^k=1，我们得到 k=log2n 。我们将 k 值代入上面的公式，得到 T(n)=Cn+nlog2n 。如果我们用大 O 标记法来表示的话，T(n) 就等于 O(nlogn)。</p>
-<p>从原理分析和伪代码可以看出，归并排序的执行效率与要排序的原始数组的有序程度无关，所以其时间复杂度是非常稳定的，不管是最好情况、最坏情况，还是平均情况，时间复杂度都是 O(nlogn)。</p>
-<p>归并排序不是原地排序算法（致命“弱点”）,递归代码的空间复杂度并不能像时间复杂度那样累加，尽管每次合并操作都需要申请额外的内存空间，但在合并完成之后，临时开辟的内存空间就被释放掉了。在任意时刻，CPU 只会有一个函数在执行，也就只会有一个临时的内存空间在使用。临时内存空间最大也不会超过 n 个数据的大小，所以空间复杂度是 O(n)。</p>
+<p>通过这样一步一步分解推导，我们可以得到 $T(n) = 2^k*T(n/2^k)+kn$​​。当 $T(n/2^k)=T(1)$ 时，也就是 $n/2^k=1$，我们得到 $k=log_2n$ 。我们将 k 值代入上面的公式，得到 $T(n)=Cn+nlog_2n$ 。如果我们用大 O 标记法来表示的话，$T(n)$ 就等于 $O(nlogn)$​​​​​。</p>
+<p>从原理分析和伪代码可以看出，归并排序的执行效率与要排序的原始数组的有序程度无关，所以其时间复杂度是非常稳定的，不管是最好情况、最坏情况，还是平均情况，时间复杂度都是 $O(nlogn)$。</p>
+<p>归并排序不是原地排序算法（致命“弱点”）,递归代码的空间复杂度并不能像时间复杂度那样累加，尽管每次合并操作都需要申请额外的内存空间，但在合并完成之后，临时开辟的内存空间就被释放掉了。在任意时刻，CPU 只会有一个函数在执行，也就只会有一个临时的内存空间在使用。临时内存空间最大也不会超过 n 个数据的大小，所以空间复杂度是 $O(n)$。</p>
 <h3 id="快速排序的原理"><a href="#快速排序的原理" class="headerlink" title="快速排序的原理"></a>快速排序的原理</h3><p>快排的思想是这样的：如果要排序数组中下标从 p 到 r 之间的一组数据，我们选择 p 到 r 之间的任意一个数据作为 pivot（分区点）。</p>
 <p>遍历 p 到 r 之间的数据，将小于 pivot 的放到左边，将大于 pivot 的放到右边，将 pivot 放到中间。再使用递归处理思想，用递归排序下标从 p 到 q-1 之间的数据和下标从 q+1 到 r 之间的数据，直到区间缩小为 1。</p>
 <img data-src="https://static001.geekbang.org/resource/image/4d/81/4d892c3a2e08a17f16097d07ea088a81.jpg" style="zoom:50%;" />
@@ -850,14 +1229,14 @@
 <p>快排和归并用的都是分治思想，递推公式和递归代码也非常相似，那它们的区别在哪里呢?</p>
 <img data-src="https://static001.geekbang.org/resource/image/aa/05/aa03ae570dace416127c9ccf9db8ac05.jpg" style="zoom:50%;" />
 
-<p>可以发现，归并排序的处理过程是由下到上的，先处理子问题，然后再合并。而快排正好相反，它的处理过程是由上到下的，先分区，然后再处理子问题。归并排序虽然是稳定的、时间复杂度为 O(nlogn) 的排序算法，但是它是非原地排序算法。我们前面讲过，归并之所以是非原地排序算法，主要原因是合并函数无法在原地执行。快速排序通过设计巧妙的原地分区函数，可以实现原地排序，解决了归并排序占用太多内存的问题</p>
+<p>可以发现，归并排序的处理过程是由下到上的，先处理子问题，然后再合并。而快排正好相反，它的处理过程是由上到下的，先分区，然后再处理子问题。归并排序虽然是稳定的、时间复杂度为 $O(nlogn) $的排序算法，但是它是非原地排序算法。我们前面讲过，归并之所以是非原地排序算法，主要原因是合并函数无法在原地执行。快速排序通过设计巧妙的原地分区函数，可以实现原地排序，解决了归并排序占用太多内存的问题</p>
 <p><strong>快速排序的性能分析</strong></p>
-<p>如果每次分区操作，都能正好把数组分成大小接近相等的两个小区间，那快排的时间复杂度递推求解公式跟归并是相同的。所以，快排的时间复杂度也是 O(nlogn)；如果我们每次选择最后一个元素作为 pivot，那每次分区得到的两个区间都是不均等的。我们需要进行大约 n 次分区操作，才能完成快排的整个过程。每次分区我们平均要扫描大约 n/2 个元素，这种情况下，快排的时间复杂度就从 O(nlogn) 退化成了 O(n2)</p>
+<p>如果每次分区操作，都能正好把数组分成大小接近相等的两个小区间，那快排的时间复杂度递推求解公式跟归并是相同的。所以，快排的时间复杂度也是 $O(nlogn)$​；如果我们每次选择最后一个元素作为 pivot，那每次分区得到的两个区间都是不均等的。我们需要进行大约 $n$ 次分区操作，才能完成快排的整个过程。每次分区我们平均要扫描大约 $n/2$ 个元素，这种情况下，快排的时间复杂度就从 $O(nlogn) $退化成了 $O(n^2)$​​</p>
 <p>刚刚讲了两个极端情况下的时间复杂度，一个是分区极其均衡，一个是分区极其不均衡。它们分别对应快排的最好情况时间复杂度和最坏情况时间复杂度。那快排的平均情况时间复杂度是多少呢？</p>
 <p>假设每次分区操作都将区间分成大小为 9:1 的两个小区间。我们继续套用递归时间复杂度的递推公式，就会变成这样：T(1) = C； n=1时，只需要常量级的执行时间，所以表示为C。T(n) = T(n/10) + T(9*n/10) + n； n&gt;1</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">T(1) &#x3D; C；   n&#x3D;1时，只需要常量级的执行时间，所以表示为C。</span><br><span class="line">T(n) &#x3D; T(n&#x2F;10) + T(9*n&#x2F;10) + n； n&gt;1</span><br></pre></td></tr></table></figure>
 
-<p>这个公式的递推求解的过程非常复杂，虽然可以求解，但我不推荐用这种方法。实际上，递归的时间复杂度的求解方法除了递推公式之外，还有递归树。这里直接给你结论：T(n) 在大部分情况下的时间复杂度都可以做到 O(nlogn)，只有在极端情况下，才会退化到 O(n2)。而且，我们也有很多方法将这个概率降到很低。</p>
+<p>这个公式的递推求解的过程非常复杂，虽然可以求解，但我不推荐用这种方法。实际上，递归的时间复杂度的求解方法除了递推公式之外，还有递归树。这里直接给你结论：T(n) 在大部分情况下的时间复杂度都可以做到 $O(nlogn)$，只有在极端情况下，才会退化到 $O(n^2)$。而且，我们也有很多方法将这个概率降到很低。</p>
 ]]></content>
       <categories>
         <category>数据结构与算法</category>
