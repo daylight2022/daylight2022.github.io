@@ -209,19 +209,119 @@
       </tags>
   </entry>
   <entry>
+    <title>堆和堆排序</title>
+    <url>/archives/2fad594d.html</url>
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/qHFQo1w4nR7bfZP.jpg" style="zoom:50%;" />
+
+<p>“堆”（Heap），是一种特殊的树，其应用场景广泛，最经典的莫过于堆排序了，它是一种原地的、时间复杂度为 $O(nlogn)$ 的排序算法。</p>
+<p>快速排序，平均情况下的时间复杂度也为 $O(nlogn)$，而且堆排序比快速排序的时间复杂度还要稳定，但是，在实际的软件开发中，快速排序的性能要比堆排序好，这是为什么呢？</p>
+<span id="more"></span>
+
+<h3 id="如何理解“堆”？"><a href="#如何理解“堆”？" class="headerlink" title="如何理解“堆”？"></a>如何理解“堆”？</h3><ul>
+<li><p>堆是一个完全二叉树；</p>
+</li>
+<li><p>堆中每一个节点的值都必须大于等于&lt;“大顶堆”&gt;（或小于等于&lt;“小顶堆”&gt;）其子树中每个节点的值。</p>
+</li>
+</ul>
+<h3 id="如何实现一个堆？"><a href="#如何实现一个堆？" class="headerlink" title="如何实现一个堆？"></a>如何实现一个堆？</h3><p>完全二叉树比较适合用数组来存储。用数组来存储完全二叉树是非常节省存储空间的。因为我们不需要存储左右子节点的指针，单纯地通过数组的下标，就可以找到一个节点的左右子节点和父节点。下面是一个用数组存储堆的例子。</p>
+<img data-src="https://i.loli.net/2021/08/17/GVpPJMldQrnKh2O.jpg" style="zoom:50%;" />
+
+<p>从图中我们可以看到，数组中下标为 $i$ 的节点的左子节点，就是下标为 $i∗2$ 的节点，右子节点就是下标为 $i∗2+1$ 的节点，父节点就是下标为 $\frac i2$ 的节点。</p>
+<p>知道了如何存储一个堆，那我们再来看看，堆上的操作有哪些呢？下面罗列了几个非常核心的操作，分别是往堆中插入一个元素和删除堆顶元素。（如果没有特殊说明，下面都是拿大顶堆来讲解）。</p>
+<ol>
+<li><strong>往堆中插入一个元素</strong></li>
+</ol>
+<p>插入一个元素后，就需要进行调整，让其重新满足堆的特性，这个过程我们起了一个名字，就叫做<strong>堆化（heapify）</strong>。</p>
+<p>堆化实际上有两种，从下往上和从上往下。这里我先讲<strong>从下往上</strong>的堆化方法。</p>
+<img data-src="https://i.loli.net/2021/08/17/a98pArTQdcs5VhU.jpg" style="zoom:50%;" />
+
+<p>我们可以让新插入的节点与父节点对比大小。如果不满足子节点小于等于父节点的大小关系，我们就互换两个节点。一直重复这个过程，直到父子节点之间满足刚说的那种大小关系。</p>
+<img data-src="https://i.loli.net/2021/08/17/L1eGUftBPFo75TY.jpg" style="zoom:50%;" />
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Heap</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span>[] a; <span class="comment">// 数组，从下标1开始存储数据</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> n;  <span class="comment">// 堆可以存储的最大数据个数</span></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">int</span> count; <span class="comment">// 堆中已经存储的数据个数</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Heap</span><span class="params">(<span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">    a = <span class="keyword">new</span> <span class="keyword">int</span>[capacity + <span class="number">1</span>];</span><br><span class="line">    n = capacity;</span><br><span class="line">    count = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(<span class="keyword">int</span> data)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (count &gt;= n) <span class="keyword">return</span>; <span class="comment">// 堆满了</span></span><br><span class="line">    ++count;</span><br><span class="line">    a[count] = data;</span><br><span class="line">    <span class="keyword">int</span> i = count;</span><br><span class="line">    <span class="keyword">while</span> (i/<span class="number">2</span> &gt; <span class="number">0</span> &amp;&amp; a[i] &gt; a[i/<span class="number">2</span>]) &#123; <span class="comment">// 自下往上堆化</span></span><br><span class="line">      swap(a, i, i/<span class="number">2</span>); <span class="comment">// swap()函数作用：交换下标为i和i/2的两个元素</span></span><br><span class="line">      i = i/<span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>删除堆顶元素</strong></li>
+</ol>
+<p>假设我们构造的是大顶堆，堆顶元素就是最大的元素。当我们删除堆顶元素之后，就需要把第二大的元素放到堆顶，那第二大元素肯定会出现在左右子节点中。然后我们再迭代地删除第二大节点，以此类推，直到叶子节点被删除。</p>
+<p>不过这种方法有点问题，就是最后堆化出来的堆并不满足完全二叉树的特性。</p>
+<img data-src="https://i.loli.net/2021/08/17/1gOwol4Zkqu5FpQ.jpg" style="zoom:50%;" />
+
+<p>我们可以把最后一个节点放到堆顶，然后利用同样的父子节点对比方法。对于不满足父子节点大小关系的，互换两个节点，并且重复进行这个过程，直到父子节点之间满足大小关系为止。这就是<strong>从上往下</strong>的堆化方法。</p>
+<p>因为我们移除的是数组中的最后一个元素，而在堆化的过程中，都是交换操作，不会出现数组中的“空洞”，所以这种方法堆化之后的结果，肯定满足完全二叉树的特性。</p>
+<img data-src="https://i.loli.net/2021/08/17/cWuQKwbgV6IeANJ.jpg" style="zoom:50%;" />
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeMax</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (count == <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>; <span class="comment">// 堆中没有数据</span></span><br><span class="line">  a[<span class="number">1</span>] = a[count];</span><br><span class="line">  --count;</span><br><span class="line">  heapify(a, count, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">heapify</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n, <span class="keyword">int</span> i)</span> </span>&#123; <span class="comment">// 自上往下堆化</span></span><br><span class="line">  <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    <span class="keyword">int</span> maxPos = i;</span><br><span class="line">    <span class="keyword">if</span> (i*<span class="number">2</span> &lt;= n &amp;&amp; a[i] &lt; a[i*<span class="number">2</span>]) maxPos = i*<span class="number">2</span>;</span><br><span class="line">    <span class="keyword">if</span> (i*<span class="number">2</span>+<span class="number">1</span> &lt;= n &amp;&amp; a[maxPos] &lt; a[i*<span class="number">2</span>+<span class="number">1</span>]) maxPos = i*<span class="number">2</span>+<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (maxPos == i) <span class="keyword">break</span>;</span><br><span class="line">    swap(a, i, maxPos);</span><br><span class="line">    i = maxPos;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一个包含 $n$ 个节点的完全二叉树，树的高度不会超过 $log_2n$。堆化的过程是顺着节点所在路径比较交换的，所以堆化的时间复杂度跟树的高度成正比，也就是 $O(logn)$。插入数据和删除堆顶元素的主要逻辑就是堆化，所以，往堆中插入一个元素和删除堆顶元素的时间复杂度都是 $O(logn)$。</p>
+<h3 id="如何基于堆实现排序？"><a href="#如何基于堆实现排序？" class="headerlink" title="如何基于堆实现排序？"></a>如何基于堆实现排序？</h3><p>堆排序的过程大致分解成两个大的步骤，建堆和排序</p>
+<ol>
+<li> <strong>建堆</strong></li>
+</ol>
+<p>首先将数组原地建成一个堆。</p>
+<p>第一种是利用前面往堆中插入一个元素的思路。尽管数组中包含 n 个数据，但是我们可以假设，起初堆中只包含一个数据，就是下标为 1 的数据。然后，我们调用前面讲的插入操作，将下标从 2 到 n 的数据依次插入到堆中。这样我们就将包含 n 个数据的数组，组织成了堆。</p>
+<p>第一种建堆思路的处理过程是从前往后处理数组数据，并且每个数据插入堆中时，都是从下往上堆化。而第二种实现思路，是从后往前处理数组，并且每个数据都是从上往下堆化。</p>
+<p>下面给出一个第二种实现思路的建堆分解步骤图，因为叶子节点往下堆化只能自己跟自己比较，所以我们直接从最后一个非叶子节点开始，依次堆化就行了。</p>
+<img data-src="https://i.loli.net/2021/08/17/XIefBErOHumhAlG.jpg" style="zoom:50%;" />
+
+<img data-src="https://i.loli.net/2021/08/17/K1UcDmZoiYEBMNQ.jpg" style="zoom:50%;" />
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">buildHeap</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = n/<span class="number">2</span>; i &gt;= <span class="number">1</span>; --i) &#123;</span><br><span class="line">    heapify(a, n, i);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">heapify</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n, <span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    <span class="keyword">int</span> maxPos = i;</span><br><span class="line">    <span class="keyword">if</span> (i*<span class="number">2</span> &lt;= n &amp;&amp; a[i] &lt; a[i*<span class="number">2</span>]) maxPos = i*<span class="number">2</span>;</span><br><span class="line">    <span class="keyword">if</span> (i*<span class="number">2</span>+<span class="number">1</span> &lt;= n &amp;&amp; a[maxPos] &lt; a[i*<span class="number">2</span>+<span class="number">1</span>]) maxPos = i*<span class="number">2</span>+<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (maxPos == i) <span class="keyword">break</span>;</span><br><span class="line">    swap(a, i, maxPos);</span><br><span class="line">    i = maxPos;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这段代码中，我们对下标从 $\frac n2$开始到 $1$ 的数据进行堆化，下标是 $\frac n2+1$ 到 $n$ 的节点是叶子节点，我们不需要堆化。实际上，对于完全二叉树来说，下标从 $\frac n2+1$到 $n$ 的节点都是叶子节点。</p>
+<p>每个节点堆化的时间复杂度是 O(logn)，那 2n+1 个节点堆化的总时间复杂度是不是就是 O(nlogn) 呢？这个答案虽然也没错，但是这个值还是不够精确。实际上，堆排序的建堆过程的时间复杂度是 O(n)。</p>
+<p>因为叶子节点不需要堆化，所以需要堆化的节点从倒数第二层开始。每个节点堆化的过程中，需要比较和交换的节点个数，跟这个节点的高度 k 成正比。</p>
+<img data-src="https://i.loli.net/2021/08/17/Af983kbiWyKuTgv.jpg" style="zoom:50%;" />
+
+<p>我们将每个非叶子节点的高度求和，就是下面这个公式：</p>
+<img data-src="https://i.loli.net/2021/08/17/iMdwhqcXyWLentA.jpg" style="zoom:50%;" />
+
+<p>这个公式的求解稍微有点技巧，不过我们高中应该都学过：把公式左右都乘以 2，就得到另一个公式 S2。我们将 S2 错位对齐，并且用 S2 减去 S1，可以得到 S。</p>
+<img data-src="https://i.loli.net/2021/08/17/xJVF8otqHfybPzm.jpg" style="zoom:50%;" />
+
+<img data-src="https://i.loli.net/2021/08/17/GAdKjWn2MiNa8FQ.jpg" style="zoom:50%;" />
+
+<p>因为 h=log2n，代入公式 S，就能得到 S=O(n)，所以，建堆的时间复杂度就是 O(n)。</p>
+<ol start="2">
+<li><strong>排序</strong></li>
+</ol>
+<p>建堆结束后，按照大顶堆的特性，第一个元素就是堆顶，也是最大的元素，将其与最后一个元素交换。下一步将剩下的 $n-1$ 个元素重新构建成堆，堆化完成后，再取堆顶的元素，放到 $n-1$ 的位置，不断重复此过程，直到排序完成。</p>
+<img data-src="https://i.loli.net/2021/08/17/GVO3nxRcWLp9qF5.jpg" style="zoom:50%;" />
+
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// n表示数据的个数，数组a中的数据从下标1到n的位置。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  buildHeap(a, n);</span><br><span class="line">  <span class="keyword">int</span> k = n;</span><br><span class="line">  <span class="keyword">while</span> (k &gt; <span class="number">1</span>) &#123;</span><br><span class="line">    swap(a, <span class="number">1</span>, k);</span><br><span class="line">    --k;</span><br><span class="line">    heapify(a, k, <span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>整个堆排序的过程，都只需要极个别临时存储空间，所以堆排序是原地排序算法。堆排序包括建堆和排序两个操作，建堆过程的时间复杂度是 $O(n)$，排序过程的时间复杂度是 $O(nlogn)$，所以，堆排序整体的时间复杂度是 $O(nlogn)$。</p>
+<p>堆排序不是稳定的排序算法，因为在排序过程中，存在将堆的最后一个节点与堆顶节点互换的操作，有可能改变值相同数据的原始顺序。</p>
+<h3 id="在实际开发中，为什么快速排序要比堆排序性能好？"><a href="#在实际开发中，为什么快速排序要比堆排序性能好？" class="headerlink" title="在实际开发中，为什么快速排序要比堆排序性能好？"></a>在实际开发中，为什么快速排序要比堆排序性能好？</h3><ul>
+<li><strong>堆排序数据访问的方式没有快速排序友好</strong></li>
+</ul>
+<p>对于快速排序来说，数据是顺序访问的。而对于堆排序来说，数据是跳着访问的，对cpu缓存不友好</p>
+<ul>
+<li><strong>对于同样的数据，在排序过程中，堆排序算法的数据交换次数要多于快速排序</strong></li>
+</ul>
+<p>对于基于比较的排序算法来说，整个排序过程就是由两个基本的操作组成的，比较和交换（或移动）。快速排序数据交换的次数不会比逆序度多。但是堆排序的第一步是建堆，建堆的过程会打乱数据原有的相对先后顺序，导致原数据的有序度降低。比如，对于一组已经有序的数据来说，经过建堆之后，数据反而变得更无序了</p>
+]]></content>
+      <categories>
+        <category>数据结构与算法</category>
+      </categories>
+      <tags>
+        <tag>数据结构与算法</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>递归树</title>
     <url>/archives/66071d43.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/2f/6d/2fde598f081f84187695fbf1937c446d.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/6jh1Rva2smYKbrw.jpg" style="zoom:50%;" />
 
 <p>我们可以借助借助递归树来分析递归算法的时间复杂度</p>
 <span id="more"></span>
 
 <h3 id="递归树与时间复杂度分析"><a href="#递归树与时间复杂度分析" class="headerlink" title="递归树与时间复杂度分析"></a>递归树与时间复杂度分析</h3><p>递归的思想就是，将大问题分解为小问题来求解，然后再将小问题分解为小小问题。这样一层一层地分解，直到问题的数据规模被分解得足够小，不用继续递归分解为止。</p>
 <p>如果我们把这个一层一层的分解过程画成图，它其实就是一棵树。我们给这棵树起一个名字，叫作递归树。下图是斐波那契数列的递归树，结点数字表示数据规模，一个节点的求解可以分解为左右子节点两个问题的求解。</p>
-<img data-src="https://static001.geekbang.org/resource/image/1d/a3/1d9648b7f43e430473d76d24803159a3.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/YoIO3L29iPKdxwF.jpg" style="zoom:50%;" />
 
 <p>我们借助归并排序来看看如何用递归树来分析递归代码的时间复杂度。</p>
-<img data-src="https://static001.geekbang.org/resource/image/c6/d0/c66bfc3d02d3b7b8f64c208bf4c948d0.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/MhHqG5vgtmOJE1n.jpg" style="zoom:50%;" />
 
 <p>因为每次分解都是一分为二，所以代价很低，我们把时间上的消耗记作常量 1。归并算法中比较耗时的是归并操作，也就是把两个子数组合并为大数组。从图中我们可以看出，每一层归并操作消耗的时间总和是一样的，跟要排序的数据规模有关。我们把每一层归并操作消耗的时间记作 n。</p>
 <p>现在，我们只需要知道这棵树的高度 h，用高度 h 乘以每一层的时间消耗 n，就可以得到总的时间复杂度 $O(n∗h)$。从归并排序的原理和递归树，可以看出来，归并排序递归树是一棵满二叉树。</p>
@@ -229,23 +329,23 @@
 <h3 id="实战一：分析快速排序的时间复杂度"><a href="#实战一：分析快速排序的时间复杂度" class="headerlink" title="实战一：分析快速排序的时间复杂度"></a>实战一：分析快速排序的时间复杂度</h3><p>快速排序在最好情况下，每次分区都能一分为二，这个时候用递推公式 $T(n)=2T(2n)+n$​，很容易就能推导出时间复杂度是 $O(nlogn)$。但是，我们并不可能每次分区都这么幸运，正好一分为二。</p>
 <p>我们假设平均情况下，每次分区之后，两个分区的大小比例为 1:k。当 k=9 时，如果用递推公式的方法来求解时间复杂度的话，递推公式就写成 $T(n)=T(10n)+T(109n)+n$。</p>
 <p>我们还是取 k 等于 9，也就是说，每次分区都很不平均，一个分区是另一个分区的 9 倍。如果我们把递归分解的过程画成递归树:</p>
-<img data-src="https://static001.geekbang.org/resource/image/44/43/44972a3531dae0b7a0ccc935bc13f243.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/4iToLW3h2HlRtXy.jpg" style="zoom:50%;" />
 
 <p>快速排序的过程中，每次分区都要遍历待分区区间的所有数据，所以，每一层分区操作所遍历的数据的个数之和就是 n。我们现在只要求出递归树的高度 $h$，这个快排过程遍历的数据个数就是 $h∗n$ ，也就是说，时间复杂度就是 $O(h∗n)$。因为每次分区并不是均匀地一分为二，所以递归树并不是满二叉树。这样一个递归树的高度是多少呢？</p>
 <p>我们知道，快速排序结束的条件就是待排序的小区间，大小为 1，也就是说叶子节点里的数据规模是 1。从根节点 n 到叶子节点 1，递归树中最短的一个路径每次都乘以 $\frac{1}{10}$​​，最长的一个路径每次都乘以$\frac{9}{10}$​​。通过计算，我们可以得到，从根节点到叶子节点的最短路径是 $log_{10}n$​​，最长的路径是 $log_{\frac{10}{9}}n$​​。</p>
-<img data-src="https://static001.geekbang.org/resource/image/7c/ed/7cea8607f0d92a901f3152341830d6ed.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/WqNR1oJbO4euB2X.jpg" style="zoom:50%;" />
 
 <p>所以，遍历数据的个数总和就介于 $log_{10}n$​ 和 $log_{\frac{10}{9}}n$​ 之间。根据复杂度的大 O 表示法，对数复杂度的底数不管是多少，我们统一写成 $logn$​，所以，当分区大小比例是 1:9 时，快速排序的时间复杂度仍然是 $O(nlogn)$​。</p>
 <p>依次类推，k=99 甚至更大时，时间复杂度仍是$O(nlogn)$</p>
 <h3 id="实战二：分析斐波那契数列的时间复杂度"><a href="#实战二：分析斐波那契数列的时间复杂度" class="headerlink" title="实战二：分析斐波那契数列的时间复杂度"></a>实战二：分析斐波那契数列的时间复杂度</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">f</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">1</span>) <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">if</span> (n == <span class="number">2</span>) <span class="keyword">return</span> <span class="number">2</span>;</span><br><span class="line">  <span class="keyword">return</span> f(n-<span class="number">1</span>) + f(n-<span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>把上面代码画成递归树：</p>
-<img data-src="https://static001.geekbang.org/resource/image/9c/ce/9ccbce1a70c7e2def52701dcf176a4ce.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/jvwqh5yZo4GJ6rV.jpg" style="zoom:50%;" />
 
 <p>f(n) 分解为 f(n−1) 和 f(n−2)，每次数据规模都是 −1 或者 −2，叶子节点的数据规模是 1 或者 2。所以，从根节点走到叶子节点，每条路径是长短不一的。如果每次都是 −1，那最长路径大约就是 n；如果每次都是 −2，那最短路径大约就是 $\frac n2$。</p>
 <p>每次分解之后的合并操作只需要一次加法运算，我们把这次加法运算的时间消耗记作 1。所以，从上往下，第一层的总时间消耗是 1，第二层的总时间消耗是 2，第三层的总时间消耗就是 $2^2$。依次类推，第 k 层的时间消耗就是 $2^{k−1}$，​那整个算法的总的时间消耗就是每一层时间消耗之和。</p>
 <p>如果路径长度都为 n，那这个总和就是 $2^n−1$。</p>
-<img data-src="https://static001.geekbang.org/resource/image/86/1f/86d301fc5fa3088383fa5b45f01e4d1f.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/OTFrIJL4jR1yQnD.jpg" style="zoom:50%;" />
 
 <p>如果路径长度都是 $\frac n2$ ，那整个算法的总的时间消耗就是 $2^{\frac n2}−1$​。</p>
 <img data-src="https://i.loli.net/2021/08/16/XO7VnQdpHcPZeK2.jpg" style="zoom:50%;" />
@@ -260,7 +360,7 @@
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 调用方式：</span></span><br><span class="line"><span class="comment">// int[]a = a=&#123;1, 2, 3, 4&#125;; printPermutations(a, 4, 4);</span></span><br><span class="line"><span class="comment">// k表示要处理的子数组的数据个数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">printPermutations</span><span class="params">(<span class="keyword">int</span>[] data, <span class="keyword">int</span> n, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (k == <span class="number">1</span>) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">      System.out.print(data[i] + <span class="string">&quot; &quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; k; ++i) &#123;</span><br><span class="line">    <span class="keyword">int</span> tmp = data[i];</span><br><span class="line">    data[i] = data[k-<span class="number">1</span>];</span><br><span class="line">    data[k-<span class="number">1</span>] = tmp;</span><br><span class="line"></span><br><span class="line">    printPermutations(data, n, k - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    tmp = data[i];</span><br><span class="line">    data[i] = data[k-<span class="number">1</span>];</span><br><span class="line">    data[k-<span class="number">1</span>] = tmp;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>现在，我们来看下，如何借助递归树，轻松分析出这个代码的时间复杂度。不过，这个递归树已经不是标准的二叉树了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/82/9b/82f40bed489cf29b14192b44decf059b.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/f42UkMeC6EIc3lQ.jpg" style="zoom:50%;" />
 
 <p>第一层分解有 n 次交换操作，第二层有 n 个节点，每个节点分解需要 n−1 次交换，所以第二层总的交换次数是 $n∗(n−1)$。第三层有 $n∗(n−1)$ 个节点，每个节点分解需要 n−2 次交换，所以第三层总的交换次数是 $n∗(n−1)∗(n−2)$。</p>
 <p>以此类推，第 k 层总的交换次数就是 $n∗(n−1)∗(n−2)∗…∗(n−k+1)$。最后一层的交换次数就是 $n∗(n−1)∗(n−2)∗…∗2∗1$。每一层的交换次数之和就是总的交换次数。</p>
@@ -283,7 +383,7 @@
   <entry>
     <title>红黑树</title>
     <url>/archives/f89cb603.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/b8/5d/b87b539ee593696aa7619bb950d1205d.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/6DqeRPSahmWwAYF.jpg" style="zoom:50%;" />
 
 <p>二叉查找树在频繁的动态更新过程中，可能会出现树的高度远大于 log2n 的情况，从而导致各个操作的效率下降。极端情况下，二叉树会退化为链表，时间复杂度会退化到 O(n)，要解决这个复杂度退化的问题，需要设计一种平衡二叉查找树。</p>
 <p>很多书籍里，但凡讲到平衡二叉查找树，就会拿红黑树作为例子。不仅如此，如果你有一定的开发经验，你会发现，在工程中，很多用到平衡二叉查找树的地方都会用红黑树。你有没有想过，<strong>为什么工程中都喜欢用红黑树，而不是其他平衡二叉查找树呢？</strong></p>
@@ -305,7 +405,7 @@
 <p>二叉查找树很多操作的性能都跟树的高度成正比。一棵极其平衡的二叉树（满二叉树或完全二叉树）的高度大约是 log2n，所以如果要证明红黑树是近似平衡的，我们只需要分析，红黑树的高度是否比较稳定地趋近 log2n 就好了。</p>
 <p>首先，我们来看，如果我们将红色节点从红黑树中去掉，那单纯包含黑色节点的红黑树的高度是多少呢？</p>
 <p>红色节点删除之后，有些节点就没有父节点了，它们会直接拿这些节点的祖父节点（父节点的父节点）作为父节点。所以，之前的二叉树就变成了四叉树。</p>
-<img data-src="https://static001.geekbang.org/resource/image/7e/ed/7e6ecc308fe44120f30de809822215ed.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/iFYVgouaCSKzs84.jpg" style="zoom:50%;" />
 
 <p>前面红黑树的定义里有这么一条：从任意节点到可达的叶子节点的每个路径包含相同数目的黑色节点。我们从四叉树中取出某些节点，放到叶节点位置，四叉树就变成了完全二叉树。所以，仅包含黑色节点的四叉树的高度，比包含相同节点个数的完全二叉树的高度还要小。</p>
 <p>完全二叉树的高度近似 log2n，这里的四叉“黑树”的高度要低于完全二叉树，所以去掉红色节点的“黑树”的高度也不会超过 log2n。我们现在知道只包含黑色节点的“黑树”的高度，那我们现在把红色节点加回去，高度会变成多少呢？</p>
@@ -321,12 +421,12 @@
 </li>
 </ul>
 <hr>
-<img data-src="https://static001.geekbang.org/resource/image/57/ed/578b1b7602a9f03a7e900145f91fa6ed.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/D4Gh3ySZAavLlQ8.jpg" style="zoom:50%;" />
 
 <p>上一节，我们讲到红黑树定义的时候，提到红黑树的叶子节点都是黑色的空节点。当时我只是粗略地解释了，这是为了代码实现方便，那更加确切的原因是什么呢？</p>
 <h3 id="实现红黑树的基本思想"><a href="#实现红黑树的基本思想" class="headerlink" title="实现红黑树的基本思想"></a>实现红黑树的基本思想</h3><p>红黑树的平衡过程跟魔方复原非常神似，大致过程就是：<strong>遇到什么样的节点排布，我们就对应怎么去调整</strong>。只要按照这些固定的调整规则来操作，就能将一个非平衡的红黑树调整成平衡的。</p>
 <p>先介绍两个非常重要的操作，<strong>左旋（rotate left）、右旋（rotate right）</strong>。左旋全称其实是叫<strong>围绕某个节点的左旋</strong>，那右旋的全称估计你已经猜到了，就叫<strong>围绕某个节点的右旋</strong>。</p>
-<img data-src="https://static001.geekbang.org/resource/image/0e/1e/0e37e597737012593a93105ebbf4591e.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/2RMTkCSpXZWD358.jpg" style="zoom:50%;" />
 
 <h3 id="插入操作的平衡调整"><a href="#插入操作的平衡调整" class="headerlink" title="插入操作的平衡调整"></a>插入操作的平衡调整</h3><p>红黑树规定，插入的节点必须是红色的。而且，二叉查找树中新插入的节点都是放在叶子节点上。</p>
 <ul>
@@ -343,7 +443,7 @@
 <li>关注节点变成 a 的祖父节点 c；</li>
 <li>跳到 CASE 2 或者 CASE 3。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/60/40/603cf91f54b5db21bd02c6c5678ecf40.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/JDXZ1aEyduUKekG.jpg" style="zoom:50%;" />
 
 <p><strong>CASE 2：如果关注节点是 a，它的叔叔节点 d 是黑色，关注节点 a 是其父节点 b 的右子节点</strong>，我们就依次执行下面的操作：</p>
 <ul>
@@ -351,7 +451,7 @@
 <li>围绕新的关注节点b 左旋；</li>
 <li>跳到 CASE 3。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/44/ad/4480a314f9d83c343b8adbb28b6782ad.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/Gb9yfuQrqJ5MlwH.jpg" style="zoom:50%;" />
 
 <p><strong>CASE 3：如果关注节点是 a，它的叔叔节点 d 是黑色，关注节点 a 是其父节点 b 的左子节点</strong>，我们就依次执行下面的操作：</p>
 <ul>
@@ -359,7 +459,7 @@
 <li>将关注节点 a 的父节点 b、兄弟节点 c 的颜色互换。</li>
 <li>调整结束。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/04/12/04650d9470b1e67899f5b8b7b8e33212.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/Ernv3yQxod1SOaw.jpg" style="zoom:50%;" />
 
 <h3 id="删除操作的平衡调整"><a href="#删除操作的平衡调整" class="headerlink" title="删除操作的平衡调整"></a>删除操作的平衡调整</h3><p>删除操作的平衡调整分为两步，第一步是<strong>针对删除节点初步调整</strong>。初步调整只是保证整棵红黑树在一个节点删除之后，仍然满足最后一条定义的要求，也就是说，每个节点，从该节点到达其可达叶子节点的所有路径，都包含相同数目的黑色节点；第二步是<strong>针对关注节点进行二次调整</strong>，让它满足红黑树的第三条定义，即不存在相邻的两个红色节点。</p>
 <ol>
@@ -373,7 +473,8 @@
 <li>节点 a 只能是黑色，节点 b 也只能是红色，其他情况均不符合红黑树的定义。这种情况下，我们把节点 b 改为黑色；</li>
 <li>调整结束，不需要进行二次调整。</li>
 </ul>
-<p><img data-src="https://i.loli.net/2021/08/15/31TUMeu7Ymi6Xvg.jpg"></p>
+<img data-src="https://i.loli.net/2021/08/15/31TUMeu7Ymi6Xvg.jpg" style="zoom:50%;" />
+
 <p><strong>CASE 2：如果要删除的节点 a 有两个非空子节点，并且它的后继节点就是节点 a 的右子节点 c</strong>。我们就依次进行下面的操作：</p>
 <ul>
 <li>如果节点 a 的后继节点就是右子节点 c，那右子节点 c 肯定没有左子树。我们把节点 a 删除，并且将节点 c 替换到节点 a 的位置。这一部分操作跟普通的二叉查找树的删除操作无异；</li>
@@ -381,7 +482,7 @@
 <li>如果节点 c 是黑色，为了不违反红黑树的最后一条定义，我们给节点 c 的右子节点 d 多加一个黑色，这个时候节点 d 就成了“红 - 黑”或者“黑 - 黑”；</li>
 <li>这个时候，关注节点变成了节点 d，第二步的调整操作就会针对关注节点来做。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/48/4e/48e3bd2cdd66cb635f8a4df8fb8fd64e.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/fg3K8FRyrde4Hqj.jpg" style="zoom:50%;" />
 
 <p><strong>CASE 3：如果要删除的是节点 a，它有两个非空子节点，并且节点 a 的后继节点不是右子节点</strong>，我们就依次进行下面的操作：</p>
 <ul>
@@ -391,7 +492,7 @@
 <li>如果节点 d 是黑色，为了不违反红黑树的最后一条定义，我们给节点 d 的右子节点 c 多加一个黑色，这个时候节点 c 就成了“红 - 黑”或者“黑 - 黑”；</li>
 <li>这个时候，关注节点变成了节点 c，第二步的调整操作就会针对关注节点来做。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/b9/29/b93c1fa4de16aee5482424ddf49f3c29.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/N8HPL5yF1DQzoAU.jpg" style="zoom:50%;" />
 
 <ol start="2">
 <li><strong>针对关注节点进行二次调整</strong></li>
@@ -404,7 +505,7 @@
 <li>关注节点不变；</li>
 <li>继续从四种情况中选择适合的规则来调整。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/ac/91/ac76d78c064a2486e2a5b4c4903acb91.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/J6VTUz3wRKhi5bc.jpg" style="zoom:50%;" />
 
 <p><strong>CASE 2：如果关注节点是 a，它的兄弟节点 c 是黑色的，并且节点 c 的左右子节点 d、e 都是黑色的</strong>，我们就依次进行下面的操作：</p>
 <ul>
@@ -414,7 +515,7 @@
 <li>关注节点从 a 变成其父节点 b；</li>
 <li>继续从四种情况中选择符合的规则来调整。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/ec/ec/eca118d673c607eb2b103f3476fb24ec.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/8Tvira7pKY9gOnZ.jpg" style="zoom:50%;" />
 
 <p><strong>CASE 3：如果关注节点是 a，它的兄弟节点 c 是黑色，c 的左子节点 d 是红色，c 的右子节点 e 是黑色</strong>，我们就依次进行下面的操作：</p>
 <ul>
@@ -423,7 +524,7 @@
 <li>关注节点不变；</li>
 <li>跳转到 CASE 4，继续调整。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/44/af/44075213100edd70315e1492422c92af.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/MxRpFfetV2N7TSj.jpg" style="zoom:50%;" />
 
 <p><strong>CASE 4：如果关注节点 a 的兄弟节点 c 是黑色的，并且 c 的右子节点是红色的</strong>，我们就依次进行下面的操作：</p>
 <ul>
@@ -434,19 +535,19 @@
 <li>将关注节点 a 的叔叔节点 e 设置为黑色；</li>
 <li>调整结束。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/5f/44/5f73f61bf77a7f2bb75f168cf432ec44.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/7YRw2l4mSnZ9K1Q.jpg" style="zoom:50%;" />
 
 <h3 id="解答"><a href="#解答" class="headerlink" title="解答"></a>解答</h3><p><strong>为什么红黑树的定义中，要求叶子节点是黑色的空节点？</strong></p>
 <p>要我说，之所以有这么奇怪的要求，其实就是为了实现起来方便。只要满足这一条要求，那在任何时刻，红黑树的平衡操作都可以归结为我们刚刚讲的那几种情况。</p>
 <p>还是有点不好理解，我通过一个例子来解释一下。假设红黑树的定义中不包含刚刚提到的那一条“叶子节点必须是黑色的空节点”，我们往一棵红黑树中插入一个数据，新插入节点的父节点也是红色的，两个红色的节点相邻，这个时候，红黑树的定义就被破坏了。那我们应该如何调整呢？</p>
-<img data-src="https://static001.geekbang.org/resource/image/d9/c9/d9d1ce7d6bf3da4888f39f9d15be99c9.jpg" style="zoom: 50%;" />
+<img data-src="https://i.loli.net/2021/08/17/6Wb15uI2RdHPDFS.jpg" style="zoom: 50%;" />
 
 <p>你会发现，这个时候，我们前面在讲插入时，三种情况下的平衡调整规则，没有一种是适用的。但是，如果我们把黑色的空节点都给它加上，变成下面这样，你会发现，它满足 CASE 2 了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/8b/9a/8b1fb8c8004d86f737d829ecbd3a599a.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/iDdTgm5YP2BhbSt.jpg" style="zoom:50%;" />
 
 <p>你可能会说，你可以调整一下平衡调整规则啊。比如把 CASE 2 改为“如果关注节点 a 的叔叔节点 b 是黑色或者不存在，a 是父节点的右子节点，就进行某某操作”。当然可以，但是这样的话规则就没有原来简洁了。</p>
 <p>你可能还会说，这样给红黑树添加黑色的空的叶子节点，会不会比较浪费存储空间呢？答案是不会的。虽然我们在讲解或者画图的时候，每个黑色的、空的叶子节点都是独立画出来的。实际上，在具体实现的时候，我们只需要像下面这样，共用一个黑色的、空的叶子节点就行了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/d6/66/d63231acb0e9d54c3469055d8dbdb366.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/mapBqIcMj9Furyz.jpg" style="zoom:50%;" />
 ]]></content>
       <categories>
         <category>数据结构与算法</category>
@@ -458,35 +559,35 @@
   <entry>
     <title>二叉树基础</title>
     <url>/archives/84ac9751.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/ab/79/abdc3641bada1a03f4444c36c1bc4879.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/1ZjWmtS6UAJiwdR.jpg" style="zoom:50%;" />
 
 <p>二叉树有哪几种存储方式？什么样的二叉树适合用数组来存储？</p>
 <span id="more"></span>
 
 <h3 id="树（Tree）"><a href="#树（Tree）" class="headerlink" title="树（Tree）"></a>树（Tree）</h3><p>“树”里面每个元素我们叫做“节点”，用来连接相邻节点之间的关系，我们叫做“父子关系”。下图中，A 节点就是 B 节点的父节点，B 节点是 A 节点的子节点。B、C、D 这三个节点的父节点是同一个节点，所以它们之间互称为兄弟节点。我们把没有父节点的节点叫做根节点，也就是图中的节点 E。我们把没有子节点的节点叫做叶子节点或者叶节点，比如图中的 G、H、I、J、K、L 都是叶子节点。</p>
-<img data-src="https://static001.geekbang.org/resource/image/22/ae/220043e683ea33b9912425ef759556ae.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/twphd5oCvk8yUrf.jpg" style="zoom:50%;" />
 
 <p>除此之外，关于“树”，还有三个比较相似的概念：<strong>高度</strong>（Height）、<strong>深度</strong>（Depth）、<strong>层</strong>（Level）。它们的定义是这样的：</p>
-<img data-src="https://static001.geekbang.org/resource/image/40/1e/4094a733986073fedb6b9d03f877d71e.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/GRuwFW2Irmg18PZ.jpg" style="zoom:50%;" />
 
 <p>这三个概念的定义比较容易混淆，描述起来也比较空洞。我举个例子说明一下，你一看应该就能明白。</p>
 <img data-src="https://i.loli.net/2021/08/15/B5oAS48XL1f7lwj.jpg" style="zoom:50%;" />
 
 <h3 id="二叉树（Binary-Tree）"><a href="#二叉树（Binary-Tree）" class="headerlink" title="二叉树（Binary Tree）"></a>二叉树（Binary Tree）</h3><p>二叉树，顾名思义，每个节点最多有两个“叉”，也就是两个子节点，分别是左子节点和右子节点。不过，二叉树并不要求每个节点都有两个子节点。</p>
-<img data-src="https://static001.geekbang.org/resource/image/09/2b/09c2972d56eb0cf67e727deda0e9412b.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/ZmAI6zVs9rhJKtY.jpg" style="zoom:50%;" />
 
 <p>上图中三个都是二叉树，其中，编号 2 的二叉树也叫做满二叉树，特征是除叶子结点外每个结点都有两个子节点。</p>
 <p>编号 3 的二叉树叫做完全二叉树，叶子节点都在最底下两层，最后一层的叶子节点都靠左排列，并且除了最后一层，其他层的节点个数都要达到最大。</p>
 <p>为什么偏偏把最后一层的叶子节点靠左排列的叫完全二叉树？如果靠右排列就不能叫完全二叉树了吗？这个定义的由来或者说目的在哪里？</p>
 <p>这是由二叉树的实现来定义的，先来了解下如何表示（存储）一棵二叉树？</p>
 <p>先来看比较简单、直观的链式存储法。从图中你应该可以很清楚地看到，每个节点有三个字段，其中一个存储数据，另外两个是指向左右子节点的指针。我们只要拎住根节点，就可以通过左右子节点的指针，把整棵树都串起来。这种存储方式我们比较常用。大部分二叉树代码都是通过这种结构来实现的。</p>
-<img data-src="https://static001.geekbang.org/resource/image/12/8e/12cd11b2432ed7c4dfc9a2053cb70b8e.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/e7qhUGwbBAurHy6.jpg" style="zoom:50%;" />
 
 <p>我们再来看，基于数组的顺序存储法。我们把根节点存储在下标 i = 1 的位置，那左子节点存储在下标 2 * i = 2 的位置，右子节点存储在 2 * i + 1 = 3 的位置。以此类推，B 节点的左子节点存储在 2 * i = 2 * 2 = 4 的位置，右子节点存储在 2 * i + 1 = 2 * 2 + 1 = 5 的位置。</p>
-<img data-src="https://static001.geekbang.org/resource/image/14/30/14eaa820cb89a17a7303e8847a412330.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/PFXASywYujfskgx.jpg" style="zoom:50%;" />
 
 <p>上图是一棵完全二叉树，所以仅仅“浪费”了一个下标为 0 的存储位置。如果是非完全二叉树，其实会浪费比较多的数组存储空间。你可以看我举的下面这个例子。</p>
-<img data-src="https://static001.geekbang.org/resource/image/08/23/08bd43991561ceeb76679fbb77071223.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/D9ndF2U1Gtm3pwH.jpg" style="zoom:50%;" />
 
 <p>所以，如果某棵二叉树是一棵完全二叉树，那用数组存储无疑是最节省内存的一种方式。因为数组的存储方式并不需要像链式存储法那样，要存储额外的左右子节点的指针。这也是为什么完全二叉树会单独拎出来的原因，也是为什么完全二叉树要求最后一层的子节点都靠左的原因。</p>
 <h3 id="二叉树的遍历"><a href="#二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历</h3><p>经典的方法有三种，<strong>前序遍历</strong>、<strong>中序遍历</strong>和<strong>后序遍历</strong>。</p>
@@ -495,23 +596,23 @@
 <li>中序遍历是指，对于树中的任意节点来说，先打印它的左子树，然后再打印它本身，最后打印它的右子树。</li>
 <li>后序遍历是指，对于树中的任意节点来说，先打印它的左子树，然后再打印它的右子树，最后打印这个节点本身。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/ab/16/ab103822e75b5b15c615b68560cb2416.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/Dbtuwo1W6dzVPNe.jpg" style="zoom:50%;" />
 
 <p>实际上，二叉树的前、中、后序遍历就是一个递归的过程。</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line">前序遍历的递推公式：</span><br><span class="line">preOrder(r) = print r-&gt;preOrder(r-&gt;left)-&gt;preOrder(r-&gt;right)</span><br><span class="line"></span><br><span class="line">中序遍历的递推公式：</span><br><span class="line">inOrder(r) = inOrder(r-&gt;left)-&gt;print r-&gt;inOrder(r-&gt;right)</span><br><span class="line"></span><br><span class="line">后序遍历的递推公式：</span><br><span class="line">postOrder(r) = postOrder(r-&gt;left)-&gt;postOrder(r-&gt;right)-&gt;print r</span><br></pre></td></tr></table></figure>
 
 <p>每个结点最多会被访问两次，时间复杂度为O(n)。</p>
 <hr>
-<img data-src="https://static001.geekbang.org/resource/image/06/8d/06f9b45611d0c76761550851fdae858d.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/matwhKI5B8WyPkp.jpg" style="zoom:50%;" />
 
 <h3 id="二叉查找树（Binary-Search-Tree）"><a href="#二叉查找树（Binary-Search-Tree）" class="headerlink" title="二叉查找树（Binary Search Tree）"></a>二叉查找树（Binary Search Tree）</h3><p>二叉查找树要求，在树中的任意一个节点，其左子树中的每个节点的值，都要小于这个节点的值，而右子树节点的值都大于这个节点的值。</p>
-<img data-src="https://static001.geekbang.org/resource/image/f3/ae/f3bb11b6d4a18f95aa19e11f22b99bae.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/dBWGVTJRNfZ9LkF.jpg" style="zoom:50%;" />
 
 <ol>
 <li><strong>二叉查找树的查找操作</strong></li>
 </ol>
 <p>先取根节点，如果它等于我们要查找的数据，那就返回。如果要查找的数据比根节点的值小，那就在左子树中递归查找；如果要查找的数据比根节点的值大，那就在右子树中递归查找。</p>
-<img data-src="https://static001.geekbang.org/resource/image/96/2a/96b3d86ed9b7c4f399e8357ceed0db2a.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/lRQ9wpMSBDOu3hb.jpg" style="zoom:50%;" />
 
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BinarySearchTree</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> Node tree;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Node <span class="title">find</span><span class="params">(<span class="keyword">int</span> data)</span> </span>&#123;</span><br><span class="line">    Node p = tree;</span><br><span class="line">    <span class="keyword">while</span> (p != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">if</span> (data &lt; p.data) p = p.left;</span><br><span class="line">      <span class="keyword">else</span> <span class="keyword">if</span> (data &gt; p.data) p = p.right;</span><br><span class="line">      <span class="keyword">else</span> <span class="keyword">return</span> p;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> data;</span><br><span class="line">    <span class="keyword">private</span> Node left;</span><br><span class="line">    <span class="keyword">private</span> Node right;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Node</span><span class="params">(<span class="keyword">int</span> data)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -520,7 +621,7 @@
 </ol>
 <p>新插入的数据一般都是在叶子节点上，所以我们只需要从根节点开始，依次比较要插入的数据和节点的大小关系。</p>
 <p>如果要插入的数据比节点的数据大，并且节点的右子树为空，就将新数据直接插到右子节点的位置；如果不为空，就再递归遍历右子树，查找插入位置。同理，如果要插入的数据比节点数值小，并且节点的左子树为空，就将新数据插入到左子节点的位置；如果不为空，就再递归遍历左子树，查找插入位置。</p>
-<img data-src="https://static001.geekbang.org/resource/image/da/c5/daa9fb557726ee6183c5b80222cfc5c5.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/XrRk1AvWdhZwMKo.jpg" style="zoom:50%;" />
 
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insert</span><span class="params">(<span class="keyword">int</span> data)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (tree == <span class="keyword">null</span>) &#123;</span><br><span class="line">    tree = <span class="keyword">new</span> Node(data);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Node p = tree;</span><br><span class="line">  <span class="keyword">while</span> (p != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (data &gt; p.data) &#123;</span><br><span class="line">      <span class="keyword">if</span> (p.right == <span class="keyword">null</span>) &#123;</span><br><span class="line">        p.right = <span class="keyword">new</span> Node(data);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      p = p.right;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// data &lt; p.data</span></span><br><span class="line">      <span class="keyword">if</span> (p.left == <span class="keyword">null</span>) &#123;</span><br><span class="line">        p.left = <span class="keyword">new</span> Node(data);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      p = p.left;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -533,7 +634,7 @@
 <li>如果要删除的节点只有一个子节点（只有左子节点或者右子节点），我们只需要更新父节点中，指向要删除节点的指针，让它指向要删除节点的子节点就可以了。比如图中的删除节点 13。</li>
 <li>如果要删除的节点有两个子节点，这就比较复杂了。我们需要找到这个节点的右子树中的最小节点，把它替换到要删除的节点上。然后再删除掉这个最小节点，因为最小节点肯定没有左子节点（如果有左子结点，那就不是最小节点了），所以，我们可以应用上面两条规则来删除这个最小节点。比如图中的删除节点 18。</li>
 </ul>
-<img data-src="https://static001.geekbang.org/resource/image/29/2c/299c615bc2e00dc32225f4d9e3490e2c.jpg" style="zoom: 50%;" />
+<img data-src="https://i.loli.net/2021/08/17/IvxqRQrony9WNjC.jpg" style="zoom: 50%;" />
 
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">(<span class="keyword">int</span> data)</span> </span>&#123;</span><br><span class="line">  Node p = tree; <span class="comment">// p指向要删除的节点，初始化指向根节点</span></span><br><span class="line">  Node pp = <span class="keyword">null</span>; <span class="comment">// pp记录的是p的父节点</span></span><br><span class="line">  <span class="keyword">while</span> (p != <span class="keyword">null</span> &amp;&amp; p.data != data) &#123;</span><br><span class="line">    pp = p;</span><br><span class="line">    <span class="keyword">if</span> (data &gt; p.data) p = p.right;</span><br><span class="line">    <span class="keyword">else</span> p = p.left;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">if</span> (p == <span class="keyword">null</span>) <span class="keyword">return</span>; <span class="comment">// 没有找到</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// 要删除的节点有两个子节点</span></span><br><span class="line">  <span class="keyword">if</span> (p.left != <span class="keyword">null</span> &amp;&amp; p.right != <span class="keyword">null</span>) &#123; <span class="comment">// 查找右子树中最小节点</span></span><br><span class="line">    Node minP = p.right;</span><br><span class="line">    Node minPP = p; <span class="comment">// minPP表示minP的父节点</span></span><br><span class="line">    <span class="keyword">while</span> (minP.left != <span class="keyword">null</span>) &#123;</span><br><span class="line">      minPP = minP;</span><br><span class="line">      minP = minP.left;</span><br><span class="line">    &#125;</span><br><span class="line">    p.data = minP.data; <span class="comment">// 将minP的数据替换到p中</span></span><br><span class="line">    p = minP; <span class="comment">// 下面就变成了删除minP了</span></span><br><span class="line">    pp = minPP;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 删除节点是叶子节点或者仅有一个子节点</span></span><br><span class="line">  Node child; <span class="comment">// p的子节点</span></span><br><span class="line">  <span class="keyword">if</span> (p.left != <span class="keyword">null</span>) child = p.left;</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (p.right != <span class="keyword">null</span>) child = p.right;</span><br><span class="line">  <span class="keyword">else</span> child = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (pp == <span class="keyword">null</span>) tree = child; <span class="comment">// 删除的是根节点</span></span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (pp.left == p) pp.left = child;</span><br><span class="line">  <span class="keyword">else</span> pp.right = child;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -543,13 +644,13 @@
 <p>前面我们讲的二叉查找树的操作，针对的都是不存在键值相同的情况。那如果存储的两个对象键值相同，这种情况该怎么处理呢？</p>
 <p>第一种方法比较容易。二叉查找树中每一个节点不仅会存储一个数据，因此我们通过链表和支持动态扩容的数组等数据结构，把值相同的数据都存储在同一个节点上。</p>
 <p>第二种方法比较不好理解，不过更加优雅。每个节点仍然只存储一个数据。在查找插入位置的过程中，如果碰到一个节点的值，与要插入数据的值相同，我们就将这个要插入的数据放到这个节点的右子树，也就是说，把这个新插入的数据当作大于这个节点的值来处理。</p>
-<img data-src="https://static001.geekbang.org/resource/image/3f/5f/3f59a40e3d927f567022918d89590a5f.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/mIt9126wc4szkGl.jpg" style="zoom:50%;" />
 
 <p>当要查找数据的时候，遇到值相同的节点，我们并不停止查找操作，而是继续在右子树中查找，直到遇到叶子节点，才停止。这样就可以把键值等于要查找值的所有节点都找出来。</p>
-<img data-src="https://static001.geekbang.org/resource/image/fb/ff/fb7b320efd59a05469d6d6fcf0c98eff.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/f8tLTjS64iFsb7R.jpg" style="zoom:50%;" />
 
 <p>对于删除操作，我们也需要先查找到每个要删除的节点，然后再按前面讲的删除操作的方法，依次删除。</p>
-<img data-src="https://static001.geekbang.org/resource/image/25/17/254a4800703d31612c0af63870260517.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/Mz1PEAvi9ydDSeF.jpg" style="zoom:50%;" />
 
 <h3 id="二叉查找树的时间复杂度分析"><a href="#二叉查找树的时间复杂度分析" class="headerlink" title="二叉查找树的时间复杂度分析"></a>二叉查找树的时间复杂度分析</h3><p>实际上，二叉查找树的形态各式各样。比如这个图中，对于同一组数据，我们构造了三种二叉查找树。它们的查找、插入、删除操作的执行效率都是不一样的。图中第一种二叉查找树，根节点的左右子树极度不平衡，已经退化成了链表，所以查找的时间复杂度就变成了 O(n)。</p>
 <img data-src="https://i.loli.net/2021/08/15/cCs2r4I61GBNz3U.jpg" style="zoom:50%;" />
@@ -667,7 +768,7 @@
   <entry>
     <title>散列表（下）</title>
     <url>/archives/feeabc3.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/a7/4f/a771ca440b52e2eca47fa72ad8a1bc4f.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/vuCV4SjXpI1UJaf.jpg" style="zoom:50%;" />
 
 <p>为什么散列表和链表经常会一起使用？</p>
 <span id="more"></span>
@@ -676,7 +777,7 @@
 <p>在跳表那一节，提到 Redis 的有序集合是使用跳表来实现的，跳表可以看作一种改进版的链表。当时也提到，Redis 有序集合不仅使用了跳表，还用到了散列表。</p>
 <p>除此之外，如果你熟悉 Java 编程语言，你会发现 LinkedHashMap 这样一个常用的容器，也用到了散列表和链表两种数据结构。</p>
 <h3 id="LRU-缓存淘汰算法"><a href="#LRU-缓存淘汰算法" class="headerlink" title="LRU 缓存淘汰算法"></a>LRU 缓存淘汰算法</h3><p>具体结构是下面这个样子：</p>
-<img data-src="https://static001.geekbang.org/resource/image/ea/6e/eaefd5f4028cc7d4cfbb56b24ce8ae6e.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/TEmRAHlkZQCtKVs.jpg" style="zoom:50%;" />
 
 <p>我们使用双向链表存储数据，链表中的每个结点处理存储数据（data）、前驱指针（prev）、后继指针（next）之外，还新增了一个特殊的字段 hnext。这个 hnext 有什么作用呢？</p>
 <p>因为我们的散列表是通过链表法解决散列冲突的，所以每个结点会在两条链中。一个链是刚刚我们提到的<strong>双向链表</strong>，另一个链是散列表中的<strong>拉链。前驱和后继指针是为了将结点串在双向链表中，hnext 指针是为了将结点串在散列表的拉链中</strong>。</p>
@@ -721,7 +822,7 @@
   <entry>
     <title>散列表（中）</title>
     <url>/archives/8ab75b21.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/28/5b/28cd69b35b43faba13958ed336db425b.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/vhNzF4WfudjAVgc.jpg" style="zoom:50%;" />
 
 <p>如何打造一个工业级水平的散列表？</p>
 <span id="more"></span>
@@ -741,7 +842,7 @@
 <p>对于动态散列表来说，数据集合是频繁变动的，我们事先无法预估将要加入的数据个数，所以我们也无法事先申请一个足够大的散列表。随着数据慢慢加入，装载因子就会慢慢变大。当装载因子大到一定程度之后，散列冲突就会变得不可接受。</p>
 <p>这个时候，我们该如何处理呢？还记得我们前面多次讲的“动态扩容”吗？你可以回想一下，我们是如何做数组、栈、队列的动态扩容的。针对散列表，当装载因子过大时，我们也可以进行动态扩容，重新申请一个更大的散列表，将数据搬移到这个新散列表中。假设每次扩容我们都申请一个原来散列表大小两倍的空间。如果原来散列表的装载因子是 0.8，那经过扩容之后，新散列表的装载因子就下降为原来的一半，变成了 0.4。</p>
 <p>针对数组的扩容，数据搬移操作比较简单。但是，针对散列表的扩容，数据搬移操作要复杂很多。因为散列表的大小变了，数据的存储位置也变了，所以我们需要通过散列函数重新计算每个数据的存储位置。</p>
-<img data-src="https://static001.geekbang.org/resource/image/67/43/67d12e07a7d673a9c1d14354ad029443.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/NfytnJAzZDplHwu.jpg" style="zoom:50%;" />
 
 <p>插入一个数据，最好情况下，不需要扩容，最好时间复杂度是 O(1)。最坏情况下，散列表装载因子过高，启动扩容，我们需要重新申请内存空间，重新计算哈希位置，并且搬移数据，所以时间复杂度是 O(n)。用摊还分析法，均摊情况下，时间复杂度接近最好情况，就是 O(1)。</p>
 <p>实际上，对于动态散列表，随着数据的删除，散列表中的数据会越来越少，空闲空间会越来越多。如果我们对空间消耗非常敏感，我们可以在装载因子小于某个值之后，启动动态缩容。当然，如果我们更加在意执行效率，能够容忍多消耗一点内存空间，那就可以不用费劲来缩容了。</p>
@@ -751,7 +852,7 @@
 <p>如果我们的业务代码直接服务于用户，尽管大部分情况下，插入一个数据的操作都很快，但是，极个别非常慢的插入操作，也会让用户崩溃。这个时候，“一次性”扩容的机制就不合适了。</p>
 <p>为了解决一次性扩容耗时过多的情况，我们可以将扩容操作穿插在插入操作的过程中，分批完成。当装载因子触达阈值之后，我们只申请新空间，但并不将老的数据搬移到新散列表中。</p>
 <p>当有新数据要插入时，我们将新数据插入新散列表中，并且从老的散列表中拿出一个数据放入到新散列表。每次插入一个数据到散列表，我们都重复上面的过程。经过多次插入操作之后，老的散列表中的数据就一点一点全部搬移到新散列表中了。这样没有了集中的一次性数据搬移，插入操作就都变得很快了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/6d/cb/6d6736f986ec4b75dabc5472965fb9cb.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/Dz46ejmGlZYVt3L.jpg" style="zoom:50%;" />
 
 <p>这期间的查询操作怎么来做呢？对于查询操作，为了兼容了新、老散列表中的数据，我们先从新散列表中查找，如果没有找到，再去老的散列表中查找。</p>
 <p>通过这样均摊的方法，将一次性扩容的代价，均摊到多次插入操作中，就避免了一次性扩容耗时过多的情况。这种实现方式，任何情况下，插入一个数据的时间复杂度都是 O(1)。</p>
@@ -769,7 +870,7 @@
 <p>链表因为要存储指针，所以对于比较小的对象的存储，是比较消耗内存的，还有可能会让内存的消耗翻倍。而且，因为链表中的结点是零散分布在内存中的，不是连续的，所以对 CPU 缓存是不友好的，这方面对于执行效率也有一定的影响。</p>
 <p>当然，如果我们存储的是大对象，也就是说要存储的对象的大小远远大于一个指针的大小（4 个字节或者 8 个字节），那链表中指针的内存消耗在大对象面前就可以忽略了。</p>
 <p>实际上，我们对链表法稍加改造，可以实现一个更加高效的散列表。那就是，我们将链表法中的链表改造为其他高效的动态数据结构，比如跳表、红黑树。这样，即便出现散列冲突，极端情况下，所有的数据都散列到同一个桶内，那最终退化成的散列表的查找时间也只不过是 O(logn)。这样也就有效避免了前面讲到的散列碰撞攻击。</p>
-<img data-src="https://static001.geekbang.org/resource/image/10/29/103b84d7173277c5565607b413c40129.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/CpwTSxUV7g6o9uh.jpg" style="zoom:50%;" />
 
 <p><strong>总结一下，基于链表的散列冲突处理方法比较适合存储大对象、大数据量的散列表，而且，比起开放寻址法，它更加灵活，支持更多的优化策略，比如用红黑树代替链表。</strong></p>
 <h3 id="工业级散列表举例分析"><a href="#工业级散列表举例分析" class="headerlink" title="工业级散列表举例分析"></a>工业级散列表举例分析</h3><p>现在，我就拿一个具体的例子，Java 中的 HashMap 这样一个工业级的散列表，来具体看下，这些技术是怎么应用的。</p>
@@ -826,7 +927,7 @@
   <entry>
     <title>散列表（上）</title>
     <url>/archives/b752cca6.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/b1/02/b1b5da27544870c9376004006387db02.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/z1tIcxdis9orCSO.jpg" style="zoom:50%;" />
 
 <p>Word 这种文本编辑器你平时应该经常用吧，那你有没有留意过它的拼写检查功能呢？一旦我们在 Word 里输入一个错误的英文单词，它就会用标红的方式提示“拼写错误”。Word 的这个单词拼写检查功能，虽然很小但却非常实用。你有没有想过，这个功能是如何实现的呢？</p>
 <span id="more"></span>
@@ -836,7 +937,7 @@
 <p>举个例子，假设有88名选手参加运动会，每个选手胸前都会贴上自己的参赛号码，现在要通过编程实现通过编号快速找到选手信息。简单考虑，可以将信息放到数组里，编号为k的选手放到数组中下标为k的位置，这里就用到了散列的思想。</p>
 <p>又假如校长要求，参赛编号不能这么简单，需要加上年级、班级等信息，编号变成051167的形式，前两位表示年级，中间两位表示班级，最后两位还是原来的编号。思路和前面一致，尽管我们不能直接将编号作为下标，但可以截取编号后两位作为下标，查询时用同样方法取后两位读取数组数据。</p>
 <p>这就是典型的散列思想。其中，参赛选手的编号我们叫做<strong>键</strong>（key）或者<strong>关键字</strong>。我们用它来标识一个选手。我们把参赛编号转化为数组下标的映射方法就叫作<strong>散列函数</strong>（或“Hash 函数”“哈希函数”），而散列函数计算得到的值就叫作<strong>散列值</strong>（或“Hash 值”“哈希值”）。</p>
-<img data-src="https://static001.geekbang.org/resource/image/92/73/92c89a57e21f49d2f14f4424343a2773.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/kDVYWCrbiuJfnLq.jpg" style="zoom:50%;" />
 
 <h3 id="散列函数"><a href="#散列函数" class="headerlink" title="散列函数"></a>散列函数</h3><p>三点散列函数设计的基本要求：</p>
 <ol>
@@ -852,14 +953,14 @@
 <p>开放寻址法的核心思想是，如果出现了散列冲突，我们就重新探测一个空闲位置，将其插入。那如何重新探测新的位置呢？我先讲一个比较简单的探测方法，<strong>线性探测</strong>（Linear Probing）。</p>
 <p>当我们往散列表中插入数据时，如果某个数据经过散列函数散列之后，存储位置已经被占用了，我们就从当前位置开始，依次往后查找，看是否有空闲位置，直到找到为止。</p>
 <p>我说的可能比较抽象，我举一个例子具体给你说明一下。这里面黄色的色块表示空闲位置，橙色的色块表示已经存储了数据。</p>
-<img data-src="https://static001.geekbang.org/resource/image/5c/d5/5c31a3127cbc00f0c63409bbe1fbd0d5.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/EoPwd7RNAIT8jea.jpg" style="zoom:50%;" />
 
 <p>从图中可以看出，散列表的大小为 10，在元素 x 插入散列表之前，已经 6 个元素插入到散列表中。x 经过 Hash 算法之后，被散列到位置下标为 7 的位置，但是这个位置已经有数据了，所以就产生了冲突。于是我们就顺序地往后一个一个找，看有没有空闲的位置，遍历到尾部都没有找到空闲的位置，于是我们再从表头开始找，直到找到空闲位置 2，于是将其插入到这个位置。</p>
 <p>在散列表中查找元素的过程有点儿类似插入过程。我们通过散列函数求出要查找元素的键值对应的散列值，然后比较数组中下标为散列值的元素和要查找的元素。如果相等，则说明就是我们要找的元素；否则就顺序往后依次查找。如果遍历到数组中的空闲位置，还没有找到，就说明要查找的元素并没有在散列表中。</p>
 <p>散列表跟数组一样，不仅支持插入、查找操作，还支持删除操作。对于使用线性探测法解决冲突的散列表，删除操作稍微有些特别。我们不能单纯地把要删除的元素设置为空。这是为什么呢？</p>
 <p>还记得我们刚讲的查找操作吗？在查找的时候，一旦我们通过线性探测方法，找到一个空闲位置，我们就可以认定散列表中不存在这个数据。但是，如果这个空闲位置是我们后来删除的，就会导致原来的查找算法失效。本来存在的数据，会被认定为不存在。</p>
 <p>我们可以将删除的元素，特殊标记为 deleted。当线性探测查找的时候，遇到标记为 deleted 的空间，并不是停下来，而是继续往下探测。</p>
-<img data-src="https://static001.geekbang.org/resource/image/fe/1d/fe7482ba09670cbe05a9dfe4dd49bd1d.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/hHAL2brjgdWk78f.jpg" style="zoom:50%;" />
 
 <p>线性探测法其实存在很大问题。当散列表中插入的数据越来越多时，散列冲突发生的可能性就会越来越大，空闲位置会越来越少，线性探测的时间就会越来越久。极端情况下，我们可能需要探测整个散列表，所以最坏情况下的时间复杂度为 O(n)。同理，在删除和查找时，也有可能会线性探测整张散列表，才能找到要查找或者删除的数据。</p>
 <p>对于开放寻址冲突解决方法，除了线性探测方法之外，还有另外两种比较经典的探测方法，二次探测（Quadratic probing）和双重散列（Double hashing）。</p>
@@ -874,7 +975,7 @@
 <li><strong>链表法</strong></li>
 </ol>
 <p>链表法是一种更加常用的散列冲突解决办法，相比开放寻址法，它要简单很多。我们来看这个图，在散列表中，每个“桶（bucket）”或者“槽（slot）”会对应一条链表，所有散列值相同的元素我们都放到相同槽位对应的链表中。</p>
-<img data-src="https://static001.geekbang.org/resource/image/a4/7f/a4b77d593e4cb76acb2b0689294ec17f.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/aXpmxTIMPN8tczQ.jpg" style="zoom:50%;" />
 
 <p>当插入的时候，我们只需要通过散列函数计算出对应的散列槽位，将其插入到对应链表中即可，所以插入的时间复杂度是 O(1)。当查找、删除一个元素时，我们同样通过散列函数计算出对应的槽，然后遍历链表查找或者删除。那查找或删除操作的时间复杂度是多少呢？</p>
 <p>实际上，这两个操作的时间复杂度跟链表的长度 k 成正比，也就是 O(k)。对于散列比较均匀的散列函数来说，理论上讲，k=n/m，其中 n 表示散列中数据的个数，m 表示散列表中“槽”的个数。</p>
@@ -907,10 +1008,10 @@
 
 <p>对于存储在链表中的数据，只需要对链表稍加改造，就可以支持类似“二分”的查找算法，我们把改造后的数据结构叫做<strong>跳表</strong>（Skip list）</p>
 <h3 id="如何理解“跳表”？"><a href="#如何理解“跳表”？" class="headerlink" title="如何理解“跳表”？"></a>如何理解“跳表”？</h3><p>对于一个单链表来讲，即便链表中存储的数据是有序的，如果我们要想在其中查找某个数据，也只能从头到尾遍历链表。这样查找效率就会很低，时间复杂度会很高，是 O(n)。</p>
-<img data-src="https://static001.geekbang.org/resource/image/e1/6d/e18303fcedc068e5a168de04df956f6d.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/xjHD5CGnqP3bKsW.jpg" style="zoom:50%;" />
 
 <p>那怎么来提高查找效率呢？如果像图中那样，对链表建立一级“索引”，查找起来是不是就会更快一些呢？每两个结点提取一个结点到上一级，我们把抽出来的那一级叫做<strong>索引</strong>或<strong>索引层</strong>。</p>
-<img data-src="https://static001.geekbang.org/resource/image/14/8e/14753c824a5ee4a976ea799727adc78e.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/BGqbofPdxgiJ3C4.jpg" style="zoom:50%;" />
 
 <p>假如现在要查找结点16，我们可以先在索引层遍历，当遍历到索引值为13时，发现下一结点是17，那要查找的结点16就在这两结点之间。然后我们通过索引层结点的down指针，下降到原始链表层，继续遍历即可。原来需要遍历10个结点，现在只需要7个结点。</p>
 <p>从这个例子里，我们看出，<strong>加来一层索引之后，查找一个结点需要遍历的结点个数减少了，也就是说查找效率提高了</strong>。</p>
@@ -927,76 +1028,12 @@
 <p>实际上，在软件开发中，我们不必太在意索引占用的额外空间。在讲数据结构和算法时，我们习惯性地把要处理的数据看成整数，但是在实际的软件开发中，原始链表中存储的有可能是很大的对象，而索引结点只需要存储关键值和几个指针，并不需要存储对象，所以当对象比索引结点大很多时，那索引占用的额外空间就可以忽略了</p>
 <h3 id="高效的动态插入和删除"><a href="#高效的动态插入和删除" class="headerlink" title="高效的动态插入和删除"></a>高效的动态插入和删除</h3><p>跳表这个动态数据结构，不仅支持查找操作，还支持动态的插入、删除操作，而且插入、删除操作的时间复杂度也是 O(logn)。因为插入、删除操作的耗时都在查找遍历上，要注意删除时如果结点在索引中也有出现，那要同事删除原始链表和索引的结点</p>
 <h3 id="跳表索引动态更新"><a href="#跳表索引动态更新" class="headerlink" title="跳表索引动态更新"></a>跳表索引动态更新</h3><p>当我们不停地往跳表中插入数据时，如果我们不更新索引，就有可能出现某 2 个索引结点之间数据非常多的情况。极端情况下，跳表还会退化成单链表。</p>
-<img data-src="https://static001.geekbang.org/resource/image/c8/c5/c863074c01c26538cf0134eaf8dc67c5.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/GqCEabQFgxnKP93.jpg" style="zoom:50%;" />
 
 <p>作为一种动态数据结构，我们需要某种手段来维护索引与原始链表大小之间的平衡，也就是说，如果链表中结点多了，索引结点就相应地增加一些，避免复杂度退化，以及查找、插入、删除操作性能下降。</p>
 <p>当我们往跳表中插入数据的时候，我们可以选择同时将这个数据插入到部分索引层中。如何选择加入哪些索引层呢？</p>
 <p>我们通过一个随机函数，来决定将这个结点插入到哪几级索引中，比如随机函数生成了值 K，那我们就将这个结点添加到第一级到第 K 级这 K 级索引中。</p>
-<img data-src="https://static001.geekbang.org/resource/image/a8/a7/a861445d0b53fc842f38919365b004a7.jpg" style="zoom:50%;" />
-]]></content>
-      <categories>
-        <category>数据结构与算法</category>
-      </categories>
-      <tags>
-        <tag>数据结构与算法</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>二分查找</title>
-    <url>/archives/e8eb0481.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/ca/df/ca9c8119a7532fc8a7b249af019bf3df.jpg" style="zoom:50%;" />
-
-<p>假设我们有 1000 万个整数数据，每个数据占 8 个字节，如何设计数据结构和算法，快速判断某个整数是否出现在这 1000 万数据中？ 我们希望这个功能不要占用太多的内存空间，最多不要超过 100MB，你会怎么做呢？</p>
-<span id="more"></span>
-
-<h3 id="无处不在的二分思想"><a href="#无处不在的二分思想" class="headerlink" title="无处不在的二分思想"></a>无处不在的二分思想</h3><p>随机写一个 0 到 99 之间的数字，然后你来猜我写的是什么。猜的过程中，你每猜一次，我就会告诉你猜的大了还是小了，直到猜中为止。</p>
-<p>假设数字是 23，你可以按照下面的步骤来试一试。</p>
-<img data-src="https://i.loli.net/2021/08/07/u6aGvywhBXeCHbm.jpg" style="zoom:50%;" />
-
-<p>这个例子用的就是二分思想，按照这个思想，即便我让你猜的是 0 到 999 的数字，最多也只要 10 次就能猜中。</p>
-<p>这是一个生活中的例子，我们现在回到实际的开发场景中。假设有 1000 条订单数据，已经按照订单金额从小到大排序，每个订单金额都不同，并且最小单位是元。我们现在想知道是否存在金额等于 19 元的订单。如果存在，则返回订单数据，如果不存在则返回 null。</p>
-<p>最简单的办法当然是从第一个订单开始，一个一个遍历这 1000 个订单，直到找到金额等于 19 元的订单为止。但这样查找会比较慢，最坏情况下，可能要遍历完这 1000 条记录才能找到。那用二分查找能不能更快速地解决呢？</p>
-<p>为了方便讲解，我们假设只有 10 个订单，订单金额分别是：8，11，19，23，27，33，45，55，67，98。</p>
-<p>还是利用二分思想，每次都与区间的中间数据比对大小，缩小查找区间的范围。为了更加直观，我画了一张查找过程的图。其中，low 和 high 表示待查找区间的下标，mid 表示待查找区间的中间元素下标。</p>
-<img data-src="https://static001.geekbang.org/resource/image/8b/29/8bce81259abf0e9a06f115e22586b829.jpg" style="zoom:50%;" />
-
-<p><strong>二分查找针对的是一个有序的数据集合，查找思想有点类似分治思想。每次都通过跟区间的中间元素对比，将待查找的区间缩小为之前的一半，直到找到要查找的元素，或者区间被缩小为 0。</strong></p>
-<h3 id="O-logn-​​惊人的查找"><a href="#O-logn-​​惊人的查找" class="headerlink" title="$O(logn)$​​惊人的查找"></a>$O(logn)$​​惊人的查找</h3><p>二分查找十分高效。我们假设数据大小是 n，每次查找后数据都会缩小为原来的一半，也就是会除以 2。最坏情况下，直到查找区间被缩小为空，才停止。</p>
-<img data-src="https://i.loli.net/2021/08/07/cDUVBderYRxmXht.jpg" style="zoom:50%;" />
-
-<p>可以求得 k=log2n，所以时间复杂度就是 O(logn)。O(logn) 这种对数时间复杂度。这是一种极其高效的时间复杂度，有的时候甚至比时间复杂度是常量级 O(1) 的算法还要高效。</p>
-<p>因为 logn 是一个非常“恐怖”的数量级，即便 n 非常非常大，对应的 logn 也很小。比如 n 等于 2 的 32 次方，这个数很大了吧？大约是 42 亿。也就是说，如果我们在 42 亿个数据中用二分查找一个数据，最多需要比较 32 次。</p>
-<p>用大 O 标记法表示时间复杂度的时候，会省略掉常数、系数和低阶。对于常量级时间复杂度的算法来说，O(1) 有可能表示的是一个非常大的常量值，比如 O(1000)、O(10000)。所以，常量级时间复杂度的算法有时候可能还没有 O(logn) 的算法执行效率高。</p>
-<h3 id="二分查找的递归与非递归实现"><a href="#二分查找的递归与非递归实现" class="headerlink" title="二分查找的递归与非递归实现"></a>二分查找的递归与非递归实现</h3><p>最简单的情况就是有序数组中不存在重复元素。</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">bsearch</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n, <span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">int</span> low = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">int</span> high = n - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">while</span> (low &lt;= high) &#123;</span><br><span class="line">    <span class="keyword">int</span> mid = (low + high) / <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">if</span> (a[mid] == value) &#123;</span><br><span class="line">      <span class="keyword">return</span> mid;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (a[mid] &lt; value) &#123;</span><br><span class="line">      low = mid + <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      high = mid - <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>需要着重强调一下容易出错的 3 个地方。</p>
-<ol>
-<li><p><strong>循环退出条件</strong></p>
-<p>注意是 low&lt;=high，而不是 low&gt;1</p>
-</li>
-<li><p><strong>mid 的取值</strong></p>
-<p>实际上，mid=(low+high)/2 这种写法是有问题的。因为如果 low 和 high 比较大的话，两者之和就有可能会溢出。改进的方法是将 mid 的计算方式写成 low+(high-low)/2。更进一步，如果要将性能优化到极致的话，我们可以将这里的除以 2 操作转化成位运算 low+((high-low)&gt;&gt;1)。因为相比除法运算来说，计算机处理位运算要快得多。</p>
-</li>
-<li><p><strong>low 和 high 的更新</strong></p>
-<p>low=mid+1，high=mid-1。注意这里的 +1 和 -1，如果直接写成 low=mid 或者 high=mid，就可能会发生死循环。比如，当 high=3，low=3 时，如果 a[3]不等于 value，就会导致一直循环不退出。</p>
-</li>
-</ol>
-<p><strong>二分查找的递归实现：</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 二分查找的递归实现</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">bsearch</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> bsearchInternally(a, <span class="number">0</span>, n - <span class="number">1</span>, val);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">bsearchInternally</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> low, <span class="keyword">int</span> high, <span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (low &gt; high) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span> mid =  low + ((high - low) &gt;&gt; <span class="number">1</span>);</span><br><span class="line">  <span class="keyword">if</span> (a[mid] == value) &#123;</span><br><span class="line">    <span class="keyword">return</span> mid;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (a[mid] &lt; value) &#123;</span><br><span class="line">    <span class="keyword">return</span> bsearchInternally(a, mid+<span class="number">1</span>, high, value);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> bsearchInternally(a, low, mid-<span class="number">1</span>, value);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="二分查找应用场景的局限性"><a href="#二分查找应用场景的局限性" class="headerlink" title="二分查找应用场景的局限性"></a>二分查找应用场景的局限性</h3><p><strong>二分查找依赖的是顺序表结构，简单点说就是数组</strong></p>
-<p>二分查找需要按照下标随机访问元素，如果使用链表这种数据结构，时间复杂会变得很高。</p>
-<p><strong>二分查找针对的是有序数据</strong></p>
-<p>如果数据没有序，我们需要先排序。前面章节里我们讲到，排序的时间复杂度最低是 O(nlogn)。所以，如果我们针对的是一组静态的数据，没有频繁地插入、删除，我们可以进行一次排序，多次二分查找。这样排序的成本可被均摊，二分查找的边际成本就会比较低。</p>
-<p>但是，如果我们的数据集合有频繁的插入和删除操作，要想用二分查找，要么每次插入、删除操作之后保证数据仍然有序，要么在每次二分查找之前都先进行排序。针对这种动态数据集合，无论哪种方法，维护有序的成本都是很高的。</p>
-<p>所以，二分查找只能用在插入、删除操作不频繁，一次排序多次查找的场景中。针对动态变化的数据集合，二分查找将不再适用。</p>
-<p><strong>数据量太小不适合二分查找。</strong></p>
-<p>比如我们在一个大小为 10 的数组中查找一个元素，不管用二分查找还是顺序遍历，查找速度都差不多。只有数据量比较大的时候，二分查找的优势才会比较明显。</p>
-<p>不过，这里有一个例外。如果数据之间的比较操作非常耗时，不管数据量大小，我都推荐使用二分查找。比如，数组中存储的都是长度超过 300 的字符串，如此长的两个字符串之间比对大小，就会非常耗时。我们需要尽可能地减少比较次数，而比较次数的减少会大大提高性能，这个时候二分查找就比顺序遍历更有优势。</p>
-<p><strong>数据量太大也不适合二分查找。</strong></p>
-<p>二分查找的底层需要依赖数组这种数据结构，而数组为了支持随机访问的特性，要求内存空间连续，对内存的要求比较苛刻。比如，我们有 1GB 大小的数据，如果希望用数组来存储，那就需要 1GB 的连续内存空间。</p>
-<p>注意这里的“连续”二字，也就是说，即便有 2GB 的内存空间剩余，但是如果这剩余的 2GB 内存空间都是零散的，没有连续的 1GB 大小的内存空间，那照样无法申请一个 1GB 大小的数组。而我们的二分查找是作用在数组这种数据结构之上的，所以太大的数据用数组存储就比较吃力了，也就不能用二分查找了。</p>
+<img data-src="https://i.loli.net/2021/08/17/rZVm9lJ1P3Rzd4Q.jpg" style="zoom:50%;" />
 ]]></content>
       <categories>
         <category>数据结构与算法</category>
@@ -1014,7 +1051,7 @@
 <span id="more"></span>
 
 <h3 id="如何选择合适的排序算法？"><a href="#如何选择合适的排序算法？" class="headerlink" title="如何选择合适的排序算法？"></a>如何选择合适的排序算法？</h3><p>先回顾下前面讲过的几种算法</p>
-<img data-src="https://static001.geekbang.org/resource/image/1f/fd/1f6ef7e0a5365d6e9d68f0ccc71755fd.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/6l3qPzWkIYei7bp.jpg" style="zoom:50%;" />
 
 <p>线性排序算法的时间复杂度比较低，适用场景比较特殊。所以如果要写一个通用的排序函数，不能选择线性排序算法。</p>
 <p>如果对小规模数据进行排序，可以选择时间复杂度是 O(n2) 的算法；如果对大规模数据进行排序，时间复杂度是 O(nlogn) 的算法更加高效。所以，为了兼顾任意规模数据的排序，一般都会首选时间复杂度是 O(nlogn) 的排序算法来实现排序函数。</p>
@@ -1047,14 +1084,14 @@
   <entry>
     <title>线性排序</title>
     <url>/archives/89c5f6b.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/53/3a/538f4aefb62df6171579293a87d9ca3a.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/fVpL8jIaYTs5yv6.jpg" style="zoom:50%;" />
 
 <p>如何根据年龄给 100 万用户排序？</p>
 <span id="more"></span>
 
 <p> 这个问题用归并、快排也能搞定，但时间复杂度最低也是$O(nlongn)$，这次我们学习几种线性排序（Linear sort）：桶排序、计数排序、基数排序，时间复杂度都是$O(n)$。</p>
 <h3 id="桶排序（Bucket-sort）"><a href="#桶排序（Bucket-sort）" class="headerlink" title="桶排序（Bucket sort）"></a>桶排序（Bucket sort）</h3><p>桶排序，顾名思义，会用到“桶”，核心思想是将要排序的数据分到几个有序的桶里，每个桶里的数据再单独进行排序。桶内排完序之后，再把每个桶里的数据按照顺序依次取出，组成的序列就是有序的了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/98/ae/987564607b864255f81686829503abae.jpg?wh=1142*705" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/6jH2cPAJTQvBYqS.jpg" style="zoom:50%;" />
 
 <p>如果要排序的数据有 n 个，我们把它们均匀地划分到 m 个桶内，每个桶里就有 k=n/m 个元素。每个桶内部使用快速排序，时间复杂度为 O(k * logk)。m 个桶排序的时间复杂度就是 O(m * k * logk)，因为 k=n/m，所以整个桶排序的时间复杂度就是 O(n*log(n/m))。当桶的个数 m 接近数据个数 n 时，log(n/m) 就是一个非常小的常量，这个时候桶排序的时间复杂度接近 O(n)。</p>
 <p><strong>桶排序看起来很优秀，那它是不是可以替代我们之前讲的排序算法呢？</strong></p>
@@ -1080,7 +1117,7 @@
 <img data-src="https://i.loli.net/2021/08/05/DnK3VLPW6ywCQbk.jpg" style="zoom:50%;" />
 
 <p>我们<strong>从后往前</strong>（为了稳定排序）扫描数组A，比如扫描到3，从数组C中取出下标为3的值7，表示分数小于等于3的考生有7个，即3是数组R的第7个元素，取出3放入数组R中，相应的C[3]减1。依次类推，扫描完整个数组A，数组R中的数据就是按照分数大小有序排序了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/1d/84/1d730cb17249f8e92ef5cab53ae65784.jpg?wh=1142*1522" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/uViQdJvcwxEpasU.jpg" style="zoom:50%;" />
 
 <p>代码：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 计数排序，a是数组，n是数组大小。假设数组中存储的都是非负整数。</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">countingSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 查找数组中数据的范围</span></span><br><span class="line">  <span class="keyword">int</span> max = a[<span class="number">0</span>];</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="keyword">if</span> (max &lt; a[i]) &#123;</span><br><span class="line">      max = a[i];</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">int</span>[] c = <span class="keyword">new</span> <span class="keyword">int</span>[max + <span class="number">1</span>]; <span class="comment">// 申请一个计数数组c，下标大小[0,max]</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= max; ++i) &#123;</span><br><span class="line">    c[i] = <span class="number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 计算每个元素的个数，放入c中</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    c[a[i]]++;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 依次累加</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= max; ++i) &#123;</span><br><span class="line">    c[i] = c[i-<span class="number">1</span>] + c[i];</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 临时数组r，存储排序之后的结果</span></span><br><span class="line">  <span class="keyword">int</span>[] r = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">  <span class="comment">// 计算排序的关键步骤，有点难理解</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = n - <span class="number">1</span>; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">    <span class="keyword">int</span> index = c[a[i]]-<span class="number">1</span>;</span><br><span class="line">    r[index] = a[i];</span><br><span class="line">    c[a[i]]--;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将结果拷贝给a数组</span></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    a[i] = r[i];</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1091,7 +1128,7 @@
 <h3 id="基数排序（Radix-sort）"><a href="#基数排序（Radix-sort）" class="headerlink" title="基数排序（Radix sort）"></a>基数排序（Radix sort）</h3><p>我们再来看这样一个排序问题。假设我们有 10 万个手机号码，希望将这 10 万个手机号码从小到大排序，你有什么比较快速的排序方法呢？</p>
 <p>之前讲的快排，时间复杂度可以做到 O(nlogn)，还有更高效的排序算法吗？桶排序、计数排序能派上用场吗？手机号码有 11 位，范围太大，显然不适合用这两种排序算法。针对这个排序问题，就可以用上基础排序了。</p>
 <p>可以先按照最后一位来排序手机号码，然后，再按照倒数第二位重新排序，以此类推，最后按照第一位重新排序。经过 11 次排序之后，手机号码就都有序了。先来看张过程分解图：</p>
-<img data-src="https://static001.geekbang.org/resource/image/df/0c/df0cdbb73bd19a2d69a52c54d8b9fc0c.jpg?wh=1142*511" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/JCgDPliSdn9K5BA.jpg" style="zoom:50%;" />
 
 <p>根据每一位来排序，我们可以用刚讲过的桶排序或者计数排序，它们的时间复杂度可以做到 O(n)。如果要排序的数据有 k 位，那我们就需要 k 次桶排序或者计数排序，总的时间复杂度是 O(k*n)。当 k 不大的时候，比如手机号码排序的例子，k 最大就是 11，所以基数排序的时间复杂度就近似于 O(n)。</p>
 <p>当要排序的数据不是等长的，比如英文单词，可以把所有的单词补齐到相同长度，位数不够可以在后面补“0”。</p>
@@ -1107,7 +1144,7 @@
   <entry>
     <title>排序</title>
     <url>/archives/a444b428.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/7c/67/7c40ffed3d9263a00af4d83198b54a67.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/iJeg93A6Kup8Vzq.jpg" style="zoom:50%;" />
 
 <p>插入排序和冒泡排序的时间复杂度相同，都是 O(n2)，在实际的软件开发里，为什么我们更倾向于使用插入排序算法而不是冒泡排序算法呢？</p>
 <span id="more"></span>
@@ -1124,13 +1161,13 @@
 <p><strong>稳定性</strong>这个概念是说，如果待排序的序列中存在值相等的元素，经过排序之后，相等元素之间原有的先后顺序不变 – 稳点排序算法 &amp; 不稳定排序算法</p>
 <h3 id="冒泡排序（Bubble-Sort）"><a href="#冒泡排序（Bubble-Sort）" class="headerlink" title="冒泡排序（Bubble Sort）"></a>冒泡排序（Bubble Sort）</h3><p>冒泡排序只会操作相邻的两个数据。每次冒泡操作都会对相邻的两个元素进行比较，看是否满足大小关系要求。如果不满足就让它俩互换。一次冒泡会让至少一个元素移动到它应该在的位置，重复 n 次，就完成了 n 个数据的排序工作。</p>
 <p>下面用一个例子，带你看下冒泡排序的整个过程。我们要对一组数据 4，5，6，3，2，1，从小到大进行排序。第一次冒泡操作的详细过程就是这样。</p>
-<img data-src="https://static001.geekbang.org/resource/image/40/e9/4038f64f47975ab9f519e4f739e464e9.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/cgnRoLkXQsBrp4a.jpg" style="zoom:50%;" />
 
 <p>可以看出，经过一次冒泡操作之后，6 这个元素已经存储在正确的位置上。要想完成所有数据的排序，我们只要进行 6 次这样的冒泡操作就行了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/92/09/9246f12cca22e5d872cbfce302ef4d09.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/O2KRjEaZXmAlhYI.jpg" style="zoom:50%;" />
 
 <p>实际上，刚讲的冒泡过程还可以优化。当某次冒泡操作已经没有数据交换时，说明已经达到完全有序，不用再继续执行后续的冒泡操作。我这里还有另外一个例子，这里面给 6 个元素排序，只需要 4 次冒泡操作就可以了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/a9/e6/a9783a3b13c11a5e064c5306c261e8e6.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/NPkJSEplcDQ7jbo.jpg" style="zoom:50%;" />
 
 <p>代码：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 冒泡排序，a表示数组，n表示数组大小</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line"> <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="comment">// 提前退出冒泡循环的标志位</span></span><br><span class="line">    <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; n - i - <span class="number">1</span>; ++j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (a[j] &gt; a[j+<span class="number">1</span>]) &#123; <span class="comment">// 交换</span></span><br><span class="line">        <span class="keyword">int</span> tmp = a[j];</span><br><span class="line">        a[j] = a[j+<span class="number">1</span>];</span><br><span class="line">        a[j+<span class="number">1</span>] = tmp;</span><br><span class="line">        flag = <span class="keyword">true</span>;  <span class="comment">// 表示有数据交换      </span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!flag) <span class="keyword">break</span>;  <span class="comment">// 没有数据交换，提前退出</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -1152,7 +1189,7 @@
 <p><strong>有序度</strong>是数组中具有有序关系的元素对的个数。有序元素对用数学表达式表示就是这样：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">有序元素对：a[i] &lt;&#x3D; a[j], 如果i &lt; j。</span><br></pre></td></tr></table></figure>
 
-<img data-src="https://static001.geekbang.org/resource/image/a1/20/a1ef4cc1999d6bd0af08d8417ee55220.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/VwFJOH4bhkLPpUu.jpg" style="zoom:50%;" />
 
 <p>同理，对于一个倒序排列的数组，比如 6，5，4，3，2，1，有序度是 0；对于一个完全有序的数组，比如 1，2，3，4，5，6，有序度就是 $n*(n-1)/2$，也就是 15。我们把这种完全有序的数组的有序度叫作<strong>满有序度</strong>。</p>
 <p>逆序度的定义正好跟有序度相反。关于这三个概念，我们还可以得到一个公式：逆序度 = 满有序度 - 有序度。我们排序的过程就是一种增加有序度，减少逆序度的过程，最后达到满有序度，就说明排序完成了</p>
@@ -1164,31 +1201,31 @@
 <p>换句话说，平均情况下，需要 $n*(n-1)/4$​ 次交换操作，比较操作肯定要比交换操作多，而复杂度的上限是 $O(n^2)$​，所以平均情况下的时间复杂度就是 $O(n^2)$​。</p>
 <p>这个平均时间复杂度推导过程其实并不严格，但是很多时候很实用，毕竟概率论的定量分析太复杂，不太好用</p>
 <h3 id="插入排序（Insertion-Sort）"><a href="#插入排序（Insertion-Sort）" class="headerlink" title="插入排序（Insertion Sort）"></a>插入排序（Insertion Sort）</h3><p>一个有序的数组，我们往里面添加一个新的数据后，如何继续保持数据有序呢？很简单，我们只要遍历数组，找到数据应该插入的位置将其插入即可。</p>
-<img data-src="https://static001.geekbang.org/resource/image/7b/a6/7b257e179787c633d2bd171a764171a6.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/xtl2sXg3VwWCmNu.jpg" style="zoom:50%;" />
 
 <p>首先，我们将数组中的数据分为两个区间，已排序区间和未排序区间。初始已排序区间只有一个元素，就是数组的第一个元素。插入算法的核心思想是取未排序区间中的元素，在已排序区间中找到合适的插入位置将其插入，并保证已排序区间数据一直有序。重复这个过程，直到未排序区间中元素为空，算法结束。</p>
 <p>如图所示，要排序的数据是 4，5，6，1，3，2，其中左侧为已排序区间，右侧是未排序区间。</p>
-<img data-src="https://static001.geekbang.org/resource/image/b6/e1/b60f61ec487358ac037bf2b6974d2de1.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/gZkxSJaH9fAtRjs.jpg" style="zoom:50%;" />
 
 <p>插入排序也包含两种操作，一种是元素的比较，一种是元素的移动。当我们需要将一个数据 a 插入到已排序区间时，需要拿 a 与已排序区间的元素依次比较大小，找到合适的插入位置。找到插入点之后，我们还需要将插入点之后的元素顺序往后移动一位，这样才能腾出位置给元素 a 插入。</p>
 <p>对于不同的查找插入点方法（从头到尾、从尾到头），元素的比较次数是有区别的。但对于一个给定的初始序列，移动操作的次数总是固定的，就等于逆序度。</p>
 <p>为什么说移动次数就等于逆序度呢？我拿刚才的例子画了一个图表，你一看就明白了。满有序度是$n*(n-1)/2=15$，初始序列的有序度是 5，所以逆序度是 10。插入排序中，数据移动的个数总和也等于 10=3+3+4。</p>
-<img data-src="https://static001.geekbang.org/resource/image/fd/01/fd6582d5e5927173ee35d7cc74d9c401.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/pf5bgNZAy7VC1sJ.jpg" style="zoom:50%;" />
 
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 插入排序，a表示数组，n表示数组大小</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">insertionSort</span><span class="params">(<span class="keyword">int</span>[] a, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (n &lt;= <span class="number">1</span>) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i) &#123;</span><br><span class="line">    <span class="keyword">int</span> value = a[i];</span><br><span class="line">    <span class="keyword">int</span> j = i - <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 查找插入的位置</span></span><br><span class="line">    <span class="keyword">for</span> (; j &gt;= <span class="number">0</span>; --j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (a[j] &gt; value) &#123;</span><br><span class="line">        a[j+<span class="number">1</span>] = a[j];  <span class="comment">// 数据移动</span></span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    a[j+<span class="number">1</span>] = value; <span class="comment">// 插入数据</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>插入排序空间复杂度为$O(1)$​，是原地排序算法，也是稳定排序算法。最好时间复杂度是$O(n)$​，最坏是$O(n^2)$​，我们在数组中插入一个数据的平均时间复杂度是$O(n)$，所以插入排序循环n次插入操作的平均时间复杂度就是$O(n^2)$。​</p>
 <h3 id="选择排序（Sort）"><a href="#选择排序（Sort）" class="headerlink" title="选择排序（Sort）"></a>选择排序（Sort）</h3><p>选择排序算法的实现思路有点类似插入排序，也分已排序区间和未排序区间。但是选择排序每次会从未排序区间中找到最小的元素，将其放到已排序区间的末尾。</p>
-<img data-src="https://static001.geekbang.org/resource/image/32/1d/32371475a0b08f0db9861d102474181d.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/Ac1jt2esPpBQYoZ.jpg" style="zoom:50%;" />
 
 <p>选择排序空间复杂度为 $O(1)$，是一种原地排序算法。选择排序的最好情况时间复杂度、最坏情况和平均情况时间复杂度都为 $O(n2)$。但是，选择排序是一种不稳定的排序算法。从我前面画的那张图中，你可以看出来，选择排序每次都要找剩余未排序元素中的最小值，并和前面的元素交换位置，这样破坏了稳定性。</p>
 <h3 id="为什么插入排序要比冒泡排序更受欢迎呢？"><a href="#为什么插入排序要比冒泡排序更受欢迎呢？" class="headerlink" title="为什么插入排序要比冒泡排序更受欢迎呢？"></a>为什么插入排序要比冒泡排序更受欢迎呢？</h3><p>冒泡排序的数据交换要比插入排序的数据移动要复杂，冒泡排序需要 3 个赋值操作，而插入排序只需要 1 个。对于数据规模大的问题，插入排序更有效率。而且插入排序的算法有很大的优化空间，参考[希尔排序](<a href="https://zh.wikipedia.org/wiki/%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F">希尔排序 - 维基百科，自由的百科全书 (wikipedia.org)</a>)。</p>
-<img data-src="https://static001.geekbang.org/resource/image/ae/fb/ae97df138c98e6c130f76d93c02095fb.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/tyJarYoQHW8Zfis.jpg" style="zoom:50%;" />
 
 <p>再讲两种时间复杂度为 $O(nlogn)$ 的排序算法，<strong>归并排序</strong>和<strong>快速排序</strong>。这两种排序算法适合大规模的数据排序。</p>
 <p>归并排序和快速排序都用到了分治思想，非常巧妙。我们可以借鉴这个思想，来解决非排序的问题，比如：<strong>如何在 O(n) 的时间复杂度内查找一个无序数组中的第 K 大元素？</strong></p>
 <h3 id="归并排序的原理"><a href="#归并排序的原理" class="headerlink" title="归并排序的原理"></a>归并排序的原理</h3><p>归并排序的核心思想还是蛮简单的。如果要排序一个数组，我们先把数组从中间分成前后两部分，然后对前后两部分分别排序，再将排好序的两部分合并在一起，这样整个数组就都有序了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/db/2b/db7f892d3355ef74da9cd64aa926dc2b.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/Tc2pXM8F4oaZV7z.jpg" style="zoom:50%;" />
 
 <p>归并排序使用的就是<strong>分治思想</strong>。分治，顾名思义，就是分而治之，将一个大问题分解成小的子问题来解决。小的子问题解决了，大问题也就解决了。</p>
 <p>分治思想跟我们前面讲的递归思想很像。是的，分治算法一般都是用递归来实现的。<strong>分治是一种解决问题的处理思想，递归是一种编程技巧</strong>。</p>
@@ -1199,7 +1236,7 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 归并排序算法, A是数组，n表示数组大小</span><br><span class="line">merge_sort(A, n) &#123;</span><br><span class="line">  merge_sort_c(A, 0, n-1)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 递归调用函数</span><br><span class="line">merge_sort_c(A, p, r) &#123;</span><br><span class="line">  &#x2F;&#x2F; 递归终止条件</span><br><span class="line">  if p &gt;&#x3D; r  then return</span><br><span class="line"></span><br><span class="line">  &#x2F;&#x2F; 取p到r之间的中间位置q</span><br><span class="line">  q &#x3D; (p+r) &#x2F; 2</span><br><span class="line">  &#x2F;&#x2F; 分治递归</span><br><span class="line">  merge_sort_c(A, p, q)</span><br><span class="line">  merge_sort_c(A, q+1, r)</span><br><span class="line">  &#x2F;&#x2F; 将A[p...q]和A[q+1...r]合并为A[p...r]</span><br><span class="line">  merge(A[p...r], A[p...q], A[q+1...r])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>merge()函数示意图：</p>
-<img data-src="https://static001.geekbang.org/resource/image/95/2f/95897ade4f7ad5d10af057b1d144a22f.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/fr8VXwpbyTHcRB5.jpg" style="zoom:50%;" />
 
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">merge(A[p...r], A[p...q], A[q+1...r]) &#123;</span><br><span class="line">  var i :&#x3D; p，j :&#x3D; q+1，k :&#x3D; 0 &#x2F;&#x2F; 初始化变量i, j, k</span><br><span class="line">  var tmp :&#x3D; new array[0...r-p] &#x2F;&#x2F; 申请一个大小跟A[p...r]一样的临时数组</span><br><span class="line">  while i&lt;&#x3D;q AND j&lt;&#x3D;r do &#123;</span><br><span class="line">    if A[i] &lt;&#x3D; A[j] &#123;</span><br><span class="line">      tmp[k++] &#x3D; A[i++] &#x2F;&#x2F; i++等于i:&#x3D;i+1</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      tmp[k++] &#x3D; A[j++]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; 判断哪个子数组中有剩余的数据</span><br><span class="line">  var start :&#x3D; i，end :&#x3D; q</span><br><span class="line">  if j&lt;&#x3D;r then start :&#x3D; j, end:&#x3D;r</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; 将剩余的数据拷贝到临时数组tmp</span><br><span class="line">  while start &lt;&#x3D; end do &#123;</span><br><span class="line">    tmp[k++] &#x3D; A[start++]</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  &#x2F;&#x2F; 将tmp中的数组拷贝回A[p...r]</span><br><span class="line">  for i:&#x3D;0 to r-p do &#123;</span><br><span class="line">    A[p+i] &#x3D; tmp[i]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -1212,18 +1249,18 @@
 <p>归并排序不是原地排序算法（致命“弱点”）,递归代码的空间复杂度并不能像时间复杂度那样累加，尽管每次合并操作都需要申请额外的内存空间，但在合并完成之后，临时开辟的内存空间就被释放掉了。在任意时刻，CPU 只会有一个函数在执行，也就只会有一个临时的内存空间在使用。临时内存空间最大也不会超过 n 个数据的大小，所以空间复杂度是 $O(n)$。</p>
 <h3 id="快速排序的原理"><a href="#快速排序的原理" class="headerlink" title="快速排序的原理"></a>快速排序的原理</h3><p>快排的思想是这样的：如果要排序数组中下标从 p 到 r 之间的一组数据，我们选择 p 到 r 之间的任意一个数据作为 pivot（分区点）。</p>
 <p>遍历 p 到 r 之间的数据，将小于 pivot 的放到左边，将大于 pivot 的放到右边，将 pivot 放到中间。再使用递归处理思想，用递归排序下标从 p 到 q-1 之间的数据和下标从 q+1 到 r 之间的数据，直到区间缩小为 1。</p>
-<img data-src="https://static001.geekbang.org/resource/image/4d/81/4d892c3a2e08a17f16097d07ea088a81.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/SMWPsEmnFlhdKHt.jpg" style="zoom:50%;" />
 
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; 快速排序，A是数组，n表示数组的大小</span><br><span class="line">quick_sort(A, n) &#123;</span><br><span class="line">  quick_sort_c(A, 0, n-1)</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F; 快速排序递归函数，p,r为下标</span><br><span class="line">quick_sort_c(A, p, r) &#123;</span><br><span class="line">  if p &gt;&#x3D; r then return</span><br><span class="line">  </span><br><span class="line">  q &#x3D; partition(A, p, r) &#x2F;&#x2F; 获取分区点</span><br><span class="line">  quick_sort_c(A, p, q-1)</span><br><span class="line">  quick_sort_c(A, q+1, r)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>和归并排序的merge函数类似，这里也有一个partition分区函数，如果我们不考虑空间消耗的话，partition() 分区函数可以写得非常简单。我们申请两个临时数组 X 和 Y，遍历 A[p…r]，将小于 pivot 的元素都拷贝到临时数组 X，将大于 pivot 的元素都拷贝到临时数组 Y，最后再将数组 X 和数组 Y 中数据顺序拷贝到 A[p….r]。</p>
-<img data-src="https://static001.geekbang.org/resource/image/66/dc/6643bc3cef766f5b3e4526c332c60adc.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/hpOQUKrdAwDNSBH.jpg" style="zoom:50%;" />
 
 <p>我们希望快排是原地排序算法，有一个巧妙地实现思路：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">partition(A, p, r) &#123;</span><br><span class="line">  pivot :&#x3D; A[r]</span><br><span class="line">  i :&#x3D; p</span><br><span class="line">  for j :&#x3D; p to r-1 do &#123;</span><br><span class="line">    if A[j] &lt; pivot &#123;</span><br><span class="line">      swap A[i] with A[j]</span><br><span class="line">      i :&#x3D; i+1</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  swap A[i] with A[r]</span><br><span class="line">  return i</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>图示：</p>
-<img data-src="https://static001.geekbang.org/resource/image/08/e7/086002d67995e4769473b3f50dd96de7.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/jZzt1Q6qYr2mI9X.jpg" style="zoom:50%;" />
 
 <p>因为分区的过程涉及交换操作，如果数组中有两个相同的元素，比如序列 6，8，7，6，3，5，9，4，在经过第一次分区操作之后，两个 6 的相对先后顺序就会改变。所以，快速排序并不是一个稳定的排序算法。</p>
 <p>快排和归并用的都是分治思想，递推公式和递归代码也非常相似，那它们的区别在哪里呢?</p>
@@ -1248,7 +1285,7 @@
   <entry>
     <title>递归</title>
     <url>/archives/c6654282.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/e1/f4/e15d9f05aadeb469258016d0901a38f4.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/VdcAmps3zq26fw4.jpg" style="zoom:50%;" />
 
 <p>现在很多APP都有注册返佣的功能，用户 A 推荐用户 B 来注册，用户 B 又推荐了用户 C 来注册。我们可以说，用户 C 的“最终推荐人”为用户 A，用户 B 的“最终推荐人”也为用户 A，而用户 A 没有“最终推荐人”。</p>
 <p><strong>那给定一个用户ID，如何查找该用户的“最终推荐人”？</strong></p>
@@ -1293,7 +1330,7 @@
 
 <p>但这种做法并不能完全解决问题，因为最大允许的递归深度跟当前线程剩余的栈空间大小有关，事先无法计算。如果实时计算，代码过于复杂，就会影响代码的可读性。所以，如果最大深度比较小，比如 10、50，就可以用这种方法，否则这种方法并不是很实用。</p>
 <h3 id="递归代码要警惕重复计算"><a href="#递归代码要警惕重复计算" class="headerlink" title="递归代码要警惕重复计算"></a>递归代码要警惕重复计算</h3><p>除此之外，使用递归时还会出现重复计算的问题。刚才第二个递归代码的例子，如果我们把整个递归过程分解一下的话，那就是这样的:</p>
-<img data-src="https://static001.geekbang.org/resource/image/e7/bf/e7e778994e90265344f6ac9da39e01bf.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/KcLTQAmVSOGhWaj.jpg" style="zoom:50%;" />
 
 <p>从图中，我们可以直观地看到，想要计算 f(5)，需要先计算 f(4) 和 f(3)，而计算 f(4) 还需要计算 f(3)，因此，f(3) 就被计算了很多次，这就是重复计算问题。为了避免重复计算，我们可以通过一个数据结构（比如散列表）来保存已经求解过的 f(k)。当递归调用到 f(k) 时，先看下是否已经求解过了。如果是，则直接从散列表中取值返回，不需要重复计算，这样就能避免刚讲的问题了。</p>
 <p>改造代码如下：</p>
@@ -1331,17 +1368,17 @@
 
 <h3 id="如何理解队列？"><a href="#如何理解队列？" class="headerlink" title="如何理解队列？"></a>如何理解队列？</h3><p><strong>先进先出者，就是典型的“队列”</strong></p>
 <p>队列和栈十分相似，基本操作也是两个：**入队 enqueue()<strong>，放一个数据到队列尾部；</strong>出队 dequeue()**，从队列头部取一个元素</p>
-<img data-src="https://static001.geekbang.org/resource/image/9e/3e/9eca53f9b557b1213c5d94b94e9dce3e.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/J7Z5h34Yt8W2MXw.jpg" style="zoom:50%;" />
 
 <p>所以，队列跟栈一样，也是一种<strong>操作受限的线性表数据结构</strong>。</p>
 <p>队列的概念很好理解，基本操作也很容易掌握。作为一种非常基础的数据结构，队列的应用也非常广泛，特别是一些具有某些额外特性的队列，比如循环队列、阻塞队列、并发队列。它们在很多偏底层系统、框架、中间件的开发中，起着关键性的作用。比如高性能队列 Disruptor、Linux 环形缓存，都用到了循环并发队列；Java concurrent 并发包利用 ArrayBlockingQueue 来实现公平锁等。</p>
 <h3 id="顺序队列和链式队列"><a href="#顺序队列和链式队列" class="headerlink" title="顺序队列和链式队列"></a>顺序队列和链式队列</h3><p>用数组实现的队列叫作<strong>顺序队列</strong>，用链表实现的队列叫作<strong>链式队列</strong>。</p>
 <p>对于栈来说，我们只需要一个栈顶指针就可以了。但是队列需要两个指针：一个是 head 指针，指向队头；一个是 tail 指针，指向队尾。</p>
 <p>你可以结合下面这张图来理解。当 a、b、c、d 依次入队之后，队列中的 head 指针指向下标为 0 的位置，tail 指针指向下标为 4 的位置。</p>
-<img data-src="https://static001.geekbang.org/resource/image/5c/cb/5c0ec42eb797e8a7d48c9dbe89dc93cb.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/xmNQEBogrnG64hX.jpg" style="zoom:50%;" />
 
 <p>当我们调用两次出队操作之后，队列中 head 指针指向下标为 2 的位置，tail 指针仍然指向下标为 4 的位置。</p>
-<img data-src="https://static001.geekbang.org/resource/image/de/0d/dea27f2c505dd8d0b6b86e262d03430d.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/TEbdjKAhzRM2otr.jpg" style="zoom:50%;" />
 
 <p>当队列的 tail 指针移动到数组的最右边后，如果有新的数据入队，我们可以将 head 到 tail 之间的数据，整体搬移到数组中 0 到 tail-head 的位置。</p>
 <img data-src="https://i.loli.net/2021/08/03/wB1kazey4TXJsli.jpg" style="zoom:50%;" />
@@ -1351,16 +1388,16 @@
 
 <p>要想写出没有 bug 的循环队列的实现代码，最关键的是，<strong>确定好队空和队满的判定条件</strong>。</p>
 <p>队列为空的判断条件仍然是 head == tail。但队列满的判断条件就稍微有点复杂了。</p>
-<img data-src="https://static001.geekbang.org/resource/image/3d/ec/3d81a44f8c42b3ceee55605f9aeedcec.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/iUzB8e5HanR6xpD.jpg" style="zoom:50%;" />
 
 <p>就像图中画的队满的情况，tail=3，head=4，n=8，所以总结一下规律就是：(3+1)%8=4。多画几张队满的图，你就会发现，当队满时，(tail+1)%n=head。</p>
 <h3 id="阻塞队列和并发队列"><a href="#阻塞队列和并发队列" class="headerlink" title="阻塞队列和并发队列"></a>阻塞队列和并发队列</h3><p><strong>阻塞队列</strong>其实就是在队列基础上增加了阻塞操作。简单来说，就是在队列为空的时候，从队头取数据会被阻塞。因为此时还没有数据可取，直到队列中有了数据才能返回；如果队列已经满了，那么插入数据的操作就会被阻塞，直到队列中有空闲位置后再插入数据，然后再返回。</p>
-<img data-src="https://static001.geekbang.org/resource/image/5e/eb/5ef3326181907dea0964f612890185eb.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/YNc2VTa4zRjBI7e.jpg" style="zoom:50%;" />
 
 <p>上述的定义其实就是一个“生产者 - 消费者模型”！是的，我们可以使用阻塞队列，轻松实现一个“生产者 - 消费者模型”！</p>
 <p>这种基于阻塞队列实现的“生产者 - 消费者模型”，可以有效地协调生产和消费的速度。当“生产者”生产数据的速度过快，“消费者”来不及消费时，存储数据的队列很快就会满了。这个时候，生产者就阻塞等待，直到“消费者”消费了数据，“生产者”才会被唤醒继续“生产”。</p>
 <p>而且不仅如此，基于阻塞队列，我们还可以通过协调“生产者”和“消费者”的个数，来提高数据的处理效率。比如前面的例子，我们可以多配置几个“消费者”，来应对一个“生产者”。</p>
-<img data-src="https://static001.geekbang.org/resource/image/9f/67/9f539cc0f1edc20e7fa6559193898067.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/6rcIPkt9WKdDO1F.jpg" style="zoom:50%;" />
 
 <p>线程安全的队列我们叫作<strong>并发队列</strong>。最简单直接的实现方式是直接在 enqueue()、dequeue() 方法上加锁，但是锁粒度大并发度会比较低，同一时刻仅允许一个存或者取操作。实际上，基于数组的循环队列，利用 CAS 原子操作，可以实现非常高效的并发队列。这也是循环队列比链式队列应用更加广泛的原因。</p>
 ]]></content>
@@ -1374,12 +1411,12 @@
   <entry>
     <title>栈</title>
     <url>/archives/1f4ac2fb.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/79/aa/79d1a08a0a016b4648a764fc62bed8aa.jpg" style="zoom:50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/c7CFMPLGHKIS12r.jpg" style="zoom:50%;" />
 
 <p>后进者先出，先进者后出，这就是典型的“栈”结构。</p>
 <span id="more"></span>
 
-<h3 id="如何理解“栈”？"><a href="#如何理解“栈”？" class="headerlink" title="如何理解“栈”？"></a>如何理解“栈”？</h3><img data-src="https://static001.geekbang.org/resource/image/3e/0b/3e20cca032c25168d3cc605fa7a53a0b.jpg" style="zoom:50%;" />
+<h3 id="如何理解“栈”？"><a href="#如何理解“栈”？" class="headerlink" title="如何理解“栈”？"></a>如何理解“栈”？</h3><img data-src="https://i.loli.net/2021/08/17/psIU7Lv3A8jXtgm.jpg" style="zoom:50%;" />
 
 <p>从栈的操作特性上来看，<strong>栈是一种“操作受限”的线性表</strong>，只允许在一端插入和删除数据。</p>
 <p>事实上，从功能上来说，数组或链表确实可以替代栈，但你要知道，特定的数据结构是对特定场景的抽象，而且，数组或链表暴露了太多的操作接口，操作上的确灵活自由，但使用时就比较不可控，自然也就更容易出错。</p>
@@ -1398,7 +1435,7 @@
 <p>实际上，编译器就是通过两个栈来实现的。其中一个保存操作数的栈，另一个是保存运算符的栈。我们从左向右遍历表达式，当遇到数字，我们就直接压入操作数栈；当遇到运算符，就与运算符栈的栈顶元素进行比较。</p>
 <p>如果比运算符栈顶元素的优先级高，就将当前运算符压入栈；如果比运算符栈顶元素的优先级低或者相同，从运算符栈中取栈顶运算符，从操作数栈的栈顶取 2 个操作数，然后进行计算，再把计算完的结果压入操作数栈，继续比较。</p>
 <p>下面将 3+5*8-6 这个表达式的计算过程画成了一张图，结合图来理解刚讲的计算过程。</p>
-<img data-src="https://static001.geekbang.org/resource/image/bc/00/bc77c8d33375750f1700eb7778551600.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/IZquxRpiWfKBVN8.jpg" style="zoom:50%;" />
 
 <p><strong>括号匹配</strong>：我们可以借助栈来检查表达式中的括号是否匹配。假设表达式中只包含三种括号，圆括号 ()、方括号[]和花括号{}，并且它们可以任意嵌套。</p>
 <p>我们用栈来保存未匹配的左括号，从左到右依次扫描字符串。当扫描到左括号时，则将其压入栈中；当扫描到右括号时，从栈顶取出一个左括号。如果能够匹配，比如“(”跟“)”匹配，“[”跟“]”匹配，“{”跟“}”匹配，则继续扫描剩下的字符串。如果扫描的过程中，遇到不能配对的右括号，或者栈中没有数据，则说明为非法格式。</p>
@@ -1498,7 +1535,7 @@
 <li>利用哨兵简化实现难度</li>
 </ul>
 <p>针对链表的插入、删除操作，需要对插入第一个结点和删除最后一个结点的情况进行特殊处理。引入哨兵结点后不管链表是否为空，head指针都会指向这个哨兵结点，我们把这种链表叫<strong>带头链表</strong>，没有哨兵结点的链表就叫做<strong>不带头链表</strong>。如此便可统一相同的代码实现逻辑。</p>
-<img data-src="https://static001.geekbang.org/resource/image/7d/c7/7d22d9428bdbba96bfe388fe1e3368c7.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/NdDxtkZ9u2HfyCl.jpg" style="zoom:50%;" />
 
 <p>哨兵是用来解决边界问题的，可以理解为它可以减少特殊情况的判断，比如判空、越界等，增加效率。</p>
 <p>代码一：</p>
@@ -1521,7 +1558,7 @@
 </ul>
 <p><strong>举例画图，辅助思考</strong></p>
 <p>找个具体例子，释放脑容量，进行更多的逻辑思考，有助于思路清晰。比如往单链表中插入一个数据，如图所示：</p>
-<img data-src="https://static001.geekbang.org/resource/image/4a/f8/4a701dd79b59427be654261805b349f8.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/u1SUf6shp8JoF3O.jpg" style="zoom:50%;" />
 
 <p><strong>多写多练，没有捷径</strong></p>
 <p>5个常见的链表操作：</p>
@@ -1561,14 +1598,14 @@
 
 <p><strong>数组（Array）是一种线性表数据结构。它用一组连续的内存空间，来存储一组具有相同类型的数据。</strong></p>
 <p>第一是<strong>线性表</strong>（Linear List）。顾名思义，线性表就是数据排成像一条线一样的结构。每个线性表上的数据最多只有前和后两个方向。其实除了数组，链表、队列、栈等也是线性表结构。</p>
-<img data-src="https://static001.geekbang.org/resource/image/b6/77/b6b71ec46935130dff5c4b62cf273477.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/t4qp6ylwrWk7bY3.jpg" style="zoom:50%;" />
 
 <p>而与它相对立的概念是<strong>非线性表</strong>，比如二叉树、堆、图等。之所以叫非线性，是因为，在非线性表中，数据之间并不是简单的前后关系。</p>
-<img data-src="https://static001.geekbang.org/resource/image/6e/69/6ebf42641b5f98f912d36f6bf86f6569.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/hHwBdIPnLC2z8K7.jpg" style="zoom:50%;" />
 
 <p>第二个是<strong>连续的内存空间和相同类型的数据</strong>。正是因为这两个限制，它才有了一个堪称“杀手锏”的特性：“随机访问”。但有利就有弊，这两个限制也让数组的很多操作变得非常低效，比如要想在数组中删除、插入一个数据，为了保证连续性，就需要做大量的数据搬移工作。</p>
 <h3 id="数组是如何实现根据下标随机访问数组元素的？"><a href="#数组是如何实现根据下标随机访问数组元素的？" class="headerlink" title="数组是如何实现根据下标随机访问数组元素的？"></a>数组是如何实现根据下标随机访问数组元素的？</h3><p>我们拿一个长度为 10 的 int 类型的数组 int[] a = new int[10]来举例。在这个图中，计算机给数组 a[10]，分配了一块连续内存空间 1000～1039，其中，内存块的首地址为 base_address = 1000。</p>
-<img data-src="https://static001.geekbang.org/resource/image/98/c4/98df8e702b14096e7ee4a5141260cdc4.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/nAQj6iLWDYCTOrv.jpg" style="zoom:50%;" />
 
 <p>计算机会给每个内存单元分配一个地址，计算机通过地址来访问内存中的数据。当计算机需要随机访问数组中的某个元素时，它会首先通过下面的寻址公式，计算出该元素存储的内存地址：</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">a[i]_address &#x3D; base_address + i * data_type_size</span><br></pre></td></tr></table></figure>
@@ -1581,7 +1618,7 @@
 <p>再看<strong>删除操作</strong>，复杂度分析过程类似，结果是一样的。</p>
 <p>实际上，在某些特殊场景下，我们并不一定非得追求数组中数据的连续性。如果我们将多次删除操作集中在一起执行，删除的效率是不是会提高很多呢？</p>
 <p>我们再看个例子。数组 a[10]中存储了 8 个元素：a，b，c，d，e，f，g，h。现在，我们要依次删除 a，b，c 三个元素。</p>
-<img data-src="https://static001.geekbang.org/resource/image/b6/e5/b69b8c5dbf6248649ddab7d3e7cfd7e5.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/fXTq6t7gPMHuAcF.jpg" style="zoom:50%;" />
 
 <p>为了避免 d，e，f，g，h 这几个数据会被搬移三次，我们可以先记录下已经删除的数据。每次的删除操作并不是真正地搬移数据，只是记录数据已经被删除。当数组没有更多空间存储数据时，我们再触发执行一次真正的删除操作，这样就大大减少了删除操作导致的数据搬移。</p>
 <p>其实这也就是 JVM 标记清除垃圾回收算法的核心思想。数据结构和算法的魅力就在于此，很多时候我们并不是要去死记硬背某个数据结构或者算法，而是要学习它背后的思想和处理技巧，这些东西才是最有价值的。如果你细心留意，不管是在软件开发还是架构设计中，总能找到某些算法和数据结构的影子。</p>
@@ -1652,7 +1689,7 @@
   <entry>
     <title>复杂度分析</title>
     <url>/archives/aaaaf04a.html</url>
-    <content><![CDATA[<img data-src="https://static001.geekbang.org/resource/image/ed/5a/edc6039771a3bdfa2ff132000710e85a.jpg" style="zoom: 50%;" />
+    <content><![CDATA[<img data-src="https://i.loli.net/2021/08/17/5ukKbHUPmwVdvgt.jpg" style="zoom: 50%;" />
 
 <p><strong>如何分析、统计算法的执行效率和资源消耗？</strong></p>
 <p>我们都知道，数据结构和算法本身解决的是“快”和“省”的问题，即如何让代码运行得更快，如何让代码更省存储空间。所以，执行效率是算法一个非常重要的考量指标。那如何来衡量你编写的算法代码的执行效率呢？这里就要用到我们今天要讲的内容：时间、空间复杂度分析。</p>
@@ -1702,7 +1739,7 @@
 
 
 <hr>
-<img data-src="https://static001.geekbang.org/resource/image/9e/ee/9efe0a80fac815101324e1d4de1e49ee.jpg" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/UKy5b2THVPStiaG.jpg" style="zoom:50%;" />
 
 <p><strong>浅析最好、最坏、平均、均摊时间复杂度</strong></p>
 <p>同一段代码，在不同输入的情况下，复杂度量级有可能是不一样的由此区分出四个复杂度方面的分析，<strong>最好情况时间复杂度</strong>（best case time complexity）、<strong>最坏情况时间复杂度</strong>（worst case time complexity）、<strong>平均情况时间复杂度</strong>（average case time complexity）、<strong>均摊时间复杂度</strong>（amortized time complexity）</p>
@@ -1712,14 +1749,14 @@
 <h3 id="最好情况时间复杂度"><a href="#最好情况时间复杂度" class="headerlink" title="最好情况时间复杂度"></a>最好情况时间复杂度</h3><p>在最理想的情况下，执行这段代码的时间复杂度，即 O(1)</p>
 <h3 id="最坏情况时间复杂度"><a href="#最坏情况时间复杂度" class="headerlink" title="最坏情况时间复杂度"></a>最坏情况时间复杂度</h3><p>在最糟糕的情况下，执行这段代码的时间复杂度，即 O(n)</p>
 <h3 id="平均情况时间复杂度"><a href="#平均情况时间复杂度" class="headerlink" title="平均情况时间复杂度"></a>平均情况时间复杂度</h3><p>在上面这个例子中，查找变量 x 在数组中位置，有 n+1 种情况：<strong>在数组的 0~n-1 位置中</strong>和<strong>不在数组#中</strong>，同时，还要考虑每种情况发生的概率，最终计算过程为：</p>
-<img data-src="https://static001.geekbang.org/resource/image/36/7f/36c0aabdac69032f8a43368f5e90c67f.jpg?wh=718*214" style="zoom: 50%;" />
+<img data-src="https://i.loli.net/2021/08/17/tqSKWINGvD2PTUa.jpg" style="zoom: 50%;" />
 
 <p>这个值在概率论中称为<strong>加权平均值</strong>，也叫做期望值，所以平均时间复杂度的全称应该叫<strong>加权平均时间复杂度</strong>或者期望时间复杂度。用大 O 表示法来表示，去掉系数和常量，加权平均时间复杂度仍然是 O(n)。</p>
 <h3 id="均摊时间复杂度"><a href="#均摊时间复杂度" class="headerlink" title="均摊时间复杂度"></a>均摊时间复杂度</h3><p>首先，均摊时间复杂度就是一种特殊的平均时间复杂度。</p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; array表示一个长度为n的数组</span><br><span class="line">&#x2F;&#x2F; 代码中的array.length就等于n</span><br><span class="line">int[] array &#x3D; new int[n];</span><br><span class="line">int count &#x3D; 0;</span><br><span class="line"></span><br><span class="line">void insert(int val) &#123;</span><br><span class="line">   if (count &#x3D;&#x3D; array.length) &#123;</span><br><span class="line">      int sum &#x3D; 0;</span><br><span class="line">      for (int i &#x3D; 0; i &lt; array.length; ++i) &#123;</span><br><span class="line">         sum &#x3D; sum + array[i];</span><br><span class="line">      &#125;</span><br><span class="line">      array[0] &#x3D; sum;</span><br><span class="line">      count &#x3D; 1;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   array[count] &#x3D; val;</span><br><span class="line">   ++count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>此例中平均时间复杂度为：</p>
-<img data-src="https://static001.geekbang.org/resource/image/6d/ed/6df62366a60336d9de3bc34f488d8bed.jpg?wh=1142*156" style="zoom:50%;" />
+<img data-src="https://i.loli.net/2021/08/17/L8DvC2AhO3PwMTj.jpg" style="zoom:50%;" />
 
 <p>这里引入<strong>摊还分析法</strong>，每一次 O(n) 的插入操作，都会跟着 n-1 次 O(1) 的插入操作，所以把耗时多的那次操作均摊到接下来的 n-1 次耗时少的操作上，均摊下来，这一组连续的操作的均摊时间复杂度就是 O(1)。这就是均摊分析的大致思路，得到的就是均摊时间复杂度。</p>
 <p>两个条件满足时使用：1）代码在绝大多数情况下是低级别复杂度，只有极少数情况是高级别复杂度；2）低级别和高级别复杂度出现具有时序规律。均摊结果一般都等于低级别复杂度。</p>
