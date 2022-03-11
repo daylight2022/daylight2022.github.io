@@ -545,13 +545,6 @@
   </url>
   
   <url>
-    <loc>https://hyacinth.fit/tags/Skill/</loc>
-    <lastmod>2022-03-11</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://hyacinth.fit/tags/Hexo/</loc>
     <lastmod>2022-03-11</lastmod>
     <changefreq>weekly</changefreq>
@@ -560,6 +553,13 @@
   
   <url>
     <loc>https://hyacinth.fit/tags/NexT/</loc>
+    <lastmod>2022-03-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://hyacinth.fit/tags/Skill/</loc>
     <lastmod>2022-03-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -610,14 +610,14 @@
   </url>
   
   <url>
-    <loc>https://hyacinth.fit/categories/Excel/</loc>
+    <loc>https://hyacinth.fit/categories/Web/</loc>
     <lastmod>2022-03-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://hyacinth.fit/categories/Web/</loc>
+    <loc>https://hyacinth.fit/categories/Excel/</loc>
     <lastmod>2022-03-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
