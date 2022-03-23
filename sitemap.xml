@@ -540,13 +540,6 @@
   </url>
   
   <url>
-    <loc>https://speedpromise.github.io/tags/Skill/</loc>
-    <lastmod>2022-03-23</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
     <loc>https://speedpromise.github.io/tags/Tools/</loc>
     <lastmod>2022-03-23</lastmod>
     <changefreq>weekly</changefreq>
@@ -561,7 +554,7 @@
   </url>
   
   <url>
-    <loc>https://speedpromise.github.io/tags/LeetCode/</loc>
+    <loc>https://speedpromise.github.io/tags/Skill/</loc>
     <lastmod>2022-03-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -576,6 +569,13 @@
   
   <url>
     <loc>https://speedpromise.github.io/tags/NexT/</loc>
+    <lastmod>2022-03-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://speedpromise.github.io/tags/LeetCode/</loc>
     <lastmod>2022-03-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -619,14 +619,14 @@
   </url>
   
   <url>
-    <loc>https://speedpromise.github.io/categories/Excel/</loc>
+    <loc>https://speedpromise.github.io/categories/Favorite/</loc>
     <lastmod>2022-03-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://speedpromise.github.io/categories/Favorite/</loc>
+    <loc>https://speedpromise.github.io/categories/Excel/</loc>
     <lastmod>2022-03-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
