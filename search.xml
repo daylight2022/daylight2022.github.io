@@ -3,7 +3,8 @@
   <entry>
     <title>Webug 4.0 笔记</title>
     <url>/archives/9679350.html</url>
-    <content><![CDATA[<span id="more"></span>
+    <content><![CDATA[<p>Webug </p>
+<span id="more"></span>
 
 <h3 id="显错注入"><a href="#显错注入" class="headerlink" title="显错注入"></a>显错注入</h3><p>注入点<br><code>control/sqlinject/manifest_error.php?id=1</code></p>
 <p>判断注入点</p>
