@@ -1,9 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Vue ToDo 项目实战(1)：环境搭建和项目分析</title>
+    <url>/archives/23a0d725.html</url>
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/28/wXcGyP5xdV6Bi83.png"></p>
+<span id="more"></span>
+
+<h2 id="一、环境搭建"><a href="#一、环境搭建" class="headerlink" title="一、环境搭建"></a>一、环境搭建</h2><h3 id="1-1-安装-node"><a href="#1-1-安装-node" class="headerlink" title="1.1 安装 node"></a>1.1 安装 node</h3><p>前往 <a href="https://nodejs.org/en/">Node.js 官网</a>下载 LTS 版，即 长期支持稳定版，下载安装后命令行输入<code>node -v</code>，若出现版本号说明安装成功</p>
+<p><img data-src="https://s2.loli.net/2022/03/28/7lsTt82OoIvajK9.png"></p>
+<h3 id="1-2-选用淘宝-npm-镜像"><a href="#1-2-选用淘宝-npm-镜像" class="headerlink" title="1.2 选用淘宝 npm 镜像"></a>1.2 选用淘宝 npm 镜像</h3><p>因为网络墙限制，国内直接访问 npm 官方镜像不稳定，建议将源换成淘宝源，与官方服务 10 分钟同步一次。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 1.全局替换源</span></span><br><span class="line">npm config set registry https:<span class="comment">//registry.npm.taobao.org</span></span><br><span class="line"><span class="comment">// 2.临时使用</span></span><br><span class="line">npm install [dependency] --registry https:<span class="comment">//registry.npm.taobao.org</span></span><br><span class="line"><span class="comment">// 3.使用 cnpm，淘宝下载 npm 模块的工具</span></span><br><span class="line">npm install cnpm -g --registry=https:<span class="comment">//registry.npm.taobao.org</span></span><br><span class="line"><span class="comment">// 4.使用 nrm 工具灵活管理</span></span><br><span class="line">npm install -g nrm</span><br><span class="line">nrm ls <span class="comment">// 查看源</span></span><br><span class="line">nrm use taobao</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-3-安装-vue-cli"><a href="#1-3-安装-vue-cli" class="headerlink" title="1.3 安装 vue-cli"></a>1.3 安装 vue-cli</h3><p>vue-cli 是 vue 的项目构建工具，帮助快速构建 Vue 项目，详情见<a href="https://cli.vuejs.org/zh/index.html">文档</a></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">npm install -g vue-cli</span><br></pre></td></tr></table></figure>
+
+<p>vue 提供了一些<a href="https://github.com/vuejs-templates">基础项目模板</a>，使用命令为</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vue init &lt;template-name&gt; &lt;project-name&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这里选择 webpack</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vue init webpack vue-todos</span><br></pre></td></tr></table></figure>
+
+<p>命令会提示修改项目名称、作者等信息，回车跳过即可，其中的 Eslint 和 test 测试都选 no，简化项目配置，学习重点。</p>
+<h3 id="1-4-启动项目"><a href="#1-4-启动项目" class="headerlink" title="1.4 启动项目"></a>1.4 启动项目</h3><p>安装依赖后，启动项目，浏览器输 <code>http://localhost:8080/#/</code>查看效果</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">cd vue-todos</span><br><span class="line">npm install</span><br><span class="line">npm run dev</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="二、项目分析"><a href="#二、项目分析" class="headerlink" title="二、项目分析"></a>二、项目分析</h2><h3 id="2-1-需求分析"><a href="#2-1-需求分析" class="headerlink" title="2.1 需求分析"></a>2.1 需求分析</h3><p>根据原型设计稿，分析需求</p>
+<blockquote>
+<p>左边待办列表项称为待办列表项，右边内容部分为待办事项</p>
+</blockquote>
+<ul>
+<li>查看待办列表项、待办事项</li>
+<li>新增、修改、删除、锁定待办列表项</li>
+<li>新增、修改、删除待办事项</li>
+<li>未完成待办事项计数</li>
+<li>…</li>
+</ul>
+<h3 id="2-2-数据分析"><a href="#2-2-数据分析" class="headerlink" title="2.2 数据分析"></a>2.2 数据分析</h3><p><strong>显示数据</strong></p>
+<ul>
+<li>待办列表项标题</li>
+<li>待办事项内容</li>
+<li>未完成待办事项数目</li>
+</ul>
+<p><strong>隐式数据</strong></p>
+<ul>
+<li>待办列表项——锁图标</li>
+<li>待办列表项——删除图标</li>
+<li>待办列表项——唯一标识(id)</li>
+<li>待办事项——删除图标</li>
+<li>待办事项——完成状态</li>
+</ul>
+<p>可得出单条待办列表应该有以下数据：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="built_in">id</span>: String,  // 唯一标识</span><br><span class="line">  title: String,  // 标题</span><br><span class="line">  count: Number,  // 未完成待办项数目</span><br><span class="line">  isDelete: Boolean,  // 是否删除</span><br><span class="line">  locked: Boolean,  // 是否锁定</span><br><span class="line">  record: [  // 待办事项</span><br><span class="line">    &#123;</span><br><span class="line">      text: String,  // 文字内容</span><br><span class="line">      isDelete: Boolean,  // 是否删除</span><br><span class="line">      checked: Boolean  // 是否完成</span><br><span class="line">    &#125; </span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-api-分析"><a href="#2-3-api-分析" class="headerlink" title="2.3 api 分析"></a>2.3 api 分析</h3><p>从用户产生行为入手，进入页面后，需要看到什么内容和执行什么操作。</p>
+<ul>
+<li>进入页面，查看待办项列表</li>
+<li>点击新增内容区域，新增一个待办项</li>
+<li>点击一个待办列表项，查看待办事项具体内容</li>
+<li>点击修改待办事项标题</li>
+<li>点击删除待办事项</li>
+<li>锁定、解锁待办列表</li>
+<li>点击加号，新增待办项</li>
+<li>点击待办事项，修改内容</li>
+<li>点击已完成按钮，修改待办项状态</li>
+<li>…</li>
+</ul>
+<p>由此进一步抽取需要的 api 接口</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">api: <span class="regexp">/todo/</span>list (get)</span><br><span class="line">params: &#123;&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 待办列表</span></span><br><span class="line"><span class="comment"> * 点击左边列表项，左边显示详细待办项内容</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">data: [</span><br><span class="line">  &#123;</span><br><span class="line">    id: <span class="built_in">String</span>,  <span class="comment">// 唯一标识</span></span><br><span class="line">    title: <span class="built_in">String</span>,  <span class="comment">// 标题</span></span><br><span class="line">    count: <span class="built_in">Number</span>,  <span class="comment">// 未完成待办数目</span></span><br><span class="line">    locked: <span class="built_in">Boolean</span>,  <span class="comment">// 是否锁定</span></span><br><span class="line">  &#125;,</span><br><span class="line">  ...</span><br><span class="line">]</span><br><span class="line">----------------</span><br><span class="line">api:  <span class="regexp">/todo/</span>addTodo (post)</span><br><span class="line">params: &#123;&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 新增待办列表项</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">data : &#123;&#125;</span><br><span class="line">----------------</span><br><span class="line">api: <span class="regexp">/todo/</span>listId  (get)</span><br><span class="line">params : &#123;<span class="attr">id</span> : xxx&#125; <span class="comment">// 待办项 id</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 查询待办项</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"> data : &#123;</span><br><span class="line"> id: <span class="built_in">String</span>,  </span><br><span class="line"> titie: <span class="built_in">String</span>, </span><br><span class="line"> count: <span class="built_in">Number</span>  </span><br><span class="line"> isDelete: <span class="built_in">Boolean</span>, </span><br><span class="line"> locked: <span class="built_in">Boolean</span>, </span><br><span class="line"> record : [  </span><br><span class="line">    text: <span class="built_in">String</span>,  </span><br><span class="line">    isDelete: <span class="built_in">Boolean</span>, </span><br><span class="line">    checked: <span class="built_in">Boolean</span></span><br><span class="line"> &#125;</span><br><span class="line">----------------</span><br><span class="line">api: <span class="regexp">/todo/</span>editTodo (post)</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 待办列表项修改，删除，锁定</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">params: &#123;</span><br><span class="line"> id: <span class="built_in">String</span>,  </span><br><span class="line"> titie: <span class="built_in">String</span>, </span><br><span class="line"> isDelete: <span class="built_in">Boolean</span>, </span><br><span class="line"> locked: <span class="built_in">Boolean</span></span><br><span class="line">&#125;</span><br><span class="line">data ： &#123;&#125;</span><br><span class="line">----------------</span><br><span class="line">api: <span class="regexp">/todo/</span>addRecord (post)</span><br><span class="line">params: &#123;&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 新增待办项</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">data ： &#123;&#125;</span><br><span class="line">----------------</span><br><span class="line">api: <span class="regexp">/todo/</span>editRecord (post)</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* 待办项修改、删除、状态更改</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">params: &#123;</span><br><span class="line">    text: <span class="built_in">String</span>,</span><br><span class="line">    isDelete: <span class="built_in">Boolean</span>, </span><br><span class="line">    checked: <span class="built_in">Boolean</span></span><br><span class="line">&#125;</span><br><span class="line">data ： &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-组件分析"><a href="#2-4-组件分析" class="headerlink" title="2.4 组件分析"></a>2.4 组件分析</h3><p>Vue 组件可分为以下 4 种：</p>
+<ul>
+<li>接入型，比如说一个容器组件，它里面包含了其他的组件，它本身只承担一个布局容器的作用</li>
+<li>展示型，纯展示型的数据，它能接收数据，展示出来，但是无法与用用户进行交互</li>
+<li>交互型，比如各类加强版的表单组件，通常强调复用</li>
+<li>功能型，比如 <code>&lt;router-view&gt;</code>，<code>&lt;transition&gt;</code>，作为一种扩展、抽象机制存在。</li>
+</ul>
+<p>结合原型设计图，可以划分组件为：</p>
+<ul>
+<li>App 组件</li>
+<li>布局组件，包含其他组件</li>
+<li>左边的标签列表组件（列表和新增按钮）</li>
+<li>右边的待办内容组件，分为上半部分标签列表操作和待办项内容展示</li>
+<li>待办事项单独成一个组件，循环使用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">app.vue   &#x2F;&#x2F; 最外层根组件 接入型</span><br><span class="line">layouts.vue  &#x2F;&#x2F; 布局组件  接入型 接入其他组件</span><br><span class="line">todos.vue  &#x2F;&#x2F; 左侧列表    交互型组件</span><br><span class="line">lists.vue  &#x2F;&#x2F; 右侧内容    交互型组件</span><br><span class="line">item.vue  &#x2F;&#x2F; 待办单项组件   交互型组件</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Vue</category>
+      </categories>
+      <tags>
+        <tag>项目</tag>
+        <tag>Vue</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Electron 安装失败：Electron failed to install correctly</title>
+    <url>/archives/63270a97.html</url>
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/wqWiPoAJhDH37jI.png"></p>
+<span id="more"></span>
+
+<h3 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h3><p>根据 ELectron 官网教程运行 Demo 过程中遇到 Electron 安装失败的问题，具体报错如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">&#x27;Electron failed to install correctly, please delete node_modules/electron and try installing again&#x27;</span>)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<h3 id="原因分析"><a href="#原因分析" class="headerlink" title="原因分析"></a>原因分析</h3><p> 安装 Electron 时由于网络访问限制问题，会造成部分文件丢失，但 npm 不会报错，具体在<code>node_modules/electron/ </code>下少了<code>path.txt</code>和<code>dist</code>，导致运行出错，所以需要去下载对应的文件才行。</p>
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p>首先将 npm 源改 为taobao 源</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">npm config set registry https:<span class="comment">//registry.npm.taobao.org</span></span><br></pre></td></tr></table></figure>
+
+<p>修改项目文件夹下 <code>node_modules/[@electron](https://github.com/electron)/get/dist/cjs/artifact-utils.js</code> </p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> path = mirrorVar(<span class="string">&#x27;customDir&#x27;</span>, opts, details.version).replace(<span class="string">&#x27;&#123;&#123; version &#125;&#125;&#x27;</span>, details.version.replace(<span class="regexp">/^v/</span>, <span class="string">&#x27;&#x27;</span>)); </span><br><span class="line"><span class="comment">// 注释上面这行，改为以下内容</span></span><br><span class="line"><span class="keyword">const</span> path = details.version.replace(<span class="regexp">/^v/</span>,<span class="string">&#x27;&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这一步主要是处理淘宝源的路径中没有v，原因在于，electron 在 node install.js 里面默认生成的下载的文件路径是这个：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">https:<span class="comment">//npm.taobao.org/mirrors/electron/v8.0.2/electron-v8.0.2-win32-x64.zip</span></span><br></pre></td></tr></table></figure>
+
+<p>而淘宝源里面的这个资源的路径是这个：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">https:<span class="comment">//npm.taobao.org/mirrors/electron/8.0.2/electron-v8.0.2-win32-x64.zip</span></span><br></pre></td></tr></table></figure>
+
+<p>接着到<code>node_modules/electron</code>目录下，运行<code>node install.js</code>，就会下载缺失的包。</p>
+]]></content>
+      <categories>
+        <category>Electron</category>
+      </categories>
+      <tags>
+        <tag>Electron</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Webug 4.0 笔记</title>
     <url>/archives/9679350.html</url>
-    <content><![CDATA[<p>Webug </p>
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/9oesZAUYxqSEw5F.png"></p>
 <span id="more"></span>
 
 <h3 id="显错注入"><a href="#显错注入" class="headerlink" title="显错注入"></a>显错注入</h3><p>注入点<br><code>control/sqlinject/manifest_error.php?id=1</code></p>
@@ -216,8 +342,7 @@
   <entry>
     <title>爬虫笔记十 -- 模拟登录</title>
     <url>/archives/ad504db1.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/03/05/iplued3mBL6YUME.png" style="zoom: 67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/AdlUeT3QpzktrEh.png"></p>
 <p>很多情况下，网站的一些数据都需要登录才能查看，爬取过程中也需要实现模拟登录的机制，主要分为两种模式，一种是基于 Session 和 Cookie 的模拟登录，一种是基于 JWT(JSON Web Token) 的模拟登录。</p>
 <span id="more"></span>
 
@@ -261,8 +386,7 @@
   <entry>
     <title>爬虫笔记九 -- 代理池的搭建及实战应用</title>
     <url>/archives/a900817c.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/03/02/1xVdOgkM3P5HBRX.png" style="zoom:67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/AdlUeT3QpzktrEh.png"></p>
 <p>一些网站服务器会检测某个 IP 在单位时间内的请求次数，如果超过了指定的阈值，会直接拒绝服务。本章介绍代理池的搭建方法，解决爬虫封 IP 的烦恼。</p>
 <span id="more"></span>
 
@@ -343,8 +467,7 @@
   <entry>
     <title>爬虫笔记八 -- 验证码的识别</title>
     <url>/archives/410e6558.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/02/15/2z4tLguB3OP8nN6.png" style="zoom:67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/AdlUeT3QpzktrEh.png"></p>
 <p>本章学习验证码的识别，不同验证码的识别方式和思路有所不同，有的用图像处理库即可，有的则需要借助深度学习技术，还有的需要借助一些工具和平台完成，学完后要进行举一反三，灵活应对不同场景。</p>
 <span id="more"></span>
 
@@ -496,8 +619,7 @@
   <entry>
     <title>爬虫笔记七 -- JavaScript 动态渲染页面爬取</title>
     <url>/archives/d1c41f0f.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/02/15/MUcb8kYIRaP21gN.png" style="zoom: 67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/AdlUeT3QpzktrEh.png"></p>
 <p>有些场景，比如 Ajax 接口中有加密参数或是像 ECharts 这种经过 Js 计算生成的页面，很难去爬取和分析规律，本章我们来了解一种技术，归纳为“所见即所爬”，我们可以直接模拟浏览器运行，然后爬取数据。</p>
 <span id="more"></span>
 
@@ -711,8 +833,7 @@
   <entry>
     <title>爬虫笔记六 -- 异步爬虫</title>
     <url>/archives/57744bfb.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/02/15/MUcb8kYIRaP21gN.png" style="zoom: 67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/AdlUeT3QpzktrEh.png"></p>
 <p>爬虫是 IO 密集型任务，当使用 requests 库爬虫某个站点，发出请求后必须等待网站返回响应，才能继续运行，那有没有可以优化的方案呢？本章来了解一下异步爬虫的概念。</p>
 <span id="more"></span>
 
@@ -777,8 +898,7 @@
   <entry>
     <title>爬虫笔记五 -- Ajax 数据爬取</title>
     <url>/archives/4ca1a587.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/02/22/xCpa2HQnmMqcX3P.png" style="zoom: 67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/AdlUeT3QpzktrEh.png"></p>
 <p>现在越来越多的页面数据都是异步加载的，原始页面开始不会包含某些数据，等原始页面加载完后，再向服务器通过 Ajax 请求后获取呈现的，本章我们就来认识一下 Ajax。</p>
 <span id="more"></span>
 
@@ -803,8 +923,7 @@
   <entry>
     <title>爬虫笔记四 -- 数据的存储</title>
     <url>/archives/39ed07bf.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/02/15/2z4tLguB3OP8nN6.png" style="zoom:67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/AdlUeT3QpzktrEh.png"></p>
 <p>解析库解析出数据后，可以将数据保存文本文件，如 TXT、JSON、CSV 等，也可以将数据保存到数据库 MySQL，非关系型数据库 MongoDB、Redis 等，另外，还可以直接把数据存储到搜索引擎（如 Elasticsearch）中，以便检索和查看。</p>
 <span id="more"></span>
 
@@ -992,8 +1111,7 @@
   <entry>
     <title>爬虫笔记三 -- 解析库的使用</title>
     <url>/archives/79659fc4.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/02/15/MUcb8kYIRaP21gN.png" style="zoom: 67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/AdlUeT3QpzktrEh.png"></p>
 <p>本章我们了解几种解析库的使用，包括 XPath、Beautiful Soup、PyQuery、Parsel，实际可根据场景和个人使用习惯来选择。</p>
 <span id="more"></span>
 
@@ -1169,8 +1287,7 @@
   <entry>
     <title>爬虫笔记二 -- 基本库的使用</title>
     <url>/archives/50c99347.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/02/15/2z4tLguB3OP8nN6.png" style="zoom:67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/AdlUeT3QpzktrEh.png"></p>
 <p>本章我们了解基础的 HTTP 库，如 urllib、requests、httpx等，最后一起来完成对一个静态网站的爬取案例实战。</p>
 <span id="more"></span>
 
@@ -1468,8 +1585,7 @@
   <entry>
     <title>爬虫笔记一 -- 爬虫基础</title>
     <url>/archives/fc84b201.html</url>
-    <content><![CDATA[<img data-src="https://s2.loli.net/2022/02/15/MUcb8kYIRaP21gN.png" style="zoom: 67%;" />
-
+    <content><![CDATA[<p><img data-src="https://s2.loli.net/2022/03/25/CVEnaLS48xYeWKA.png"></p>
 <p>本章我们会详细了解 HTTP 原理、爬虫的基本原理、Cookie的基本原理、多进程和多线程的基本原理等，有助于我们更好理解和编写网络爬虫程序。</p>
 <span id="more"></span>
 
@@ -5041,7 +5157,7 @@
     <title>Python 爬取百度文库数据</title>
     <url>/archives/62201.html</url>
     <content><![CDATA[<p>使用 python3 抓取百度文库特点文章数据，只对可查看的内容有效。通过分析查找传输内容数据的 js 链接，而后请求即可</p>
-<img data-src="https://i.loli.net/2021/06/07/igN6U5TuVYI7wrC.png"  />
+<img data-src="C:\Users\Pro\Desktop\igN6U5TuVYI7wrC.png"  />
 
 <span id="more"></span>
 
